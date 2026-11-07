@@ -1,0 +1,73 @@
+import type { MuscleId } from './data/muscles';
+
+export type ExerciseType = 'weight' | 'bodyweight' | 'timed' | 'machine';
+
+export interface ExerciseDefaults {
+  sets: number;
+  reps?: number;
+  seconds?: number;
+  weight?: number;
+}
+
+export interface Exercise {
+  id: string;
+  name: string;
+  type: ExerciseType;
+  equipment: string;
+  /** How the weight is entered, shown as a hint next to the weight field. */
+  weightNote?: string;
+  primary: MuscleId[];
+  secondary: MuscleId[];
+  defaults: ExerciseDefaults;
+}
+
+export interface RoutineItem {
+  exerciseId: string;
+  sets?: number;
+  reps?: number;
+  seconds?: number;
+  weight?: number;
+}
+
+export interface RoutineBlock {
+  superset?: boolean;
+  items: RoutineItem[];
+}
+
+export interface Routine {
+  id: string;
+  name: string;
+  description?: string;
+  blocks: RoutineBlock[];
+}
+
+export interface SetEntry {
+  weight?: number;
+  reps?: number;
+  seconds?: number;
+  done: boolean;
+}
+
+export type ItemStatus = 'pending' | 'done' | 'skipped';
+
+export interface WorkoutItem {
+  id: string;
+  exerciseId: string;
+  status: ItemStatus;
+  sets: SetEntry[];
+}
+
+export interface WorkoutBlock {
+  id: string;
+  superset: boolean;
+  items: WorkoutItem[];
+}
+
+export interface Workout {
+  id: string;
+  routineId?: string;
+  name: string;
+  startedAt: string;
+  finishedAt?: string;
+  blocks: WorkoutBlock[];
+}

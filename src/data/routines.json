@@ -1,0 +1,165 @@
+[
+  {
+    "id": "push",
+    "name": "Push",
+    "description": "Chest, shoulders & triceps",
+    "blocks": [
+      {
+        "items": [
+          {
+            "exerciseId": "barbell-bench-press"
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "incline-dumbbell-press"
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "dumbbell-shoulder-press"
+          }
+        ]
+      },
+      {
+        "superset": true,
+        "items": [
+          {
+            "exerciseId": "lateral-raise"
+          },
+          {
+            "exerciseId": "triceps-pushdown"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pull",
+    "name": "Pull",
+    "description": "Back, rear delts & biceps",
+    "blocks": [
+      {
+        "items": [
+          {
+            "exerciseId": "lat-pulldown"
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "seated-cable-row"
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "one-arm-dumbbell-row"
+          }
+        ]
+      },
+      {
+        "superset": true,
+        "items": [
+          {
+            "exerciseId": "face-pull"
+          },
+          {
+            "exerciseId": "hammer-curl"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "legs",
+    "name": "Legs",
+    "description": "Quads, hamstrings, glutes & calves",
+    "blocks": [
+      {
+        "items": [
+          {
+            "exerciseId": "back-squat"
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "romanian-deadlift"
+          }
+        ]
+      },
+      {
+        "superset": true,
+        "items": [
+          {
+            "exerciseId": "leg-extension"
+          },
+          {
+            "exerciseId": "leg-curl"
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "standing-calf-raise"
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "plank"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "arms",
+    "name": "Arms",
+    "description": "Biceps, triceps & forearms supersets",
+    "blocks": [
+      {
+        "superset": true,
+        "items": [
+          {
+            "exerciseId": "hammer-curl",
+            "sets": 3,
+            "reps": 8,
+            "weight": 10
+          },
+          {
+            "exerciseId": "overhead-triceps-extension"
+          }
+        ]
+      },
+      {
+        "superset": true,
+        "items": [
+          {
+            "exerciseId": "cable-curl"
+          },
+          {
+            "exerciseId": "triceps-pushdown"
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "wrist-curl"
+          }
+        ]
+      }
+    ]
+  }
+]

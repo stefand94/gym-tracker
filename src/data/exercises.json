@@ -1,0 +1,880 @@
+[
+  {
+    "id": "barbell-bench-press",
+    "name": "Barbell bench press",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "primary": [
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts",
+      "triceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 40
+    }
+  },
+  {
+    "id": "dumbbell-bench-press",
+    "name": "Dumbbell bench press",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts",
+      "triceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 16
+    }
+  },
+  {
+    "id": "incline-dumbbell-press",
+    "name": "Incline dumbbell press",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "chest",
+      "frontDelts"
+    ],
+    "secondary": [
+      "triceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 14
+    }
+  },
+  {
+    "id": "dumbbell-fly",
+    "name": "Dumbbell fly",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 8
+    }
+  },
+  {
+    "id": "cable-crossover",
+    "name": "Cable crossover",
+    "type": "weight",
+    "equipment": "Cable",
+    "weightNote": "per side",
+    "primary": [
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 10
+    }
+  },
+  {
+    "id": "chest-press-machine",
+    "name": "Chest press machine",
+    "type": "machine",
+    "equipment": "Machine",
+    "primary": [
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts",
+      "triceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 40
+    }
+  },
+  {
+    "id": "push-up",
+    "name": "Push-up",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "primary": [
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts",
+      "triceps",
+      "abs"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 15
+    }
+  },
+  {
+    "id": "dip",
+    "name": "Dip",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "primary": [
+      "triceps",
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10
+    }
+  },
+  {
+    "id": "overhead-press",
+    "name": "Overhead press",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "primary": [
+      "frontDelts"
+    ],
+    "secondary": [
+      "sideDelts",
+      "triceps",
+      "traps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 30
+    }
+  },
+  {
+    "id": "dumbbell-shoulder-press",
+    "name": "Dumbbell shoulder press",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "frontDelts"
+    ],
+    "secondary": [
+      "sideDelts",
+      "triceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 12
+    }
+  },
+  {
+    "id": "lateral-raise",
+    "name": "Lateral raise",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "sideDelts"
+    ],
+    "secondary": [
+      "traps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 6
+    }
+  },
+  {
+    "id": "rear-delt-fly",
+    "name": "Rear delt fly",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "rearDelts"
+    ],
+    "secondary": [
+      "upperBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 6
+    }
+  },
+  {
+    "id": "face-pull",
+    "name": "Face pull",
+    "type": "weight",
+    "equipment": "Cable",
+    "primary": [
+      "rearDelts"
+    ],
+    "secondary": [
+      "upperBack",
+      "traps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 15,
+      "weight": 15
+    }
+  },
+  {
+    "id": "dumbbell-shrug",
+    "name": "Dumbbell shrug",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "traps"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 20
+    }
+  },
+  {
+    "id": "deadlift",
+    "name": "Deadlift",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "primary": [
+      "hamstrings",
+      "glutes",
+      "lowerBack"
+    ],
+    "secondary": [
+      "traps",
+      "forearms",
+      "quads",
+      "upperBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 5,
+      "weight": 60
+    }
+  },
+  {
+    "id": "barbell-row",
+    "name": "Barbell row",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "primary": [
+      "lats",
+      "upperBack"
+    ],
+    "secondary": [
+      "rearDelts",
+      "biceps",
+      "lowerBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 40
+    }
+  },
+  {
+    "id": "one-arm-dumbbell-row",
+    "name": "One-arm dumbbell row",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "lats",
+      "upperBack"
+    ],
+    "secondary": [
+      "rearDelts",
+      "biceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 18
+    }
+  },
+  {
+    "id": "lat-pulldown",
+    "name": "Lat pulldown",
+    "type": "machine",
+    "equipment": "Cable",
+    "primary": [
+      "lats"
+    ],
+    "secondary": [
+      "biceps",
+      "upperBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 45
+    }
+  },
+  {
+    "id": "seated-cable-row",
+    "name": "Seated cable row",
+    "type": "machine",
+    "equipment": "Cable",
+    "primary": [
+      "upperBack",
+      "lats"
+    ],
+    "secondary": [
+      "biceps",
+      "rearDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 40
+    }
+  },
+  {
+    "id": "pull-up",
+    "name": "Pull-up",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "primary": [
+      "lats"
+    ],
+    "secondary": [
+      "biceps",
+      "upperBack",
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 6
+    }
+  },
+  {
+    "id": "chin-up",
+    "name": "Chin-up",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "primary": [
+      "lats",
+      "biceps"
+    ],
+    "secondary": [
+      "upperBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 6
+    }
+  },
+  {
+    "id": "back-extension",
+    "name": "Back extension",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "primary": [
+      "lowerBack"
+    ],
+    "secondary": [
+      "glutes",
+      "hamstrings"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12
+    }
+  },
+  {
+    "id": "hammer-curl",
+    "name": "Hammer curl",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "biceps",
+      "forearms"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 10
+    }
+  },
+  {
+    "id": "dumbbell-curl",
+    "name": "Dumbbell curl",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "biceps"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 10
+    }
+  },
+  {
+    "id": "barbell-curl",
+    "name": "Barbell curl",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "primary": [
+      "biceps"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 20
+    }
+  },
+  {
+    "id": "cable-curl",
+    "name": "Cable curl",
+    "type": "weight",
+    "equipment": "Cable",
+    "primary": [
+      "biceps"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 15
+    }
+  },
+  {
+    "id": "triceps-pushdown",
+    "name": "Triceps pushdown",
+    "type": "weight",
+    "equipment": "Cable",
+    "primary": [
+      "triceps"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 20
+    }
+  },
+  {
+    "id": "overhead-triceps-extension",
+    "name": "Overhead triceps extension",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "one dumbbell, both hands",
+    "primary": [
+      "triceps"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 14
+    }
+  },
+  {
+    "id": "skull-crusher",
+    "name": "Skull crusher",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "EZ bar, total weight",
+    "primary": [
+      "triceps"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 20
+    }
+  },
+  {
+    "id": "wrist-curl",
+    "name": "Wrist curl",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "forearms"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 15,
+      "weight": 6
+    }
+  },
+  {
+    "id": "back-squat",
+    "name": "Back squat",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "primary": [
+      "quads",
+      "glutes"
+    ],
+    "secondary": [
+      "hamstrings",
+      "lowerBack",
+      "adductors"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 50
+    }
+  },
+  {
+    "id": "goblet-squat",
+    "name": "Goblet squat",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "one dumbbell",
+    "primary": [
+      "quads",
+      "glutes"
+    ],
+    "secondary": [
+      "adductors",
+      "abs"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 16
+    }
+  },
+  {
+    "id": "leg-press",
+    "name": "Leg press",
+    "type": "machine",
+    "equipment": "Machine",
+    "primary": [
+      "quads",
+      "glutes"
+    ],
+    "secondary": [
+      "hamstrings",
+      "adductors"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 80
+    }
+  },
+  {
+    "id": "romanian-deadlift",
+    "name": "Romanian deadlift",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "primary": [
+      "hamstrings",
+      "glutes"
+    ],
+    "secondary": [
+      "lowerBack",
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 40
+    }
+  },
+  {
+    "id": "walking-lunge",
+    "name": "Walking lunge",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell, reps per leg",
+    "primary": [
+      "quads",
+      "glutes"
+    ],
+    "secondary": [
+      "hamstrings",
+      "adductors",
+      "calves"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 10
+    }
+  },
+  {
+    "id": "bulgarian-split-squat",
+    "name": "Bulgarian split squat",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell, reps per leg",
+    "primary": [
+      "quads",
+      "glutes"
+    ],
+    "secondary": [
+      "hamstrings",
+      "adductors"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 10
+    }
+  },
+  {
+    "id": "leg-extension",
+    "name": "Leg extension",
+    "type": "machine",
+    "equipment": "Machine",
+    "primary": [
+      "quads"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 35
+    }
+  },
+  {
+    "id": "leg-curl",
+    "name": "Leg curl",
+    "type": "machine",
+    "equipment": "Machine",
+    "primary": [
+      "hamstrings"
+    ],
+    "secondary": [
+      "calves"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 30
+    }
+  },
+  {
+    "id": "hip-thrust",
+    "name": "Hip thrust",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "primary": [
+      "glutes"
+    ],
+    "secondary": [
+      "hamstrings",
+      "abductors"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 40
+    }
+  },
+  {
+    "id": "hip-abduction",
+    "name": "Hip abduction machine",
+    "type": "machine",
+    "equipment": "Machine",
+    "primary": [
+      "abductors"
+    ],
+    "secondary": [
+      "glutes"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 15,
+      "weight": 35
+    }
+  },
+  {
+    "id": "hip-adduction",
+    "name": "Hip adduction machine",
+    "type": "machine",
+    "equipment": "Machine",
+    "primary": [
+      "adductors"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 15,
+      "weight": 35
+    }
+  },
+  {
+    "id": "standing-calf-raise",
+    "name": "Standing calf raise",
+    "type": "machine",
+    "equipment": "Machine",
+    "primary": [
+      "calves"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 15,
+      "weight": 40
+    }
+  },
+  {
+    "id": "plank",
+    "name": "Plank",
+    "type": "timed",
+    "equipment": "Bodyweight",
+    "primary": [
+      "abs"
+    ],
+    "secondary": [
+      "obliques",
+      "frontDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "seconds": 45
+    }
+  },
+  {
+    "id": "side-plank",
+    "name": "Side plank",
+    "type": "timed",
+    "equipment": "Bodyweight",
+    "weightNote": "seconds per side",
+    "primary": [
+      "obliques"
+    ],
+    "secondary": [
+      "abs",
+      "abductors"
+    ],
+    "defaults": {
+      "sets": 3,
+      "seconds": 30
+    }
+  },
+  {
+    "id": "hanging-leg-raise",
+    "name": "Hanging leg raise",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "primary": [
+      "abs"
+    ],
+    "secondary": [
+      "obliques",
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10
+    }
+  },
+  {
+    "id": "cable-crunch",
+    "name": "Cable crunch",
+    "type": "weight",
+    "equipment": "Cable",
+    "primary": [
+      "abs"
+    ],
+    "secondary": [
+      "obliques"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 25
+    }
+  },
+  {
+    "id": "russian-twist",
+    "name": "Russian twist",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "primary": [
+      "obliques"
+    ],
+    "secondary": [
+      "abs"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 20
+    }
+  },
+  {
+    "id": "dead-hang",
+    "name": "Dead hang",
+    "type": "timed",
+    "equipment": "Bodyweight",
+    "primary": [
+      "forearms"
+    ],
+    "secondary": [
+      "lats"
+    ],
+    "defaults": {
+      "sets": 3,
+      "seconds": 30
+    }
+  },
+  {
+    "id": "neck-curl",
+    "name": "Neck curl (plate)",
+    "type": "weight",
+    "equipment": "Plate",
+    "primary": [
+      "neck"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 15,
+      "weight": 5
+    }
+  }
+]
