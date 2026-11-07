@@ -23,3 +23,37 @@ export function Sheet({ title, onClose, children, tall }: { title?: string; onCl
     document.body,
   );
 }
+
+/** In-app confirmation (the browser's confirm() is blocked in installed web apps on some phones). */
+export function ConfirmSheet({
+  title,
+  body,
+  confirmLabel,
+  danger,
+  onConfirm,
+  onClose,
+  extra,
+}: {
+  title: string;
+  body?: ReactNode;
+  confirmLabel: string;
+  danger?: boolean;
+  onConfirm: () => void;
+  onClose: () => void;
+  extra?: ReactNode;
+}) {
+  return (
+    <Sheet title={title} onClose={onClose}>
+      {body && <p className="dim" style={{ margin: '0 0 16px', lineHeight: 1.45 }}>{body}</p>}
+      <div className="stack">
+        <button className={'btn btn-block btn-lg ' + (danger ? 'btn-danger-solid' : 'btn-primary')} onClick={onConfirm}>
+          {confirmLabel}
+        </button>
+        {extra}
+        <button className="btn btn-block btn-lg" onClick={onClose}>
+          Keep going
+        </button>
+      </div>
+    </Sheet>
+  );
+}

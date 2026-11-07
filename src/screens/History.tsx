@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { BodyMap } from '../components/BodyMap';
 import { IconBack } from '../components/Icons';
+import { ConfirmSheet } from '../components/Sheet';
 import { getExercise } from '../data/library';
 import { MUSCLE_LABELS, MUSCLE_IDS } from '../data/muscles';
 import { doneSetCount, duration, exerciseCount, fmtDate, fmtSet } from '../lib/format';
@@ -53,6 +55,7 @@ export function HistoryDetail() {
   const [params] = useSearchParams();
   const { state, dispatch } = useStore();
   const nav = useNavigate();
+  const [ask, setAsk] = useState(false);
   const w = state.history.find((x) => x.id === id);
   if (!w) return <div className="empty">Workout not found.</div>;
   const load = workoutLoad(w, getExercise);
@@ -133,15 +136,23 @@ export function HistoryDetail() {
       <button
         className="btn btn-ghost btn-danger btn-block"
         style={{ marginTop: 20 }}
-        onClick={() => {
-          if (confirm('Delete this workout? This also removes it from your GitHub data repo.')) {
-            dispatch({ type: 'delete', id: w.id, path: workoutPath(w) });
-            nav('/history', { replace: true });
-          }
-        }}
+        onClick={() => setAsk(true)}
       >
         Delete workout
       </button>
+      {ask && (
+        <ConfirmSheet
+          title="Delete this workout?"
+          body="It's also removed from your GitHub data repo."
+          confirmLabel="Delete workout"
+          danger
+          onConfirm={() => {
+            dispatch({ type: 'delete', id: w.id, path: workoutPath(w) });
+            nav('/history', { replace: true });
+          }}
+          onClose={() => setAsk(false)}
+        />
+      )}
     </div>
   );
 }

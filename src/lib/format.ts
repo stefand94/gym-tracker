@@ -1,4 +1,4 @@
-import type { Exercise, SetEntry, Workout } from '../types';
+import type { Exercise, SetEntry, Workout, WorkoutItem } from '../types';
 
 export function fmtDate(iso: string, opts: Intl.DateTimeFormatOptions = { weekday: 'short', day: 'numeric', month: 'short' }) {
   return new Date(iso).toLocaleDateString(undefined, opts);
@@ -53,4 +53,21 @@ export function exerciseCount(w: Workout): number {
   let n = 0;
   for (const b of w.blocks) for (const i of b.items) if (i.status !== 'skipped' && i.sets.some((s) => s.done)) n++;
   return n;
+}
+
+/** One-line summary of an exercise's sets, e.g. "3 × 10 · 55 kg" or "3 sets · top 60 kg". */
+export function itemSummary(ex: Exercise | undefined, item: WorkoutItem): string {
+  if (item.status === 'skipped') return 'Skipped';
+  const done = item.sets.filter((s) => s.done);
+  const sets = done.length ? done : item.sets;
+  const n = sets.length;
+  const same = (k: 'weight' | 'reps' | 'seconds') => sets.every((s) => s[k] === sets[0][k]);
+  const top = Math.max(0, ...sets.map((s) => s.weight ?? 0));
+  if (ex?.type === 'timed') {
+    const t = same('seconds') ? `${n} × ${fmtNum(sets[0].seconds)} s` : `${n} sets · best ${fmtNum(Math.max(...sets.map((s) => s.seconds ?? 0)))} s`;
+    return top ? `${t} · +${fmtNum(top)} kg` : t;
+  }
+  const reps = same('reps') ? `${n} × ${fmtNum(sets[0].reps)}` : `${n} sets`;
+  if (ex?.type === 'bodyweight') return top ? `${reps} · +${fmtNum(top)} kg` : reps;
+  return same('weight') ? `${reps} · ${fmtNum(sets[0].weight)} kg` : `${reps} · top ${fmtNum(top)} kg`;
 }

@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BodyMap } from '../components/BodyMap';
+import { IconSettings } from '../components/Icons';
+import { ConfirmSheet } from '../components/Sheet';
 import { getExercise, ROUTINES } from '../data/library';
 import { doneSetCount, fmtDate, relDay } from '../lib/format';
 import { loadSince, workoutLoad } from '../lib/muscleLoad';
@@ -35,18 +38,24 @@ export function Home() {
   const recent = finishedNewestFirst(state.history).slice(0, 3);
   const week = loadSince(state.history, 7, getExercise);
 
-  const start = (w: Workout) => {
-    if (state.active && !confirm('You have a workout in progress. Discard it and start a new one?')) return;
+  const [pending, setPending] = useState<Workout | null>(null);
+  const begin = (w: Workout) => {
     dispatch({ type: 'start', workout: w });
     nav('/workout');
   };
+  const start = (w: Workout) => (state.active ? setPending(w) : begin(w));
 
   const active = state.active;
   const prog = active ? workoutProgress(active) : null;
 
   return (
     <div>
-      <h1 className="page-title">Gym</h1>
+      <div className="spread title-row">
+        <h1 className="page-title">Gym</h1>
+        <Link to="/settings" className="icon-btn" aria-label="Settings">
+          <IconSettings />
+        </Link>
+      </div>
 
       {active && prog && (
         <Link to="/workout" className="card resume">
@@ -106,6 +115,19 @@ export function Home() {
             ))}
           </div>
         </>
+      )}
+      {pending && (
+        <ConfirmSheet
+          title="Start a new workout?"
+          body={`${state.active?.name ?? 'Your workout'} is still in progress. Starting ${pending.name} discards it.`}
+          confirmLabel={`Discard and start ${pending.name}`}
+          danger
+          onConfirm={() => {
+            setPending(null);
+            begin(pending);
+          }}
+          onClose={() => setPending(null)}
+        />
       )}
     </div>
   );

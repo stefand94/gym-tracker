@@ -11,6 +11,10 @@ import {
   toggleSkip,
   updateSet,
   updateUnticked,
+  updateSetForward,
+  currentBlockIndex,
+  roundComplete,
+  addRound,
   workoutFromRoutine,
   addExercise,
   emptyWorkout,
@@ -19,6 +23,7 @@ import {
 import { lastPerformance } from './prefill';
 import { lastTrained, loadSince, workoutLoad } from './muscleLoad';
 import { epley, metricsFor, series } from './progress';
+import { itemSummary } from './format';
 
 const curl: Exercise = {
   id: 'hammer-curl',
@@ -137,6 +142,28 @@ describe('ticking sets', () => {
     expect(w.blocks[0].items[0].sets.map((s) => s.weight)).toEqual([10, 14, 14]);
   });
 
+  it('changing a set carries forward to later unticked sets only', () => {
+    let w = fresh();
+    const id = itemId(w, 0);
+    w = addSet(w, id);
+    w = toggleSet(w, id, 0);
+    w = toggleSet(w, id, 2);
+    w = updateSetForward(w, id, 1, { weight: 12 });
+    // set 0 is earlier, set 2 is ticked: both keep 10
+    expect(w.blocks[0].items[0].sets.map((s) => s.weight)).toEqual([10, 12, 10, 12]);
+  });
+
+  it('summarises an exercise in one line', () => {
+    let w = fresh();
+    const id = itemId(w, 0);
+    expect(itemSummary(curl, w.blocks[0].items[0])).toBe('3 × 8 · 10 kg');
+    w = updateSet(w, id, 2, { weight: 12 });
+    expect(itemSummary(curl, w.blocks[0].items[0])).toBe('3 × 8 · top 12 kg');
+    expect(itemSummary(plank, w.blocks[1].items[1])).toBe('2 × 45 s');
+    w = toggleSkip(w, id);
+    expect(itemSummary(curl, w.blocks[0].items[0])).toBe('Skipped');
+  });
+
   it('adding a set reopens a completed exercise', () => {
     let w = fresh();
     const id = itemId(w, 0);
@@ -155,6 +182,30 @@ describe('supersets', () => {
     expect(blockComplete(w.blocks[1])).toBe(false);
     w = toggleSkip(w, itemId(w, 1, 1));
     expect(blockComplete(w.blocks[1])).toBe(true);
+  });
+
+  it('tracks the current block and completed rounds', () => {
+    let w = fresh();
+    expect(currentBlockIndex(w)).toBe(0);
+    w = toggleComplete(w, itemId(w, 0));
+    expect(currentBlockIndex(w)).toBe(1);
+    w = toggleSet(w, itemId(w, 1, 0), 0);
+    expect(roundComplete(w.blocks[1], 0)).toBe(false);
+    w = toggleSet(w, itemId(w, 1, 1), 0);
+    expect(roundComplete(w.blocks[1], 0)).toBe(true);
+    // round 2 only exists for push-ups (plank has 2 sets)
+    w = toggleSet(w, itemId(w, 1, 0), 2);
+    expect(roundComplete(w.blocks[1], 2)).toBe(true);
+    w = toggleComplete(w, itemId(w, 1, 0));
+    w = toggleSkip(w, itemId(w, 1, 1));
+    expect(currentBlockIndex(w)).toBe(-1);
+  });
+
+  it('adds a round to every non-skipped exercise', () => {
+    let w = fresh();
+    w = toggleSkip(w, itemId(w, 1, 1));
+    w = addRound(w, w.blocks[1].id);
+    expect(w.blocks[1].items.map((i) => i.sets.length)).toEqual([4, 2]);
   });
 
   it('merges and splits blocks', () => {

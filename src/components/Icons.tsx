@@ -27,3 +27,9 @@ export const IconPlus = () => (
 export const IconBack = () => (
   <svg viewBox="0 0 24 24" {...p}><path d="M15 5l-7 7 7 7" /></svg>
 );
+export const IconTimer = () => (
+  <svg viewBox="0 0 24 24" {...p}><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2.5 2M9 2h6" /></svg>
+);
+export const IconChevronUp = () => (
+  <svg viewBox="0 0 24 24" {...p}><path d="m6 15 6-6 6 6" /></svg>
+);

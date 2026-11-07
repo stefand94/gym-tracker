@@ -17,11 +17,26 @@ export interface SyncState {
   busy: boolean;
 }
 
+export interface Prefs {
+  /** Start a rest countdown when a set is ticked. */
+  rest: boolean;
+  restSeconds: number;
+  /** Countdown tucked into the header button instead of the full bar. */
+  restMini: boolean;
+}
+
+export interface RestState {
+  endsAt: number;
+  total: number;
+}
+
 export interface State {
   history: Workout[];
   active: Workout | null;
   settings: SyncSettings;
   sync: SyncState;
+  prefs: Prefs;
+  rest: RestState | null;
 }
 
 type Action =
@@ -35,9 +50,17 @@ type Action =
   | { type: 'syncStart' }
   | { type: 'syncDone'; completed: QueueOp[]; at: string }
   | { type: 'syncError'; error: string; completed: QueueOp[] }
-  | { type: 'restore'; history: Workout[] };
+  | { type: 'restore'; history: Workout[] }
+  | { type: 'prefs'; prefs: Partial<Prefs> }
+  | { type: 'restStart'; now: number }
+  | { type: 'restAdjust'; seconds: number; now: number }
+  | { type: 'restStop' };
 
 const KEY = 'gym-tracker:v1';
+
+const DEFAULT_PREFS: Prefs = { rest: false, restSeconds: 90, restMini: false };
+const REST_MIN = 15;
+const REST_MAX = 600;
 
 const DEFAULT_SETTINGS: SyncSettings = {
   token: '',
@@ -52,6 +75,8 @@ function load(): State {
     active: null,
     settings: DEFAULT_SETTINGS,
     sync: { queue: [], busy: false },
+    prefs: DEFAULT_PREFS,
+    rest: null,
   };
   try {
     const raw = localStorage.getItem(KEY);
@@ -62,6 +87,8 @@ function load(): State {
       active: saved.active ?? null,
       settings: { ...DEFAULT_SETTINGS, ...saved.settings },
       sync: { queue: saved.sync?.queue ?? [], lastSync: saved.sync?.lastSync, busy: false },
+      prefs: { ...DEFAULT_PREFS, ...saved.prefs },
+      rest: saved.rest ?? null,
     };
   } catch {
     return base;
@@ -88,12 +115,13 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         active: null,
+        rest: null,
         history: [...state.history.filter((w) => w.id !== done.id), done],
         sync: { ...state.sync, queue: enqueue(state.sync.queue, { op: 'put', id: done.id }) },
       };
     }
     case 'discard':
-      return { ...state, active: null };
+      return { ...state, active: null, rest: null };
     case 'delete': {
       const queue = state.sync.queue.filter((q) => q.id !== action.id);
       return {
@@ -134,6 +162,25 @@ function reducer(state: State, action: Action): State {
           error: action.error,
         },
       };
+    case 'prefs':
+      return { ...state, prefs: { ...state.prefs, ...action.prefs }, rest: action.prefs.rest === false ? null : state.rest };
+    case 'restStart': {
+      const total = state.prefs.restSeconds;
+      return { ...state, rest: { endsAt: action.now + total * 1000, total } };
+    }
+    case 'restAdjust': {
+      // Adjusting the running rest also becomes the length used next time.
+      const restSeconds = Math.min(REST_MAX, Math.max(REST_MIN, state.prefs.restSeconds + action.seconds));
+      const rest = state.rest
+        ? {
+            endsAt: Math.max(action.now, state.rest.endsAt + action.seconds * 1000),
+            total: Math.max(REST_MIN, state.rest.total + action.seconds),
+          }
+        : null;
+      return { ...state, rest, prefs: { ...state.prefs, restSeconds } };
+    }
+    case 'restStop':
+      return state.rest ? { ...state, rest: null } : state;
     case 'restore': {
       const known = new Set(state.history.map((w) => w.id));
       const fresh = action.history.filter((w) => w.finishedAt && !known.has(w.id));
@@ -155,10 +202,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined, load);
   useEffect(() => {
     try {
-      const { history, active, settings, sync } = state;
+      const { history, active, settings, sync, prefs, rest } = state;
       localStorage.setItem(
         KEY,
-        JSON.stringify({ history, active, settings, sync: { queue: sync.queue, lastSync: sync.lastSync } }),
+        JSON.stringify({ history, active, settings, prefs, rest, sync: { queue: sync.queue, lastSync: sync.lastSync } }),
       );
     } catch {
       /* storage full or unavailable */

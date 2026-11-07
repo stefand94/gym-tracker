@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { ConfirmSheet } from '../components/Sheet';
 import { fmtDate } from '../lib/format';
 import { testConnection } from '../lib/sync';
 import { useStore } from '../state/store';
@@ -11,6 +12,7 @@ export function Settings({ syncNow }: { syncNow: () => void }) {
   const [repo, setRepo] = useState(`${settings.owner}/${settings.repo}`);
   const [test, setTest] = useState<{ ok: boolean; msg: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [askDisconnect, setAskDisconnect] = useState(false);
 
   const save = async () => {
     const [owner, name] = repo.trim().split('/');
@@ -106,16 +108,25 @@ export function Settings({ syncNow }: { syncNow: () => void }) {
         {connected && (
           <button
             className="btn btn-ghost btn-danger btn-block btn-sm"
-            onClick={() => {
-              if (confirm('Disconnect? Workouts stay on this device but stop syncing.')) {
-                dispatch({ type: 'settings', settings: { token: '' } });
-                setToken('');
-                setTest(null);
-              }
-            }}
+            onClick={() => setAskDisconnect(true)}
           >
             Disconnect
           </button>
+        )}
+        {askDisconnect && (
+          <ConfirmSheet
+            title="Disconnect sync?"
+            body="Workouts stay on this device but stop syncing to GitHub."
+            confirmLabel="Disconnect"
+            danger
+            onConfirm={() => {
+              dispatch({ type: 'settings', settings: { token: '' } });
+              setToken('');
+              setTest(null);
+              setAskDisconnect(false);
+            }}
+            onClose={() => setAskDisconnect(false)}
+          />
         )}
         <details>
           <summary className="small" style={{ fontWeight: 650, cursor: 'pointer' }}>

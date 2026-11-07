@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
-import { IconBody, IconChart, IconHistory, IconHome, IconSettings } from './components/Icons';
+import { IconBody, IconChart, IconHistory, IconHome } from './components/Icons';
 import { Body } from './screens/Body';
 import { HistoryDetail, HistoryList } from './screens/History';
 import { Home } from './screens/Home';
@@ -17,7 +17,6 @@ function Nav() {
     { to: '/body', label: 'Body', icon: <IconBody /> },
     { to: '/progress', label: 'Progress', icon: <IconChart /> },
     { to: '/history', label: 'History', icon: <IconHistory /> },
-    { to: '/settings', label: 'Settings', icon: <IconSettings /> },
   ];
   return (
     <nav className="nav" aria-label="Main">

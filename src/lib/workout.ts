@@ -144,6 +144,14 @@ export function updateSet(w: Workout, itemId: string, setIndex: number, patch: S
   }));
 }
 
+/** Change one set and carry the change forward to the later sets that haven't been ticked yet. */
+export function updateSetForward(w: Workout, itemId: string, setIndex: number, patch: SetPatch): Workout {
+  return mapItem(w, itemId, (i) => ({
+    ...i,
+    sets: i.sets.map((s, idx) => (idx === setIndex || (idx > setIndex && !s.done) ? { ...s, ...patch } : s)),
+  }));
+}
+
 /** Apply a value to every set that hasn't been ticked yet. */
 export function updateUnticked(w: Workout, itemId: string, patch: SetPatch): Workout {
   return mapItem(w, itemId, (i) => ({
@@ -213,6 +221,25 @@ export function splitBlock(w: Workout, blockId: string): Workout {
   const blocks = [...w.blocks];
   blocks.splice(idx, 1, ...parts);
   return { ...w, blocks };
+}
+
+/** Index of the first block with an exercise still to do, or -1 when everything is done or skipped. */
+export function currentBlockIndex(w: Workout): number {
+  return w.blocks.findIndex((b) => !blockComplete(b));
+}
+
+/** True when every non-skipped exercise in the block that has a set at this round has ticked it. */
+export function roundComplete(block: WorkoutBlock, round: number): boolean {
+  return block.items
+    .filter((i) => i.status !== 'skipped' && round < i.sets.length)
+    .every((i) => i.sets[round].done);
+}
+
+/** Add one set to every non-skipped exercise in a block (a new superset round). */
+export function addRound(w: Workout, blockId: string): Workout {
+  const block = w.blocks.find((b) => b.id === blockId);
+  if (!block) return w;
+  return block.items.filter((i) => i.status !== 'skipped').reduce((acc, i) => addSet(acc, i.id), w);
 }
 
 export function workoutProgress(w: Workout): { done: number; total: number } {
