@@ -19,7 +19,9 @@ import {
   addExercise,
   emptyWorkout,
   workoutProgress,
+  replaceItem,
 } from './workout';
+import { rankReplacements, similarity } from './similar';
 import { lastPerformance } from './prefill';
 import { lastTrained, loadSince, workoutLoad } from './muscleLoad';
 import { epley, metricsFor, series } from './progress';
@@ -300,4 +302,58 @@ describe('seed data', async () => {
     for (const r of ROUTINES) for (const b of r.blocks) for (const i of b.items) expect(ids(EXERCISES).has(i.exerciseId), i.exerciseId).toBe(true);
   });
   const ids = (xs: { id: string }[]) => new Set(xs.map((x) => x.id));
+});
+
+describe('replacing an exercise', () => {
+  const pulldown: Exercise = {
+    id: 'lat-pulldown', name: 'Lat pulldown', type: 'machine', equipment: 'Cable',
+    primary: ['lats'], secondary: ['biceps', 'upperBack'], defaults: { sets: 3, reps: 10, weight: 40 },
+  };
+  const pullup: Exercise = {
+    id: 'pull-up', name: 'Pull-up', type: 'bodyweight', equipment: 'Bodyweight',
+    primary: ['lats'], secondary: ['biceps', 'upperBack', 'forearms'], defaults: { sets: 3, reps: 8 },
+  };
+  const row: Exercise = {
+    id: 'seated-cable-row', name: 'Seated cable row', type: 'machine', equipment: 'Cable',
+    primary: ['upperBack', 'lats'], secondary: ['biceps', 'rearDelts'], defaults: { sets: 3, reps: 10, weight: 40 },
+  };
+
+  it('ranks exercises with the same main muscles first, closest overlap first', () => {
+    expect(similarity(pulldown, pulldown)).toBe(1);
+    expect(similarity(pulldown, pullup)).toBeGreaterThan(similarity(pulldown, row));
+    expect(similarity(pulldown, plank)).toBe(0);
+    const r = rankReplacements(pulldown, [pulldown, plank, curl, row, pullup]);
+    expect(r.close.map((e) => e.id)).toEqual(['pull-up', 'seated-cable-row']);
+    expect(r.other.map((e) => e.id)).toEqual(['hammer-curl', 'plank']);
+  });
+
+  it('swaps in place when nothing is ticked, keeping the set count', () => {
+    const w = fresh();
+    const out = replaceItem(w, itemId(w, 0), pullup, []);
+    expect(out.blocks).toHaveLength(2);
+    expect(out.blocks[0].items[0].exerciseId).toBe('pull-up');
+    expect(out.blocks[0].items[0].sets).toHaveLength(3);
+    expect(out.blocks[0].items[0].sets[0]).toEqual({ reps: 8, done: false });
+  });
+
+  it('keeps ticked sets on the old exercise and adds the rest as the new one', () => {
+    let w = fresh();
+    w = toggleSet(w, itemId(w, 0), 0);
+    const out = replaceItem(w, itemId(w, 0), pullup, []);
+    expect(out.blocks).toHaveLength(3);
+    expect(out.blocks[0].items[0]).toMatchObject({ exerciseId: 'hammer-curl', status: 'done' });
+    expect(out.blocks[0].items[0].sets).toHaveLength(1);
+    expect(out.blocks[1].items[0].exerciseId).toBe('pull-up');
+    expect(out.blocks[1].items[0].sets).toHaveLength(2);
+  });
+
+  it('stays inside the superset', () => {
+    let w = fresh();
+    const out = replaceItem(w, itemId(w, 1, 1), curl, []);
+    expect(out.blocks[1].superset).toBe(true);
+    expect(out.blocks[1].items.map((i) => i.exerciseId)).toEqual(['push-up', 'hammer-curl']);
+    w = toggleSet(w, itemId(w, 1, 0), 0);
+    const out2 = replaceItem(w, itemId(w, 1, 0), curl, []);
+    expect(out2.blocks[1].items.map((i) => i.exerciseId)).toEqual(['push-up', 'hammer-curl', 'plank']);
+  });
 });

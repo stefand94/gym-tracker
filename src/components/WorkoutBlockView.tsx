@@ -11,6 +11,7 @@ import {
   moveBlock,
   removeItem,
   removeSet,
+  replaceItem,
   roundComplete,
   splitBlock,
   supersetWithNext,
@@ -23,6 +24,7 @@ import {
 import { useStore } from '../state/store';
 import type { Exercise, SetEntry, Workout, WorkoutBlock, WorkoutItem } from '../types';
 import { BodyMap } from './BodyMap';
+import { ExercisePicker } from './ExercisePicker';
 import { IconCheck, IconMore } from './Icons';
 import { Sheet } from './Sheet';
 import { NumInput, Stepper } from './Stepper';
@@ -205,13 +207,27 @@ function ItemMenu({
   update: Update;
   onClose: () => void;
 }) {
+  const { state } = useStore();
   const [armed, setArmed] = useState(false);
+  const [replacing, setReplacing] = useState(false);
   const act = (fn: (w: Workout) => Workout) => {
     update(fn);
     onClose();
   };
+  if (replacing)
+    return (
+      <ExercisePicker
+        title="Replace exercise"
+        similarTo={ex}
+        onClose={onClose}
+        onPick={(next) => act((w) => replaceItem(w, item.id, next, state.history))}
+      />
+    );
   return (
     <Sheet title={ex.name} onClose={onClose}>
+      <button className="menu-item" onClick={() => setReplacing(true)}>
+        Replace exercise…
+      </button>
       <button className="menu-item" onClick={() => act((w) => toggleComplete(w, item.id))}>
         {item.status === 'done' ? 'Untick all sets' : 'Complete all sets'}
       </button>

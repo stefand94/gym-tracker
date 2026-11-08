@@ -176,6 +176,33 @@ export function addExercise(w: Workout, exercise: Exercise, history: Workout[]):
   return { ...w, blocks: [...w.blocks, { id: uid(), superset: false, items: [makeItem(exercise, history)] }] };
 }
 
+/**
+ * Swap an exercise for another. Sets already ticked stay logged: the old exercise keeps just those and the new
+ * one takes the sets still to do, placed right after it. With nothing ticked, the new exercise takes its place.
+ */
+export function replaceItem(w: Workout, itemId: string, exercise: Exercise, history: Workout[]): Workout {
+  const bi = w.blocks.findIndex((b) => b.items.some((i) => i.id === itemId));
+  if (bi < 0) return w;
+  const block = w.blocks[bi];
+  const old = block.items.find((i) => i.id === itemId)!;
+  const ticked = old.status === 'skipped' ? 0 : old.sets.filter((s) => s.done).length;
+  const remaining = Math.max(1, old.sets.length - ticked);
+  const fresh = makeItem(exercise, history, { exerciseId: exercise.id, sets: remaining });
+  const blocks = [...w.blocks];
+  if (ticked === 0) {
+    blocks[bi] = { ...block, items: block.items.map((i) => (i.id === itemId ? fresh : i)) };
+  } else {
+    const kept = deriveStatus({ ...old, sets: old.sets.filter((s) => s.done) });
+    if (block.superset) {
+      const items = block.items.flatMap((i) => (i.id === itemId ? [kept, fresh] : [i]));
+      blocks[bi] = { ...block, items };
+    } else {
+      blocks.splice(bi, 1, { ...block, items: [kept] }, { id: uid(), superset: false, items: [fresh] });
+    }
+  }
+  return { ...w, blocks };
+}
+
 export function removeItem(w: Workout, itemId: string): Workout {
   return {
     ...w,
