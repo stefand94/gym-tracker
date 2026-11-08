@@ -1,27 +1,23 @@
 [
   {
-    "id": "push",
-    "name": "Push",
-    "description": "Chest, shoulders & triceps",
+    "id": "upper-a",
+    "name": "Upper A",
+    "description": "Monday · bench focus",
     "blocks": [
       {
+        "superset": true,
         "items": [
           {
-            "exerciseId": "barbell-bench-press"
-          }
-        ]
-      },
-      {
-        "items": [
+            "exerciseId": "barbell-bench-press",
+            "sets": 4,
+            "reps": 6,
+            "weight": 45
+          },
           {
-            "exerciseId": "incline-dumbbell-press"
-          }
-        ]
-      },
-      {
-        "items": [
-          {
-            "exerciseId": "dumbbell-shoulder-press"
+            "exerciseId": "assisted-pull-up",
+            "sets": 4,
+            "reps": 5,
+            "weight": 32
           }
         ]
       },
@@ -29,38 +25,64 @@
         "superset": true,
         "items": [
           {
-            "exerciseId": "lateral-raise"
+            "exerciseId": "overhead-press",
+            "sets": 3,
+            "reps": 8,
+            "weight": 20
           },
           {
-            "exerciseId": "triceps-pushdown"
+            "exerciseId": "machine-row",
+            "sets": 3,
+            "reps": 10,
+            "weight": 32
+          }
+        ]
+      },
+      {
+        "superset": true,
+        "items": [
+          {
+            "exerciseId": "leg-curl",
+            "sets": 3,
+            "reps": 10
+          },
+          {
+            "exerciseId": "lateral-raise",
+            "sets": 3,
+            "reps": 12,
+            "weight": 6
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "dead-hang",
+            "sets": 3,
+            "seconds": 30
           }
         ]
       }
     ]
   },
   {
-    "id": "pull",
-    "name": "Pull",
-    "description": "Back, rear delts & biceps",
+    "id": "upper-b",
+    "name": "Upper B",
+    "description": "Wednesday · pull focus",
     "blocks": [
       {
+        "superset": true,
         "items": [
           {
-            "exerciseId": "lat-pulldown"
-          }
-        ]
-      },
-      {
-        "items": [
+            "exerciseId": "pull-up-negative",
+            "sets": 4,
+            "reps": 3
+          },
           {
-            "exerciseId": "seated-cable-row"
-          }
-        ]
-      },
-      {
-        "items": [
-          {
-            "exerciseId": "one-arm-dumbbell-row"
+            "exerciseId": "dumbbell-bench-press",
+            "sets": 4,
+            "reps": 8,
+            "weight": 14
           }
         ]
       },
@@ -68,10 +90,42 @@
         "superset": true,
         "items": [
           {
-            "exerciseId": "face-pull"
+            "exerciseId": "lat-pulldown",
+            "sets": 3,
+            "reps": 8,
+            "weight": 40
           },
           {
-            "exerciseId": "hammer-curl"
+            "exerciseId": "assisted-dip",
+            "sets": 3,
+            "reps": 8,
+            "weight": 20
+          }
+        ]
+      },
+      {
+        "superset": true,
+        "items": [
+          {
+            "exerciseId": "barbell-curl",
+            "sets": 3,
+            "reps": 8,
+            "weight": 17.5
+          },
+          {
+            "exerciseId": "triceps-pushdown",
+            "sets": 3,
+            "reps": 10,
+            "weight": 22.5
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "plank",
+            "sets": 2,
+            "seconds": 45
           }
         ]
       }
@@ -80,83 +134,57 @@
   {
     "id": "legs",
     "name": "Legs",
-    "description": "Quads, hamstrings, glutes & calves",
+    "description": "Thursday · squat & hamstrings",
     "blocks": [
-      {
-        "items": [
-          {
-            "exerciseId": "back-squat"
-          }
-        ]
-      },
-      {
-        "items": [
-          {
-            "exerciseId": "romanian-deadlift"
-          }
-        ]
-      },
       {
         "superset": true,
         "items": [
           {
-            "exerciseId": "leg-extension"
+            "exerciseId": "back-squat",
+            "sets": 4,
+            "reps": 5,
+            "weight": 50
           },
           {
-            "exerciseId": "leg-curl"
+            "exerciseId": "dead-bug",
+            "sets": 4,
+            "reps": 8
           }
         ]
       },
       {
         "items": [
           {
-            "exerciseId": "standing-calf-raise"
+            "exerciseId": "romanian-deadlift",
+            "sets": 4,
+            "reps": 8,
+            "weight": 40
           }
         ]
       },
-      {
-        "items": [
-          {
-            "exerciseId": "plank"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "arms",
-    "name": "Arms",
-    "description": "Biceps, triceps & forearms supersets",
-    "blocks": [
       {
         "superset": true,
         "items": [
           {
-            "exerciseId": "hammer-curl",
+            "exerciseId": "bulgarian-split-squat",
             "sets": 3,
             "reps": 8,
-            "weight": 10
+            "weight": 0
           },
           {
-            "exerciseId": "overhead-triceps-extension"
-          }
-        ]
-      },
-      {
-        "superset": true,
-        "items": [
-          {
-            "exerciseId": "cable-curl"
-          },
-          {
-            "exerciseId": "triceps-pushdown"
+            "exerciseId": "leg-curl",
+            "sets": 3,
+            "reps": 10
           }
         ]
       },
       {
         "items": [
           {
-            "exerciseId": "wrist-curl"
+            "exerciseId": "farmer-carry",
+            "sets": 3,
+            "reps": 30,
+            "weight": 20
           }
         ]
       }

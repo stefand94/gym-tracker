@@ -15,6 +15,7 @@ Stefan adds exercises and routines by asking Claude, not in the app. Weights are
   "type": "weight | bodyweight | timed | machine",
   "equipment": "Dumbbells | Barbell | Cable | Machine | Bodyweight | …",
   "weightNote": "per dumbbell",          // optional hint shown on the card
+  "cue": "lower over 4–5 s",             // optional coaching cue shown on the card
   "primary": ["biceps"],                  // 1 set credit each
   "secondary": ["forearms"],              // ½ set credit each
   "defaults": { "sets": 3, "reps": 10, "weight": 10 }   // timed: "seconds" instead of "reps"
@@ -24,6 +25,8 @@ Stefan adds exercises and routines by asking Claude, not in the app. Weights are
 - `weight`: weight × reps. `machine`: same, +/− steps of 5 kg. `bodyweight`: reps + optional added kg.
   `timed`: seconds (+ optional kg).
 - Dumbbell exercises are entered **per dumbbell**; barbell as total bar weight. Say so in `weightNote`.
+- Assisted machines (pull-up, dip): `weight` type, `equipment: "Machine"`, weight = kg of assistance
+  (`weightNote: "assistance (less = harder)"`). Carries: `weight` type with reps = metres.
 - Never change an existing `id` — logged workouts reference it.
 
 Muscle ids (`src/data/muscles.ts`, drawn in `src/components/BodyMap.tsx`):

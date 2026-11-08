@@ -620,7 +620,8 @@
       "sets": 3,
       "reps": 8,
       "weight": 40
-    }
+    },
+    "cue": "double-overhand grip; straps last set only"
   },
   {
     "id": "walking-lunge",
@@ -661,7 +662,8 @@
       "sets": 3,
       "reps": 8,
       "weight": 10
-    }
+    },
+    "cue": "bodyweight first, then light dumbbells"
   },
   {
     "id": "leg-extension",
@@ -860,7 +862,8 @@
     "defaults": {
       "sets": 3,
       "seconds": 30
-    }
+    },
+    "cue": "max hold"
   },
   {
     "id": "neck-curl",
@@ -875,6 +878,141 @@
       "sets": 3,
       "reps": 15,
       "weight": 5
+    }
+  },
+  {
+    "id": "assisted-pull-up",
+    "name": "Assisted pull-up",
+    "type": "weight",
+    "equipment": "Machine",
+    "weightNote": "assistance (less = harder)",
+    "cue": "drop 2–3 kg every 2 weeks",
+    "primary": [
+      "lats"
+    ],
+    "secondary": [
+      "biceps",
+      "upperBack",
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 4,
+      "reps": 5,
+      "weight": 32
+    }
+  },
+  {
+    "id": "pull-up-negative",
+    "name": "Pull-up negative",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "cue": "jump or step up, lower over 4–5 s",
+    "primary": [
+      "lats"
+    ],
+    "secondary": [
+      "biceps",
+      "upperBack",
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 4,
+      "reps": 3
+    }
+  },
+  {
+    "id": "machine-row",
+    "name": "Machine row",
+    "type": "machine",
+    "equipment": "Machine",
+    "cue": "no straps",
+    "primary": [
+      "upperBack",
+      "lats"
+    ],
+    "secondary": [
+      "biceps",
+      "rearDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 32
+    }
+  },
+  {
+    "id": "assisted-dip",
+    "name": "Assisted dip",
+    "type": "weight",
+    "equipment": "Machine",
+    "weightNote": "assistance (less = harder)",
+    "primary": [
+      "triceps",
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 20
+    }
+  },
+  {
+    "id": "dead-bug",
+    "name": "Dead bug",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "cue": "reps per side",
+    "primary": [
+      "abs"
+    ],
+    "secondary": [
+      "obliques"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8
+    }
+  },
+  {
+    "id": "pallof-press",
+    "name": "Pallof press",
+    "type": "weight",
+    "equipment": "Cable",
+    "cue": "reps per side",
+    "primary": [
+      "obliques",
+      "abs"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 10
+    }
+  },
+  {
+    "id": "farmer-carry",
+    "name": "Farmer carry",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per hand",
+    "cue": "reps = metres walked",
+    "primary": [
+      "forearms",
+      "traps"
+    ],
+    "secondary": [
+      "abs",
+      "obliques",
+      "glutes"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 30,
+      "weight": 20
     }
   }
 ]

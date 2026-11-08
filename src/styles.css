@@ -859,6 +859,13 @@ button {
   margin-top: 3px;
 }
 
+.ex-cue {
+  display: block;
+  margin-top: 2px;
+  color: var(--text);
+  opacity: 0.8;
+}
+
 .ex-sub em {
   font-style: normal;
   color: var(--text);

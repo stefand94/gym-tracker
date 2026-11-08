@@ -16,6 +16,8 @@ export interface Exercise {
   equipment: string;
   /** How the weight is entered, shown as a hint next to the weight field. */
   weightNote?: string;
+  /** Short coaching cue shown on the exercise card, e.g. "lower over 4–5 s". */
+  cue?: string;
   primary: MuscleId[];
   secondary: MuscleId[];
   defaults: ExerciseDefaults;

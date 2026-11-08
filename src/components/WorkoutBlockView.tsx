@@ -170,6 +170,7 @@ function ItemHead({
             <em>kg {ex.weightNote}</em>
           </>
         ) : null}
+        {ex.cue ? <span className="ex-cue">{ex.cue}</span> : null}
       </div>
     </>
   );
