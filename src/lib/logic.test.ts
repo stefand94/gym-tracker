@@ -22,6 +22,7 @@ import {
   replaceItem,
 } from './workout';
 import { rankReplacements, similarity } from './similar';
+import { daysLabel, todaysRoutine } from './schedule';
 import { lastPerformance } from './prefill';
 import { lastTrained, loadSince, workoutLoad } from './muscleLoad';
 import { epley, metricsFor, series } from './progress';
@@ -355,5 +356,23 @@ describe('replacing an exercise', () => {
     w = toggleSet(w, itemId(w, 1, 0), 0);
     const out2 = replaceItem(w, itemId(w, 1, 0), curl, []);
     expect(out2.blocks[1].items.map((i) => i.exerciseId)).toEqual(['push-up', 'hammer-curl', 'plank']);
+  });
+});
+
+describe('today on Home', () => {
+  const mon = { ...routine, id: 'a', days: ['mon' as const] };
+  const thu = { ...routine, id: 'b', days: ['thu' as const] };
+  const monday = new Date(2026, 10, 9, 8); // Mon 9 Nov 2026
+  it('picks the routine scheduled for the weekday', () => {
+    expect(todaysRoutine([mon, thu], [], monday)?.id).toBe('a');
+    expect(todaysRoutine([mon, thu], [], new Date(2026, 10, 10, 8))).toBeNull();
+    expect(daysLabel(['mon'])).toBe('Monday');
+    expect(daysLabel(['mon', 'thu'])).toBe('Mon & Thu');
+  });
+  it('stops promoting it once it is finished today', () => {
+    const w = workoutFromRoutine(mon, [], lookup, new Date(2026, 10, 9, 7));
+    expect(todaysRoutine([mon, thu], [{ ...w, finishedAt: w.startedAt }], monday)).toBeNull();
+    const lastWeek = workoutFromRoutine(mon, [], lookup, new Date(2026, 10, 2, 7));
+    expect(todaysRoutine([mon, thu], [{ ...lastWeek, finishedAt: lastWeek.startedAt }], monday)?.id).toBe('a');
   });
 });

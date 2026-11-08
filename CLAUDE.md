@@ -37,12 +37,13 @@ Adding a new muscle means adding it to `muscles.ts` **and** drawing its region i
 ## Adding a routine — `src/data/routines.json`
 
 ```json
-{ "id": "push", "name": "Push", "description": "optional subtitle",
+{ "id": "push", "name": "Push", "description": "optional subtitle", "days": ["mon"],
   "blocks": [
     { "items": [{ "exerciseId": "barbell-bench-press" }] },
     { "superset": true, "items": [{ "exerciseId": "lateral-raise" }, { "exerciseId": "triceps-pushdown", "sets": 3, "reps": 12, "weight": 20 }] }
   ] }
 ```
+`days` (optional, "mon"…"sun") schedules it: on that weekday Home shows it first under Today.
 Per-item `sets/reps/seconds/weight` are optional; when a workout starts, sets pre-fill from the last time the
 exercise was done, then routine values, then exercise defaults.
 

@@ -553,6 +553,50 @@ button {
   background: var(--surface-2);
 }
 
+.today {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1.5px solid var(--accent);
+  padding: 14px 16px 16px;
+  margin-top: 4px;
+}
+
+.today:active {
+  background: var(--surface-2);
+}
+
+.today-label {
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.today-top {
+  margin-top: 2px;
+  gap: 12px;
+}
+
+.today-name {
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.today-list {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.45;
+  margin: 10px 0 14px;
+}
+
+.today-go {
+  pointer-events: none;
+}
+
 .routine-name {
   font-weight: 750;
   font-size: 18px;

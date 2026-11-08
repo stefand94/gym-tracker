@@ -2,7 +2,10 @@
   {
     "id": "upper-a",
     "name": "Upper A",
-    "description": "Monday · bench focus",
+    "description": "Bench focus",
+    "days": [
+      "mon"
+    ],
     "blocks": [
       {
         "superset": true,
@@ -68,7 +71,10 @@
   {
     "id": "upper-b",
     "name": "Upper B",
-    "description": "Wednesday · pull focus",
+    "description": "Pull focus",
+    "days": [
+      "wed"
+    ],
     "blocks": [
       {
         "superset": true,
@@ -134,7 +140,10 @@
   {
     "id": "legs",
     "name": "Legs",
-    "description": "Thursday · squat & hamstrings",
+    "description": "Squat & hamstrings",
+    "days": [
+      "thu"
+    ],
     "blocks": [
       {
         "superset": true,

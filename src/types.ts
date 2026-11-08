@@ -40,6 +40,8 @@ export interface Routine {
   id: string;
   name: string;
   description?: string;
+  /** Weekdays it's scheduled for ("mon" … "sun"). Today's routine is shown first on Home. */
+  days?: ('sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat')[];
   blocks: RoutineBlock[];
 }
 

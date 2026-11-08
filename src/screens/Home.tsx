@@ -7,6 +7,7 @@ import { getExercise, ROUTINES } from '../data/library';
 import { doneSetCount, fmtDate, relDay } from '../lib/format';
 import { loadSince, workoutLoad } from '../lib/muscleLoad';
 import { finishedNewestFirst } from '../lib/prefill';
+import { daysLabel, todaysRoutine } from '../lib/schedule';
 import { emptyWorkout, workoutFromRoutine, workoutProgress } from '../lib/workout';
 import { useStore } from '../state/store';
 import type { Routine, Workout } from '../types';
@@ -16,6 +17,10 @@ function routineSummary(r: Routine): string {
     .flatMap((b) => b.items)
     .map((i) => getExercise(i.exerciseId)?.name ?? i.exerciseId)
     .join(' · ');
+}
+
+function routineMeta(r: Routine): string {
+  return [daysLabel(r.days), r.description ?? routineSummary(r)].filter(Boolean).join(' · ');
 }
 
 function routineLoad(r: Routine) {
@@ -47,6 +52,9 @@ export function Home() {
 
   const active = state.active;
   const prog = active ? workoutProgress(active) : null;
+  const today = active ? null : todaysRoutine(ROUTINES, state.history);
+  const others = ROUTINES.filter((r) => r !== today);
+  const startRoutine = (r: Routine) => start(workoutFromRoutine(r, state.history, getExercise));
 
   return (
     <div>
@@ -72,14 +80,29 @@ export function Home() {
         </Link>
       )}
 
-      <div className="section-title">Start a workout</div>
+      {today && (
+        <button className="card today" onClick={() => startRoutine(today)}>
+          <div className="today-label">Today</div>
+          <div className="spread today-top">
+            <div className="grow">
+              <div className="today-name">{today.name}</div>
+              <div className="routine-meta">{today.description ?? daysLabel(today.days)}</div>
+            </div>
+            <BodyMap load={routineLoad(today)} size="mini" />
+          </div>
+          <div className="today-list">{routineSummary(today)}</div>
+          <span className="btn btn-primary btn-block btn-lg today-go">Start {today.name}</span>
+        </button>
+      )}
+
+      <div className="section-title">{today ? 'Other workouts' : 'Start a workout'}</div>
       <div className="stack">
-        {ROUTINES.map((r) => (
-          <button key={r.id} className="card routine" onClick={() => start(workoutFromRoutine(r, state.history, getExercise))}>
+        {others.map((r) => (
+          <button key={r.id} className="card routine" onClick={() => startRoutine(r)}>
             <BodyMap load={routineLoad(r)} size="mini" />
             <div className="grow">
               <div className="routine-name">{r.name}</div>
-              <div className="routine-meta">{r.description ?? routineSummary(r)}</div>
+              <div className="routine-meta">{routineMeta(r)}</div>
             </div>
           </button>
         ))}
