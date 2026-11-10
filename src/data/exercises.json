@@ -57,6 +57,25 @@
     }
   },
   {
+    "id": "incline-barbell-bench-press",
+    "name": "Incline barbell bench press",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "primary": [
+      "chest",
+      "frontDelts"
+    ],
+    "secondary": [
+      "triceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 35
+    }
+  },
+  {
     "id": "dumbbell-fly",
     "name": "Dumbbell fly",
     "type": "weight",
@@ -108,6 +127,23 @@
       "sets": 3,
       "reps": 10,
       "weight": 40
+    }
+  },
+  {
+    "id": "pec-deck",
+    "name": "Pec deck",
+    "type": "machine",
+    "equipment": "Machine",
+    "primary": [
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 30
     }
   },
   {
@@ -185,6 +221,43 @@
     }
   },
   {
+    "id": "arnold-press",
+    "name": "Arnold press",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "frontDelts",
+      "sideDelts"
+    ],
+    "secondary": [
+      "triceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 10
+    }
+  },
+  {
+    "id": "machine-shoulder-press",
+    "name": "Machine shoulder press",
+    "type": "machine",
+    "equipment": "Machine",
+    "primary": [
+      "frontDelts"
+    ],
+    "secondary": [
+      "sideDelts",
+      "triceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 25
+    }
+  },
+  {
     "id": "lateral-raise",
     "name": "Lateral raise",
     "type": "weight",
@@ -203,6 +276,23 @@
     }
   },
   {
+    "id": "cable-lateral-raise",
+    "name": "Cable lateral raise",
+    "type": "weight",
+    "equipment": "Cable",
+    "weightNote": "per arm",
+    "cue": "reps per side",
+    "primary": [
+      "sideDelts"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 5
+    }
+  },
+  {
     "id": "rear-delt-fly",
     "name": "Rear delt fly",
     "type": "weight",
@@ -218,6 +308,23 @@
       "sets": 3,
       "reps": 12,
       "weight": 6
+    }
+  },
+  {
+    "id": "reverse-pec-deck",
+    "name": "Reverse pec deck",
+    "type": "machine",
+    "equipment": "Machine",
+    "primary": [
+      "rearDelts"
+    ],
+    "secondary": [
+      "upperBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 20
     }
   },
   {
@@ -340,6 +447,48 @@
     }
   },
   {
+    "id": "chest-supported-row",
+    "name": "Chest-supported dumbbell row",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "cue": "chest on an incline bench",
+    "primary": [
+      "upperBack",
+      "lats"
+    ],
+    "secondary": [
+      "rearDelts",
+      "biceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 14
+    }
+  },
+  {
+    "id": "t-bar-row",
+    "name": "T-bar row",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "plates only, not the bar",
+    "primary": [
+      "upperBack",
+      "lats"
+    ],
+    "secondary": [
+      "rearDelts",
+      "biceps",
+      "lowerBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 20
+    }
+  },
+  {
     "id": "lat-pulldown",
     "name": "Lat pulldown",
     "type": "machine",
@@ -355,6 +504,24 @@
       "sets": 3,
       "reps": 10,
       "weight": 45
+    }
+  },
+  {
+    "id": "straight-arm-pulldown",
+    "name": "Straight-arm pulldown",
+    "type": "weight",
+    "equipment": "Cable",
+    "cue": "arms nearly straight, pull to thighs",
+    "primary": [
+      "lats"
+    ],
+    "secondary": [
+      "triceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 20
     }
   },
   {
@@ -464,6 +631,40 @@
     }
   },
   {
+    "id": "incline-dumbbell-curl",
+    "name": "Incline dumbbell curl",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "biceps"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 8
+    }
+  },
+  {
+    "id": "concentration-curl",
+    "name": "Concentration curl",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "cue": "reps per arm",
+    "primary": [
+      "biceps"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 8
+    }
+  },
+  {
     "id": "barbell-curl",
     "name": "Barbell curl",
     "type": "weight",
@@ -479,6 +680,43 @@
       "sets": 3,
       "reps": 10,
       "weight": 20
+    }
+  },
+  {
+    "id": "ez-bar-curl",
+    "name": "EZ-bar curl",
+    "type": "weight",
+    "equipment": "EZ bar",
+    "weightNote": "total bar weight",
+    "primary": [
+      "biceps"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 20
+    }
+  },
+  {
+    "id": "preacher-curl",
+    "name": "Preacher curl",
+    "type": "weight",
+    "equipment": "EZ bar",
+    "weightNote": "total bar weight",
+    "cue": "full stretch at the bottom",
+    "primary": [
+      "biceps"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 15
     }
   },
   {
@@ -543,6 +781,57 @@
       "sets": 3,
       "reps": 12,
       "weight": 14
+    }
+  },
+  {
+    "id": "overhead-cable-triceps-extension",
+    "name": "Overhead cable triceps extension",
+    "type": "weight",
+    "equipment": "Cable",
+    "cue": "rope, facing away from the stack",
+    "primary": [
+      "triceps"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 15
+    }
+  },
+  {
+    "id": "triceps-kickback",
+    "name": "Triceps kickback",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "primary": [
+      "triceps"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 5
+    }
+  },
+  {
+    "id": "close-grip-bench-press",
+    "name": "Close-grip bench press",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "primary": [
+      "triceps",
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 35
     }
   },
   {
@@ -616,6 +905,44 @@
       "sets": 3,
       "reps": 10,
       "weight": 16
+    }
+  },
+  {
+    "id": "front-squat",
+    "name": "Front squat",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "primary": [
+      "quads"
+    ],
+    "secondary": [
+      "glutes",
+      "abs",
+      "upperBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 6,
+      "weight": 40
+    }
+  },
+  {
+    "id": "hack-squat",
+    "name": "Hack squat",
+    "type": "machine",
+    "equipment": "Machine",
+    "weightNote": "plates only, not the sled",
+    "primary": [
+      "quads"
+    ],
+    "secondary": [
+      "glutes"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 40
     }
   },
   {
@@ -701,6 +1028,26 @@
     "cue": "bodyweight first, then light dumbbells"
   },
   {
+    "id": "step-up",
+    "name": "Step-up",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "cue": "reps per leg",
+    "primary": [
+      "quads",
+      "glutes"
+    ],
+    "secondary": [
+      "hamstrings"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 8
+    }
+  },
+  {
     "id": "leg-extension",
     "name": "Leg extension",
     "type": "machine",
@@ -749,6 +1096,44 @@
       "sets": 3,
       "reps": 10,
       "weight": 40
+    }
+  },
+  {
+    "id": "cable-pull-through",
+    "name": "Cable pull-through",
+    "type": "weight",
+    "equipment": "Cable",
+    "cue": "hinge at the hips, rope between legs",
+    "primary": [
+      "glutes",
+      "hamstrings"
+    ],
+    "secondary": [
+      "lowerBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 20
+    }
+  },
+  {
+    "id": "kettlebell-swing",
+    "name": "Kettlebell swing",
+    "type": "weight",
+    "equipment": "Kettlebell",
+    "primary": [
+      "glutes",
+      "hamstrings"
+    ],
+    "secondary": [
+      "lowerBack",
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 15,
+      "weight": 16
     }
   },
   {
@@ -818,6 +1203,21 @@
     }
   },
   {
+    "id": "seated-calf-raise",
+    "name": "Seated calf raise",
+    "type": "machine",
+    "equipment": "Machine",
+    "primary": [
+      "calves"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 15,
+      "weight": 20
+    }
+  },
+  {
     "id": "plank",
     "name": "Plank",
     "type": "timed",
@@ -870,6 +1270,23 @@
     }
   },
   {
+    "id": "hanging-knee-raise",
+    "name": "Hanging knee raise",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "cue": "easier step before leg raises",
+    "primary": [
+      "abs"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10
+    }
+  },
+  {
     "id": "cable-crunch",
     "name": "Cable crunch",
     "type": "weight",
@@ -884,6 +1301,42 @@
       "sets": 3,
       "reps": 12,
       "weight": 25
+    }
+  },
+  {
+    "id": "ab-wheel-rollout",
+    "name": "Ab wheel rollout",
+    "type": "bodyweight",
+    "equipment": "Ab wheel",
+    "cue": "from knees; only as far as you can keep your back flat",
+    "primary": [
+      "abs"
+    ],
+    "secondary": [
+      "lats",
+      "obliques"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8
+    }
+  },
+  {
+    "id": "cable-woodchop",
+    "name": "Cable woodchop",
+    "type": "weight",
+    "equipment": "Cable",
+    "cue": "reps per side",
+    "primary": [
+      "obliques"
+    ],
+    "secondary": [
+      "abs"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 10
     }
   },
   {
