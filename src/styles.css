@@ -400,6 +400,10 @@ button {
   flex-wrap: wrap;
 }
 
+.chips-groups .chip {
+  flex: 1;
+}
+
 .chips-scroll {
   flex-wrap: nowrap;
   overflow-x: auto;
@@ -1526,4 +1530,53 @@ ol.steps code {
   background: var(--surface-2);
   padding: 1px 5px;
   border-radius: 5px;
+}
+
+/* ---------- push vs pull balance (Body) ---------- */
+.balance {
+  display: grid;
+  gap: 8px;
+}
+
+.balance-nums {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  color: var(--text-dim);
+}
+
+.balance-nums strong {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  margin-right: 4px;
+}
+
+.balance-bar {
+  display: flex;
+  gap: 3px;
+  height: 10px;
+}
+
+.balance-bar > div {
+  flex-basis: 0;
+  border-radius: 999px;
+  transition: flex-grow 0.3s;
+}
+
+.balance-push {
+  background: var(--accent);
+}
+
+.balance-pull {
+  background: var(--rest);
+}
+
+.balance-warn {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.balance-rest {
+  margin-top: 2px;
 }

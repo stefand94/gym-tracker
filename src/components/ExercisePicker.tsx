@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { EXERCISES } from '../data/library';
 import { MUSCLE_IDS, MUSCLE_LABELS, type MuscleId } from '../data/muscles';
+import { exerciseGroup, GROUP_LABELS, GROUPS, type Group } from '../lib/groups';
 import { exerciseMap } from '../lib/muscleLoad';
 import { rankReplacements } from '../lib/similar';
 import type { Exercise } from '../types';
@@ -38,12 +39,14 @@ export function ExercisePicker({
 }) {
   const [q, setQ] = useState('');
   const [muscle, setMuscle] = useState<MuscleId | null>(null);
+  const [group, setGroup] = useState<Group | null>(null);
   const list = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return EXERCISES.filter(
       (e) =>
         (!needle || e.name.toLowerCase().includes(needle) || e.equipment.toLowerCase().includes(needle)) &&
-        (!muscle || e.primary.includes(muscle) || e.secondary.includes(muscle)),
+        (!muscle || e.primary.includes(muscle) || e.secondary.includes(muscle)) &&
+        (!group || exerciseGroup(e) === group),
     ).sort((a, b) => {
       if (muscle) {
         const pa = a.primary.includes(muscle) ? 0 : 1;
@@ -52,13 +55,20 @@ export function ExercisePicker({
       }
       return a.name.localeCompare(b.name);
     });
-  }, [q, muscle]);
+  }, [q, muscle, group]);
   const ranked = useMemo(() => (similarTo ? rankReplacements(similarTo, list) : null), [similarTo, list]);
 
   return (
     <Sheet title={title} onClose={onClose} tall>
       <div className="search stack">
         <input className="input" placeholder="Search exercises" value={q} onChange={(e) => setQ(e.target.value)} />
+        <div className="chips chips-groups">
+          {GROUPS.map((g) => (
+            <button key={g} className={'chip' + (group === g ? ' on' : '')} onClick={() => setGroup(group === g ? null : g)}>
+              {GROUP_LABELS[g]}
+            </button>
+          ))}
+        </div>
         <div className="chips chips-scroll">
           {MUSCLE_IDS.map((m) => (
             <button key={m} className={'chip' + (muscle === m ? ' on' : '')} onClick={() => setMuscle(muscle === m ? null : m)}>

@@ -29,6 +29,7 @@ import { lastPerformance } from './prefill';
 import { lastTrained, loadSince, workoutLoad } from './muscleLoad';
 import { epley, metricsFor, series } from './progress';
 import { itemSummary } from './format';
+import { balanceNote, exerciseGroup, groupSets } from './groups';
 
 const curl: Exercise = {
   id: 'hammer-curl',
@@ -396,5 +397,26 @@ describe('hold timer', () => {
     expect(restsAfter(w, itemId(w, 1, 1), 0)).toBe(false);
     w = toggleSet(w, itemId(w, 1, 0), 0);
     expect(restsAfter(w, itemId(w, 1, 1), 0)).toBe(true);
+  });
+});
+
+describe('push / pull / legs / core', () => {
+  it('groups an exercise by its main muscles', () => {
+    expect(exerciseGroup(curl)).toBe('pull');
+    expect(exerciseGroup(pushup)).toBe('push');
+    expect(exerciseGroup(plank)).toBe('core');
+  });
+
+  it('counts ticked sets per group and flags push-heavy weeks', () => {
+    let w = fresh();
+    w = toggleComplete(w, itemId(w, 0)); // 3 curl sets
+    w = toggleComplete(w, itemId(w, 1, 0)); // 3 push-up sets
+    w = toggleSkip(w, itemId(w, 1, 1)); // skipped plank counts for nothing
+    const done = { ...w, finishedAt: '2026-11-01T11:00:00Z' };
+    expect(groupSets([done], 7, lookup, new Date('2026-11-03T10:00:00Z'))).toEqual({ push: 3, pull: 3, legs: 0, core: 0 });
+    expect(groupSets([done], 1, lookup, new Date('2026-11-03T10:00:00Z')).push).toBe(0);
+    expect(balanceNote(3, 3)).toBe('Balanced');
+    expect(balanceNote(10, 5)).toMatch(/More push/);
+    expect(balanceNote(5, 10)).toMatch(/More pull/);
   });
 });

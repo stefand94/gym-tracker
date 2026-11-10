@@ -3,6 +3,7 @@ import { BodyMap } from '../components/BodyMap';
 import { getExercise } from '../data/library';
 import { MUSCLE_IDS, MUSCLE_LABELS, type MuscleId } from '../data/muscles';
 import { daysAgo, fmtNum } from '../lib/format';
+import { balanceNote, groupSets } from '../lib/groups';
 import { lastTrained, loadSince } from '../lib/muscleLoad';
 import { useStore } from '../state/store';
 
@@ -23,6 +24,9 @@ export function Body() {
   const last = useMemo(() => lastTrained(state.history, getExercise), [state.history]);
   const max = Math.max(0, ...Object.values(load));
   const ranked = [...MUSCLE_IDS].sort((a, b) => load[a] - load[b] || (last[a] ?? '').localeCompare(last[b] ?? ''));
+  const groups = useMemo(() => groupSets(state.history, days, getExercise), [state.history, days]);
+  const upper = groups.push + groups.pull;
+  const pushHeavy = groups.push > groups.pull * 1.2;
   const anyHistory = state.history.some((w) => w.finishedAt);
 
   return (
@@ -53,6 +57,26 @@ export function Body() {
           ) : (
             <div className="small dim">{anyHistory ? 'Tap a muscle for details' : 'Finish a workout to see your heatmap'}</div>
           )}
+        </div>
+      </div>
+
+      <div className="section-title">Push vs pull</div>
+      <div className="card balance">
+        <div className="balance-nums num">
+          <span>
+            <strong>{groups.push}</strong> push
+          </span>
+          <span>
+            <strong>{groups.pull}</strong> pull
+          </span>
+        </div>
+        <div className="balance-bar" aria-hidden>
+          <div className="balance-push" style={{ flexGrow: upper ? groups.push : 1 }} />
+          <div className="balance-pull" style={{ flexGrow: upper ? groups.pull : 1 }} />
+        </div>
+        <div className={'small' + (pushHeavy ? ' balance-warn' : ' dim')}>{balanceNote(groups.push, groups.pull)}</div>
+        <div className="small dim num balance-rest">
+          Also {groups.legs} legs · {groups.core} core sets in {days} days
         </div>
       </div>
 

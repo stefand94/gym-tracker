@@ -34,6 +34,9 @@ neck, traps, frontDelts, sideDelts, rearDelts, chest, biceps, triceps, forearms,
 lowerBack, abs, obliques, glutes, abductors, adductors, quads, hamstrings, calves.
 Adding a new muscle means adding it to `muscles.ts` **and** drawing its region in `BodyMap.tsx`.
 
+Push / pull / legs / core (picker filter, Body balance card) is derived from `primary` muscles in
+`src/lib/groups.ts` — no tag to set; a new muscle also needs a group there.
+
 ## Adding a routine — `src/data/routines.json`
 
 ```json
