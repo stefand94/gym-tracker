@@ -33,3 +33,9 @@ export const IconTimer = () => (
 export const IconChevronUp = () => (
   <svg viewBox="0 0 24 24" {...p}><path d="m6 15 6-6 6 6" /></svg>
 );
+export const IconPlay = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" /></svg>
+);
+export const IconClose = () => (
+  <svg viewBox="0 0 24 24" {...p}><path d="M6 6l12 12M18 6 6 18" /></svg>
+);

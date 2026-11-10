@@ -20,6 +20,8 @@ import {
   emptyWorkout,
   workoutProgress,
   replaceItem,
+  completeHold,
+  restsAfter,
 } from './workout';
 import { rankReplacements, similarity } from './similar';
 import { daysLabel, todaysRoutine } from './schedule';
@@ -374,5 +376,25 @@ describe('today on Home', () => {
     expect(todaysRoutine([mon, thu], [{ ...w, finishedAt: w.startedAt }], monday)).toBeNull();
     const lastWeek = workoutFromRoutine(mon, [], lookup, new Date(2026, 10, 2, 7));
     expect(todaysRoutine([mon, thu], [{ ...lastWeek, finishedAt: lastWeek.startedAt }], monday)?.id).toBe('a');
+  });
+});
+
+describe('hold timer', () => {
+  it('logs the seconds held on that set only and ticks it', () => {
+    let w = fresh();
+    const plankId = itemId(w, 1, 1);
+    w = completeHold(w, plankId, 0, 32);
+    const sets = w.blocks[1].items[1].sets;
+    expect(sets[0]).toEqual({ seconds: 32, done: true });
+    expect(sets[1]).toEqual({ seconds: 45, done: false });
+  });
+
+  it('rests after a single exercise set, but only at the end of a superset round', () => {
+    let w = fresh();
+    expect(restsAfter(w, itemId(w, 0), 0)).toBe(true);
+    w = completeHold(w, itemId(w, 1, 1), 0, 45);
+    expect(restsAfter(w, itemId(w, 1, 1), 0)).toBe(false);
+    w = toggleSet(w, itemId(w, 1, 0), 0);
+    expect(restsAfter(w, itemId(w, 1, 1), 0)).toBe(true);
   });
 });

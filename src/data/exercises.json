@@ -239,6 +239,25 @@
     }
   },
   {
+    "id": "cable-external-rotation",
+    "name": "Cable external rotation",
+    "type": "weight",
+    "equipment": "Cable",
+    "weightNote": "per arm",
+    "cue": "elbow pinned to side, slow; keep it light",
+    "primary": [
+      "rearDelts"
+    ],
+    "secondary": [
+      "upperBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 2.5
+    }
+  },
+  {
     "id": "dumbbell-shrug",
     "name": "Dumbbell shrug",
     "type": "weight",
@@ -481,7 +500,7 @@
   },
   {
     "id": "triceps-pushdown",
-    "name": "Triceps pushdown",
+    "name": "Triceps pushdown (bar)",
     "type": "weight",
     "equipment": "Cable",
     "primary": [
@@ -492,6 +511,22 @@
       "sets": 3,
       "reps": 12,
       "weight": 20
+    }
+  },
+  {
+    "id": "triceps-rope-pushdown",
+    "name": "Triceps rope pushdown",
+    "type": "weight",
+    "equipment": "Cable",
+    "cue": "split the rope at the bottom",
+    "primary": [
+      "triceps"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 17.5
     }
   },
   {
@@ -717,6 +752,25 @@
     }
   },
   {
+    "id": "glute-bridge",
+    "name": "Glute bridge",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "weightNote": "plate or dumbbell on hips",
+    "cue": "squeeze 1 s at top; feet further out = more hamstring",
+    "primary": [
+      "glutes",
+      "hamstrings"
+    ],
+    "secondary": [
+      "lowerBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12
+    }
+  },
+  {
     "id": "hip-abduction",
     "name": "Hip abduction machine",
     "type": "machine",
@@ -830,6 +884,24 @@
       "sets": 3,
       "reps": 12,
       "weight": 25
+    }
+  },
+  {
+    "id": "decline-sit-up",
+    "name": "Decline sit-up",
+    "type": "bodyweight",
+    "equipment": "Bench",
+    "weightNote": "plate held on chest",
+    "cue": "lower slowly to parallel or just below",
+    "primary": [
+      "abs"
+    ],
+    "secondary": [
+      "obliques"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12
     }
   },
   {

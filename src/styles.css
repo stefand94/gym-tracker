@@ -970,8 +970,79 @@ button {
   border-radius: var(--radius-sm);
 }
 
-.set-row.single {
-  grid-template-columns: 22px minmax(0, 1fr) 60px;
+/* ---- hold timer (timed sets) ---- */
+.hold-btn {
+  height: 50px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--well);
+  color: var(--text-dim);
+  display: grid;
+  place-items: center;
+}
+
+.hold-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.hold-btn.play {
+  color: var(--accent);
+}
+
+.hold-btn:active {
+  transform: scale(0.94);
+}
+
+.hold {
+  position: relative;
+  overflow: hidden;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--accent) 12%, var(--well));
+}
+
+.hold > * {
+  position: relative;
+}
+
+.hold-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: color-mix(in oklab, var(--accent) 28%, transparent);
+  transition: width 0.25s linear;
+}
+
+.hold-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.hold-time {
+  margin-left: auto;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.hold.ready .hold-time {
+  animation: hold-pulse 1s ease-out infinite;
+}
+
+@keyframes hold-pulse {
+  from { transform: scale(1.18); }
+  to { transform: scale(1); }
+}
+
+.set-row.holding .tick {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .set-row + .set-row {

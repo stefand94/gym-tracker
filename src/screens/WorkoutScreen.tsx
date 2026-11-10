@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { Navigate, useNavigate } from 'react-router-dom';
 import { BodyMap } from '../components/BodyMap';
 import { ExercisePicker } from '../components/ExercisePicker';
+import { HoldWatcher } from '../components/HoldTimer';
 import { IconPlus } from '../components/Icons';
 import { RestBar, TimerButton } from '../components/RestBar';
 import { ConfirmSheet } from '../components/Sheet';
@@ -125,6 +126,7 @@ export function WorkoutScreen() {
         </div>
         <RestBar />
       </div>
+      <HoldWatcher />
 
       <div className="wo-list">
         {w.blocks.map((b, i) => {

@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { getExercise } from '../data/library';
 import { MUSCLE_LABELS } from '../data/muscles';
-import { tickFeedback } from '../lib/alert';
+import { primeAudio, tickFeedback } from '../lib/alert';
 import { itemSummary, weightStep } from '../lib/format';
 import { exerciseMap } from '../lib/muscleLoad';
 import {
   addRound,
   addSet,
   blockComplete,
+  completeHold,
   moveBlock,
   removeItem,
   removeSet,
@@ -25,7 +26,8 @@ import { useStore } from '../state/store';
 import type { Exercise, SetEntry, Workout, WorkoutBlock, WorkoutItem } from '../types';
 import { BodyMap } from './BodyMap';
 import { ExercisePicker } from './ExercisePicker';
-import { IconCheck, IconMore } from './Icons';
+import { HoldDisplay } from './HoldTimer';
+import { IconCheck, IconClose, IconMore, IconPlay } from './Icons';
 import { Sheet } from './Sheet';
 import { NumInput, Stepper } from './Stepper';
 
@@ -55,7 +57,7 @@ function useStartRest() {
 
 /** Column labels for an exercise's set fields, in display order. */
 function fieldLabels(ex: Exercise): string[] {
-  if (ex.type === 'timed') return ['sec'];
+  if (ex.type === 'timed') return ['sec', ''];
   if (ex.type === 'bodyweight') return ['reps', '+kg'];
   return ['kg', 'reps'];
 }
@@ -81,7 +83,7 @@ function SetFields({ ex, set, onChange, units }: { ex: Exercise; set: SetEntry; 
 
 function SetHeader({ labels }: { labels: string[] }) {
   return (
-    <div className={'set-row set-head' + (labels.length === 1 ? ' single' : '')} aria-hidden>
+    <div className="set-row set-head" aria-hidden>
       <div>set</div>
       {labels.map((l) => (
         <div key={l}>{l}</div>
@@ -111,24 +113,63 @@ function SetRow({
   now?: boolean;
   onTicked: () => void;
 }) {
+  const { state, dispatch } = useStore();
   const set = item.sets[index];
-  const single = ex.type === 'timed';
+  const timed = ex.type === 'timed';
+  const hold = timed && state.hold?.itemId === item.id && state.hold.set === index ? state.hold : null;
+
+  const tap = () => {
+    if (hold) {
+      dispatch({ type: 'holdStop' });
+      // Stopped mid-hold: log what was actually held. During get-ready: an ordinary tick.
+      if (Date.now() >= hold.goAt) {
+        const held = Math.max(1, Math.round((Date.now() - hold.goAt) / 1000));
+        tickFeedback();
+        onTicked();
+        return update((w) => completeHold(w, item.id, index, held));
+      }
+    }
+    if (!set.done) {
+      tickFeedback();
+      onTicked();
+    }
+    update((w) => toggleSet(w, item.id, index));
+  };
+
   return (
-    <div className={'set-row' + (single ? ' single' : '') + (set.done ? ' done' : '') + (now ? ' now' : '')}>
+    <div className={'set-row' + (set.done ? ' done' : '') + (now ? ' now' : '') + (hold ? ' holding' : '')}>
       <div className="set-idx">{label}</div>
-      <SetFields ex={ex} set={set} units={units} onChange={(p) => update((w) => updateSetForward(w, item.id, index, p))} />
+      {hold ? (
+        <HoldDisplay hold={hold} />
+      ) : (
+        <SetFields ex={ex} set={set} units={units} onChange={(p) => update((w) => updateSetForward(w, item.id, index, p))} />
+      )}
+      {timed &&
+        (hold ? (
+          <button type="button" className="hold-btn" aria-label="Cancel timer" onClick={() => dispatch({ type: 'holdStop' })}>
+            <IconClose />
+          </button>
+        ) : set.done || !set.seconds ? (
+          <div />
+        ) : (
+          <button
+            type="button"
+            className="hold-btn play"
+            aria-label={`Start ${set.seconds} second timer for set ${index + 1} of ${ex.name}`}
+            onClick={() => {
+              primeAudio();
+              dispatch({ type: 'holdStart', itemId: item.id, set: index, seconds: set.seconds!, now: Date.now() });
+            }}
+          >
+            <IconPlay />
+          </button>
+        ))}
       <button
         type="button"
         className={'tick' + (set.done ? ' on' : '')}
-        aria-label={`${set.done ? 'Untick' : 'Tick'} set ${index + 1} of ${ex.name}`}
+        aria-label={hold ? `Stop timer and log set ${index + 1} of ${ex.name}` : `${set.done ? 'Untick' : 'Tick'} set ${index + 1} of ${ex.name}`}
         aria-pressed={set.done}
-        onClick={() => {
-          if (!set.done) {
-            tickFeedback();
-            onTicked();
-          }
-          update((w) => toggleSet(w, item.id, index));
-        }}
+        onClick={tap}
       >
         <IconCheck />
       </button>

@@ -46,3 +46,13 @@ export function tickFeedback() {
   navigator.vibrate?.(15);
   primeAudio();
 }
+
+/** Short pip for the last seconds of a countdown. */
+export function countBeep(high = false) {
+  navigator.vibrate?.(high ? 120 : 40);
+  try {
+    if (ctx && ctx.state === 'running') beep(ctx.currentTime, high ? 1175 : 660);
+  } catch {
+    /* ignore */
+  }
+}

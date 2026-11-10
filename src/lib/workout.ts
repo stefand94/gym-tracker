@@ -119,6 +119,22 @@ export function toggleSet(w: Workout, itemId: string, setIndex: number): Workout
   }));
 }
 
+/** Log a timed set as held for `seconds` and tick it (only that set changes). */
+export function completeHold(w: Workout, itemId: string, setIndex: number, seconds: number): Workout {
+  return mapItem(w, itemId, (i) => ({
+    ...i,
+    status: i.status === 'skipped' ? 'pending' : i.status,
+    sets: i.sets.map((s, idx) => (idx === setIndex ? { ...s, seconds, done: true } : s)),
+  }));
+}
+
+/** Whether ticking this set should start a rest: always in a single block, only at the end of a round in a superset. */
+export function restsAfter(w: Workout, itemId: string, setIndex: number): boolean {
+  const block = w.blocks.find((b) => b.items.some((i) => i.id === itemId));
+  if (!block || !block.superset) return true;
+  return roundComplete(block, setIndex);
+}
+
 /** Tick every set (or untick all if every set is already done). */
 export function toggleComplete(w: Workout, itemId: string): Workout {
   return mapItem(w, itemId, (i) => {

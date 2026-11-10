@@ -30,6 +30,16 @@ export interface RestState {
   total: number;
 }
 
+/** A timed set being counted down. `goAt` is when the hold starts (after a short get-ready). */
+export interface HoldState {
+  itemId: string;
+  set: number;
+  goAt: number;
+  endsAt: number;
+}
+
+export const HOLD_LEAD_IN = 5;
+
 export interface State {
   history: Workout[];
   active: Workout | null;
@@ -37,6 +47,7 @@ export interface State {
   sync: SyncState;
   prefs: Prefs;
   rest: RestState | null;
+  hold: HoldState | null;
 }
 
 type Action =
@@ -54,7 +65,9 @@ type Action =
   | { type: 'prefs'; prefs: Partial<Prefs> }
   | { type: 'restStart'; now: number }
   | { type: 'restAdjust'; seconds: number; now: number }
-  | { type: 'restStop' };
+  | { type: 'restStop' }
+  | { type: 'holdStart'; itemId: string; set: number; seconds: number; now: number }
+  | { type: 'holdStop' };
 
 const KEY = 'gym-tracker:v1';
 
@@ -77,6 +90,7 @@ function load(): State {
     sync: { queue: [], busy: false },
     prefs: DEFAULT_PREFS,
     rest: null,
+    hold: null,
   };
   try {
     const raw = localStorage.getItem(KEY);
@@ -89,6 +103,7 @@ function load(): State {
       sync: { queue: saved.sync?.queue ?? [], lastSync: saved.sync?.lastSync, busy: false },
       prefs: { ...DEFAULT_PREFS, ...saved.prefs },
       rest: saved.rest ?? null,
+      hold: saved.hold ?? null,
     };
   } catch {
     return base;
@@ -116,12 +131,13 @@ function reducer(state: State, action: Action): State {
         ...state,
         active: null,
         rest: null,
+        hold: null,
         history: [...state.history.filter((w) => w.id !== done.id), done],
         sync: { ...state.sync, queue: enqueue(state.sync.queue, { op: 'put', id: done.id }) },
       };
     }
     case 'discard':
-      return { ...state, active: null, rest: null };
+      return { ...state, active: null, rest: null, hold: null };
     case 'delete': {
       const queue = state.sync.queue.filter((q) => q.id !== action.id);
       return {
@@ -181,6 +197,13 @@ function reducer(state: State, action: Action): State {
     }
     case 'restStop':
       return state.rest ? { ...state, rest: null } : state;
+    case 'holdStart': {
+      // Starting a hold ends any rest that's still counting.
+      const goAt = action.now + HOLD_LEAD_IN * 1000;
+      return { ...state, rest: null, hold: { itemId: action.itemId, set: action.set, goAt, endsAt: goAt + action.seconds * 1000 } };
+    }
+    case 'holdStop':
+      return state.hold ? { ...state, hold: null } : state;
     case 'restore': {
       const known = new Set(state.history.map((w) => w.id));
       const fresh = action.history.filter((w) => w.finishedAt && !known.has(w.id));
@@ -202,10 +225,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined, load);
   useEffect(() => {
     try {
-      const { history, active, settings, sync, prefs, rest } = state;
+      const { history, active, settings, sync, prefs, rest, hold } = state;
       localStorage.setItem(
         KEY,
-        JSON.stringify({ history, active, settings, prefs, rest, sync: { queue: sync.queue, lastSync: sync.lastSync } }),
+        JSON.stringify({ history, active, settings, prefs, rest, hold, sync: { queue: sync.queue, lastSync: sync.lastSync } }),
       );
     } catch {
       /* storage full or unavailable */
