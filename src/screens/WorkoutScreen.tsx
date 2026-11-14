@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { BodyMap } from '../components/BodyMap';
+import { ExerciseEditor } from '../components/ExerciseEditor';
 import { ExercisePicker } from '../components/ExercisePicker';
 import { HoldWatcher } from '../components/HoldTimer';
 import { IconPlus } from '../components/Icons';
@@ -30,6 +31,7 @@ export function WorkoutScreen() {
   const { state, dispatch } = useStore();
   const nav = useNavigate();
   const [picking, setPicking] = useState(false);
+  const [creating, setCreating] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(true);
   const [ask, setAsk] = useState<Ask>(null);
   /** Blocks opened or closed by hand; everything else follows "only the current block is open". */
@@ -196,6 +198,22 @@ export function WorkoutScreen() {
           onPick={(ex) => {
             update((x) => addExercise(x, ex, state.history));
             setPicking(false);
+            setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 50);
+          }}
+          onCreate={(name) => {
+            setPicking(false);
+            setCreating(name);
+          }}
+        />
+      )}
+      {creating !== null && (
+        <ExerciseEditor
+          initialName={creating}
+          saveLabel="Save & add to workout"
+          onClose={() => setCreating(null)}
+          onSaved={(ex) => {
+            update((x) => addExercise(x, ex, state.history));
+            setCreating(null);
             setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 50);
           }}
         />

@@ -1,9 +1,13 @@
 import { useRef, useState } from 'react';
+import { BodyMap } from '../components/BodyMap';
+import { ExerciseEditor } from '../components/ExerciseEditor';
 import { ConfirmSheet } from '../components/Sheet';
+import { MUSCLE_LABELS } from '../data/muscles';
+import { exerciseMap } from '../lib/muscleLoad';
 import { fmtDate } from '../lib/format';
 import { testConnection } from '../lib/sync';
 import { useStore } from '../state/store';
-import type { Workout } from '../types';
+import type { Exercise, Workout } from '../types';
 
 export function Settings({ syncNow }: { syncNow: () => void }) {
   const { state, dispatch } = useStore();
@@ -13,6 +17,8 @@ export function Settings({ syncNow }: { syncNow: () => void }) {
   const [test, setTest] = useState<{ ok: boolean; msg: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [askDisconnect, setAskDisconnect] = useState(false);
+  const [editing, setEditing] = useState<Exercise | 'new' | null>(null);
+  const mine = [...state.customExercises].sort((a, b) => a.name.localeCompare(b.name));
 
   const save = async () => {
     const [owner, name] = repo.trim().split('/');
@@ -81,6 +87,34 @@ export function Settings({ syncNow }: { syncNow: () => void }) {
           Sync now
         </button>
       </div>
+
+      <div className="section-title">Your exercises</div>
+      <div className="card custom-list">
+        {mine.length === 0 && <div className="small dim">Exercises you create show up here. Claude checks their muscles later.</div>}
+        {mine.map((e) => (
+          <button key={e.id} className="picker-item" onClick={() => setEditing(e)}>
+            <BodyMap load={exerciseMap(e)} scaleMax={1} size="mini" />
+            <div className="grow picker-text">
+              <div className="picker-name">{e.name}</div>
+              <div className="picker-meta">
+                {[e.equipment, e.primary.map((m) => MUSCLE_LABELS[m]).join(', ') || 'no muscles yet'].join(' · ')}
+                {e.reviewed ? ' · checked' : ''}
+              </div>
+            </div>
+          </button>
+        ))}
+        <button className="picker-create" onClick={() => setEditing('new')}>
+          <span className="picker-create-plus">+</span>
+          New exercise
+        </button>
+      </div>
+      {editing && (
+        <ExerciseEditor
+          existing={editing === 'new' ? undefined : editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => setEditing(null)}
+        />
+      )}
 
       <div className="section-title">GitHub connection</div>
       <div className="card stack">
