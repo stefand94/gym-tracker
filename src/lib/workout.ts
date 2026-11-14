@@ -59,6 +59,7 @@ export function makeItem(exercise: Exercise, history: Workout[], routineItem?: R
     exerciseId: exercise.id,
     status: 'pending',
     sets: buildSets(exercise, history, routineItem),
+    ...(routineItem?.trackPain ? { trackPain: true } : {}),
   };
 }
 

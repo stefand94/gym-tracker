@@ -1539,5 +1539,136 @@
       "reps": 30,
       "weight": 20
     }
+  },
+  {
+    "id": "hamstring-iso-bridge",
+    "name": "Isometric bridge hold (heel dig)",
+    "type": "timed",
+    "equipment": "Bodyweight",
+    "cue": "knees ~90°, dig heels into the floor, push 30–50% — no pain",
+    "primary": [
+      "hamstrings"
+    ],
+    "secondary": [
+      "glutes"
+    ],
+    "defaults": {
+      "sets": 5,
+      "seconds": 30
+    }
+  },
+  {
+    "id": "long-lever-bridge-hold",
+    "name": "Long-lever bridge hold",
+    "type": "timed",
+    "equipment": "Bodyweight",
+    "cue": "heels further out, knees nearly straight; hips up and hold",
+    "primary": [
+      "hamstrings",
+      "glutes"
+    ],
+    "secondary": [
+      "lowerBack"
+    ],
+    "defaults": {
+      "sets": 4,
+      "seconds": 20
+    }
+  },
+  {
+    "id": "single-leg-glute-bridge",
+    "name": "Single-leg glute bridge",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "weightNote": "reps per leg",
+    "cue": "drive through the heel, hips level, 1 s squeeze",
+    "primary": [
+      "glutes",
+      "hamstrings"
+    ],
+    "secondary": [
+      "lowerBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10
+    }
+  },
+  {
+    "id": "dumbbell-romanian-deadlift",
+    "name": "Dumbbell Romanian deadlift",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "cue": "soft knees, hips back, stop where the stretch starts",
+    "primary": [
+      "hamstrings",
+      "glutes"
+    ],
+    "secondary": [
+      "lowerBack",
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 10
+    }
+  },
+  {
+    "id": "single-leg-rdl",
+    "name": "Single-leg Romanian deadlift",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "one dumbbell, opposite hand · reps per leg",
+    "cue": "slow, square hips; touch a wall for balance at first",
+    "primary": [
+      "hamstrings",
+      "glutes"
+    ],
+    "secondary": [
+      "lowerBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 8
+    }
+  },
+  {
+    "id": "slider-hamstring-curl",
+    "name": "Slider hamstring curl",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "weightNote": "sliders, towel or Swiss ball",
+    "cue": "hips up, slide heels out slowly (3 s), curl back in",
+    "primary": [
+      "hamstrings"
+    ],
+    "secondary": [
+      "glutes"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8
+    }
+  },
+  {
+    "id": "nordic-curl",
+    "name": "Nordic hamstring curl (lowering)",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "weightNote": "feet anchored",
+    "cue": "lower as slowly as you can, catch with your hands, push back up",
+    "primary": [
+      "hamstrings"
+    ],
+    "secondary": [
+      "glutes"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 4
+    }
   }
 ]

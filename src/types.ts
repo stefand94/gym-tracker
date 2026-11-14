@@ -29,10 +29,16 @@ export interface RoutineItem {
   reps?: number;
   seconds?: number;
   weight?: number;
+  /** Ask for a 0–10 pain score on this exercise (rehab work). */
+  trackPain?: boolean;
 }
+
+export type RehabArea = 'hamstring';
 
 export interface RoutineBlock {
   superset?: boolean;
+  /** A rehab "daily dose": swapped for the current phase's dose when the workout starts. */
+  rehabDose?: RehabArea;
   items: RoutineItem[];
 }
 
@@ -42,6 +48,8 @@ export interface Routine {
   description?: string;
   /** Weekdays it's scheduled for ("mon" … "sun"). Today's routine is shown first on Home. */
   days?: ('sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat')[];
+  /** Marks a rehab phase routine. */
+  rehab?: { area: RehabArea; phase: number };
   blocks: RoutineBlock[];
 }
 
@@ -59,6 +67,9 @@ export interface WorkoutItem {
   exerciseId: string;
   status: ItemStatus;
   sets: SetEntry[];
+  trackPain?: boolean;
+  /** 0–10 pain during this exercise. */
+  pain?: number;
 }
 
 export interface WorkoutBlock {

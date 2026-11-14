@@ -45,9 +45,10 @@
         "superset": true,
         "items": [
           {
-            "exerciseId": "leg-curl",
+            "exerciseId": "face-pull",
             "sets": 3,
-            "reps": 10
+            "reps": 15,
+            "weight": 15
           },
           {
             "exerciseId": "lateral-raise",
@@ -63,6 +64,23 @@
             "exerciseId": "dead-hang",
             "sets": 3,
             "seconds": 30
+          }
+        ]
+      },
+      {
+        "rehabDose": "hamstring",
+        "items": [
+          {
+            "exerciseId": "hamstring-iso-bridge",
+            "sets": 3,
+            "seconds": 30,
+            "trackPain": true
+          },
+          {
+            "exerciseId": "glute-bridge",
+            "sets": 2,
+            "reps": 12,
+            "trackPain": true
           }
         ]
       }
@@ -134,6 +152,23 @@
             "seconds": 45
           }
         ]
+      },
+      {
+        "rehabDose": "hamstring",
+        "items": [
+          {
+            "exerciseId": "hamstring-iso-bridge",
+            "sets": 3,
+            "seconds": 30,
+            "trackPain": true
+          },
+          {
+            "exerciseId": "glute-bridge",
+            "sets": 2,
+            "reps": 12,
+            "trackPain": true
+          }
+        ]
       }
     ]
   },
@@ -194,6 +229,143 @@
             "sets": 3,
             "reps": 30,
             "weight": 20
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hamstring-rehab-1",
+    "name": "Hamstring rehab 1",
+    "description": "Isometrics · ~1 week · move on after 2 sessions ≤2/10 pain",
+    "rehab": {
+      "area": "hamstring",
+      "phase": 1
+    },
+    "blocks": [
+      {
+        "items": [
+          {
+            "exerciseId": "hamstring-iso-bridge",
+            "trackPain": true,
+            "sets": 5,
+            "seconds": 30
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "long-lever-bridge-hold",
+            "trackPain": true,
+            "sets": 4,
+            "seconds": 20
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "glute-bridge",
+            "trackPain": true,
+            "sets": 3,
+            "reps": 12
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hamstring-rehab-2",
+    "name": "Hamstring rehab 2",
+    "description": "Strength · 1–2 weeks · light, slow lowering",
+    "rehab": {
+      "area": "hamstring",
+      "phase": 2
+    },
+    "blocks": [
+      {
+        "items": [
+          {
+            "exerciseId": "single-leg-glute-bridge",
+            "trackPain": true,
+            "sets": 3,
+            "reps": 10
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "leg-curl",
+            "trackPain": true,
+            "sets": 3,
+            "reps": 12,
+            "weight": 15
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "dumbbell-romanian-deadlift",
+            "trackPain": true,
+            "sets": 3,
+            "reps": 10,
+            "weight": 8
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hamstring-rehab-3",
+    "name": "Hamstring rehab 3",
+    "description": "Lengthened · ~2 weeks · then back to Legs",
+    "rehab": {
+      "area": "hamstring",
+      "phase": 3
+    },
+    "blocks": [
+      {
+        "items": [
+          {
+            "exerciseId": "slider-hamstring-curl",
+            "trackPain": true,
+            "sets": 3,
+            "reps": 8
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "single-leg-rdl",
+            "trackPain": true,
+            "sets": 3,
+            "reps": 8,
+            "weight": 6
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "nordic-curl",
+            "trackPain": true,
+            "sets": 3,
+            "reps": 4
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "romanian-deadlift",
+            "trackPain": true,
+            "sets": 3,
+            "reps": 8,
+            "weight": 30
           }
         ]
       }
