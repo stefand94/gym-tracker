@@ -91,7 +91,8 @@ type Action =
   | { type: 'routineSave'; routine: Routine; now: string }
   | { type: 'routineArchive'; id: string; now: string }
   | { type: 'exerciseSave'; exercise: Exercise; now: string }
-  | { type: 'remoteMerge'; remote: RemoteData };
+  | { type: 'remoteMerge'; remote: RemoteData }
+  | { type: 'historyUpdate'; workout: Workout };
 
 const KEY = 'gym-tracker:v1';
 
@@ -282,6 +283,15 @@ export function reducer(state: State, action: Action): State {
           ? state.customExercises.map((e) => (e.id === exercise.id ? exercise : e))
           : [...state.customExercises, exercise],
         sync: { ...state.sync, queue: enqueue(state.sync.queue, { op: 'put', kind: 'customExercises', id: CUSTOM_ID }) },
+      };
+    }
+    case 'historyUpdate': {
+      const w = action.workout;
+      if (!state.history.some((h) => h.id === w.id)) return state;
+      return {
+        ...state,
+        history: state.history.map((h) => (h.id === w.id ? w : h)),
+        sync: { ...state.sync, queue: enqueue(state.sync.queue, { op: 'put', id: w.id }) },
       };
     }
     case 'remoteMerge': {

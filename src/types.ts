@@ -96,4 +96,6 @@ export interface Workout {
   startedAt: string;
   finishedAt?: string;
   blocks: WorkoutBlock[];
+  /** 0–10 pain the morning after (rehab check-in); null = dismissed without answering. */
+  nextDayPain?: number | null;
 }

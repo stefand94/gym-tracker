@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BodyMap } from '../components/BodyMap';
 import { IconSettings } from '../components/Icons';
+import { PainStrip } from '../components/PainStrip';
 import { ConfirmSheet } from '../components/Sheet';
 import { getExercise } from '../data/library';
 import { doneSetCount, fmtDate, relDay } from '../lib/format';
 import { loadSince, workoutLoad } from '../lib/muscleLoad';
 import { finishedNewestFirst } from '../lib/prefill';
+import { AREA_LABELS, doseItems, morningCheck, rehabState, rehabStatus, STREAK } from '../lib/rehab';
 import { daysLabel, todaysRoutine } from '../lib/schedule';
 import { emptyWorkout, workoutFromRoutine, workoutProgress } from '../lib/workout';
 import { useStore } from '../state/store';
@@ -55,7 +57,11 @@ export function Home() {
   const routines = state.routines.filter((r) => !r.archived);
   const today = active ? null : todaysRoutine(routines, state.history);
   const others = routines.filter((r) => r !== today);
-  const startRoutine = (r: Routine) => start(workoutFromRoutine(r, state.history, getExercise));
+  const rehab = rehabState(state.history, state.routines);
+  const startRoutine = (r: Routine) =>
+    start(workoutFromRoutine(r, state.history, getExercise, new Date(), (rb) => doseItems(rb, rehab, state.routines)));
+  const morning = morningCheck(state.history);
+  const answerMorning = (v: number | null) => morning && dispatch({ type: 'historyUpdate', workout: { ...morning, nextDayPain: v } });
 
   return (
     <div>
@@ -79,6 +85,41 @@ export function Home() {
           </div>
           <div style={{ marginTop: 8, fontWeight: 700 }}>Resume workout →</div>
         </Link>
+      )}
+
+      {morning && (
+        <div className="card morning-card">
+          <div className="spread">
+            <div className="routine-name">How's the {AREA_LABELS[rehab?.area ?? 'hamstring'].toLowerCase()} this morning?</div>
+            <button className="link-btn" onClick={() => answerMorning(null)}>
+              Skip
+            </button>
+          </div>
+          <div className="small dim">After {morning.name}, {relDay(morning.startedAt).toLowerCase()}</div>
+          <PainStrip label="Pain now" value={undefined} onChange={(v) => v !== undefined && answerMorning(v)} />
+        </div>
+      )}
+
+      {rehab && !rehab.done && !active && (
+        <div className="card rehab-card">
+          <div className="rehab-top">
+            <div className="routine-name">{AREA_LABELS[rehab.area]} rehab</div>
+            <div className="rehab-phase">
+              Phase {Math.min(rehab.phase, rehab.maxPhase)} of {rehab.maxPhase}
+            </div>
+          </div>
+          <div className="rehab-dots" aria-hidden>
+            {Array.from({ length: STREAK }, (_, i) => (
+              <span key={i} className={i < rehab.streak ? 'on' : ''} />
+            ))}
+          </div>
+          <div className={'rehab-status' + (rehab.dropBack ? ' warn' : '')}>{rehabStatus(rehab)}</div>
+          {rehab.next && (
+            <button className="btn btn-block" onClick={() => startRoutine(rehab.next!)}>
+              Start {rehab.next.name}
+            </button>
+          )}
+        </div>
       )}
 
       {today && (

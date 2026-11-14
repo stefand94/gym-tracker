@@ -1,6 +1,7 @@
 import type {
   Exercise,
   Routine,
+  RoutineBlock,
   RoutineItem,
   SetEntry,
   Workout,
@@ -68,10 +69,12 @@ export function workoutFromRoutine(
   history: Workout[],
   lookup: Lookup,
   now = new Date(),
+  /** Fills in `rehabDose` blocks (see rehab.ts doseItems). */
+  dose?: (block: RoutineBlock) => RoutineItem[],
 ): Workout {
   const blocks: WorkoutBlock[] = [];
   for (const rb of routine.blocks) {
-    const items = rb.items
+    const items = (rb.rehabDose && dose ? dose(rb) : rb.items)
       .map((ri) => {
         const ex = lookup(ri.exerciseId);
         return ex ? makeItem(ex, history, ri) : null;
@@ -296,4 +299,20 @@ export function workoutProgress(w: Workout): { done: number; total: number } {
       done += i.sets.filter((s) => s.done).length;
     }
   return { done, total };
+}
+
+/** Set (or clear, with undefined) the 0–10 pain score on an item; logging pain also marks it as tracked. */
+export function setPain(w: Workout, itemId: string, pain: number | undefined): Workout {
+  return mapItem(w, itemId, (i) => {
+    const { pain: _old, ...rest } = i;
+    return pain === undefined ? rest : { ...rest, trackPain: true, pain };
+  });
+}
+
+export function toggleTrackPain(w: Workout, itemId: string): Workout {
+  return mapItem(w, itemId, (i) => {
+    if (!i.trackPain) return { ...i, trackPain: true };
+    const { trackPain: _t, pain: _p, ...rest } = i;
+    return rest;
+  });
 }

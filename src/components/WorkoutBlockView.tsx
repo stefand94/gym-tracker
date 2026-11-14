@@ -19,6 +19,8 @@ import {
   toggleComplete,
   toggleSet,
   toggleSkip,
+  setPain,
+  toggleTrackPain,
   updateSetForward,
   type SetPatch,
 } from '../lib/workout';
@@ -29,6 +31,7 @@ import { ExercisePicker } from './ExercisePicker';
 import { HoldDisplay } from './HoldTimer';
 import { IconCheck, IconClose, IconMore, IconPlay } from './Icons';
 import { Sheet } from './Sheet';
+import { PainStrip } from './PainStrip';
 import { NumInput, Stepper } from './Stepper';
 
 type Update = (fn: (w: Workout) => Workout) => void;
@@ -279,6 +282,9 @@ function ItemMenu({
       <button className="menu-item" onClick={() => act((w) => addSet(w, item.id))}>
         Add a set
       </button>
+      <button className="menu-item" onClick={() => act((w) => toggleTrackPain(w, item.id))}>
+        {item.trackPain ? 'Stop logging pain' : 'Log pain'}
+      </button>
       <button className="menu-item" disabled={item.sets.length <= 1} onClick={() => act((w) => removeSet(w, item.id))}>
         Remove last set
       </button>
@@ -324,6 +330,9 @@ function SingleBlock({ block, index, count, update, current, onToggle }: BlockPr
             <SetRow key={i} ex={ex} item={item} index={i} label={String(i + 1)} update={update} now={i === nextSet} onTicked={startRest} />
           ))}
         </div>
+      )}
+      {item.trackPain && item.status !== 'skipped' && (
+        <PainStrip value={item.pain} onChange={(v) => update((w) => setPain(w, item.id, v))} />
       )}
       <div className="ex-actions">
         <button className={'btn' + (item.status === 'skipped' ? ' on' : '')} onClick={() => update((w) => toggleSkip(w, item.id))}>
@@ -409,6 +418,16 @@ function SupersetBlock({ block, index, count, update, current, onToggle }: Block
           </div>
         ))}
       </div>
+      {active
+        .filter((e) => e.item.trackPain)
+        .map((e) => (
+          <PainStrip
+            key={e.item.id}
+            label={`${e.tag} pain`}
+            value={e.item.pain}
+            onChange={(v) => update((w) => setPain(w, e.item.id, v))}
+          />
+        ))}
       <div className="ex-actions">
         <button className="btn" disabled={!active.length} onClick={() => update((w) => addRound(w, block.id))}>
           + Round
