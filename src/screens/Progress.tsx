@@ -1,12 +1,4 @@
-import {
-  CategoryScale,
-  Chart as ChartJS,
-  Filler,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Tooltip,
-} from 'chart.js';
+import { CategoryScale, Chart as ChartJS, Filler, LinearScale, LineElement, PointElement, Tooltip } from 'chart.js';
 import { useEffect, useMemo, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -16,7 +8,7 @@ import { allExercises, getExercise } from '../data/library';
 import { MUSCLE_LABELS } from '../data/muscles';
 import { fmtDate, fmtNum, fmtSet } from '../lib/format';
 import { exerciseMap } from '../lib/muscleLoad';
-import { metricsFor, performedExerciseIds, series } from '../lib/progress';
+import { metricsFor, performedExerciseIds, series, stationsIn } from '../lib/progress';
 import { useStore } from '../state/store';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Filler);
@@ -34,7 +26,13 @@ function useColors() {
     return () => mq.removeEventListener('change', on);
   }, []);
   return useMemo(
-    () => ({ accent: cssVar('--heat'), grid: cssVar('--border'), text: cssVar('--text-dim'), surface: cssVar('--surface') }),
+    () => ({
+      accent: cssVar('--heat'),
+      lines: [cssVar('--heat'), cssVar('--rest'), cssVar('--done'), cssVar('--skip')],
+      grid: cssVar('--border'),
+      text: cssVar('--text-dim'),
+      surface: cssVar('--surface'),
+    }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [scheme],
   );
@@ -54,6 +52,19 @@ export function Progress() {
   const metrics = ex ? metricsFor(ex.type) : [];
   const metric = metrics.find((m) => m.key === metricKey) ?? metrics[0];
   const pts = useMemo(() => (ex && metric ? series(ex, metric, state.history) : []), [ex, metric, state.history]);
+  /** One line per station once an exercise has been done on more than one (null = no station set). */
+  const lines = useMemo(() => {
+    if (!ex || !metric) return [];
+    const stations = stationsIn(ex, state.history);
+    if (stations.length < 2) return [];
+    return stations.slice(0, 4).map((st) => {
+      const byDate = new Map(series(ex, metric, state.history, st).map((p) => [p.date, p.value]));
+      return {
+        label: st ?? 'No station',
+        data: pts.map((p) => byDate.get(p.date) ?? null),
+      };
+    });
+  }, [ex, metric, state.history, pts]);
 
   const sessions = useMemo(() => {
     if (!ex) return [];
@@ -62,7 +73,12 @@ export function Progress() {
       .sort((a, b) => (a.startedAt < b.startedAt ? 1 : -1))
       .map((w) => ({
         w,
-        sets: w.blocks.flatMap((b) => b.items).filter((i) => i.exerciseId === ex.id && i.status !== 'skipped').flatMap((i) => i.sets.filter((s) => s.done)),
+        items: w.blocks.flatMap((b) => b.items).filter((i) => i.exerciseId === ex.id && i.status !== 'skipped'),
+      }))
+      .map(({ w, items }) => ({
+        w,
+        sets: items.flatMap((i) => i.sets.filter((s) => s.done)),
+        stations: [...new Set(items.flatMap((i) => (i.station ? [i.station] : [])))],
       }))
       .filter((x) => x.sets.length)
       .slice(0, 10);
@@ -89,9 +105,22 @@ export function Progress() {
       </button>
 
       {performed.length > 1 && (
-        <div className="chips" style={{ marginTop: 10, flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: 4 }}>
+        <div
+          className="chips"
+          style={{
+            marginTop: 10,
+            flexWrap: 'nowrap',
+            overflowX: 'auto',
+            paddingBottom: 4,
+          }}
+        >
           {performed.slice(0, 12).map((pid) => (
-            <button key={pid} className={'chip' + (pid === exId ? ' on' : '')} style={{ flexShrink: 0 }} onClick={() => nav(`/progress/${pid}`, { replace: true })}>
+            <button
+              key={pid}
+              className={'chip' + (pid === exId ? ' on' : '')}
+              style={{ flexShrink: 0 }}
+              onClick={() => nav(`/progress/${pid}`, { replace: true })}
+            >
               {getExercise(pid)?.name ?? pid}
             </button>
           ))}
@@ -127,40 +156,91 @@ export function Progress() {
 
           <div className="card">
             {pts.length ? (
-              <div className="chart-box">
-                <Line
-                  data={{
-                    labels: pts.map((p) => fmtDate(p.date, { day: 'numeric', month: 'short' })),
-                    datasets: [
-                      {
-                        data: pts.map((p) => p.value),
-                        borderColor: colors.accent,
-                        backgroundColor: `${colors.accent}2e`,
-                        pointBackgroundColor: colors.accent,
-                        pointBorderColor: colors.surface,
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        borderWidth: 2.5,
-                        tension: 0.25,
-                        fill: true,
+              <>
+                <div className="chart-box">
+                  <Line
+                    data={{
+                      labels: pts.map((p) => fmtDate(p.date, { day: 'numeric', month: 'short' })),
+                      datasets: lines.length
+                        ? lines.map((l, n) => {
+                            const c = colors.lines[n % colors.lines.length];
+                            return {
+                              label: l.label,
+                              data: l.data,
+                              borderColor: c,
+                              backgroundColor: c,
+                              pointBackgroundColor: c,
+                              pointBorderColor: colors.surface,
+                              pointBorderWidth: 2,
+                              pointRadius: 4,
+                              pointHoverRadius: 6,
+                              borderWidth: 2.5,
+                              tension: 0.25,
+                              spanGaps: true,
+                            };
+                          })
+                        : [
+                            {
+                              data: pts.map((p) => p.value),
+                              borderColor: colors.accent,
+                              backgroundColor: `${colors.accent}2e`,
+                              pointBackgroundColor: colors.accent,
+                              pointBorderColor: colors.surface,
+                              pointBorderWidth: 2,
+                              pointRadius: 4,
+                              pointHoverRadius: 6,
+                              borderWidth: 2.5,
+                              tension: 0.25,
+                              fill: true,
+                            },
+                          ],
+                    }}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      interaction: { mode: 'index', intersect: false },
+                      plugins: {
+                        tooltip: {
+                          callbacks: {
+                            label: (c) =>
+                              `${lines.length ? `${c.dataset.label}: ` : `${metric.label}: `}${fmtNum(c.parsed.y ?? undefined)} ${metric.unit}`,
+                          },
+                        },
                       },
-                    ],
-                  }}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                      tooltip: { callbacks: { label: (c) => `${metric.label}: ${fmtNum(c.parsed.y ?? undefined)} ${metric.unit}` } },
-                    },
-                    scales: {
-                      x: { grid: { display: false }, ticks: { color: colors.text, maxRotation: 0, autoSkipPadding: 12 } },
-                      y: { grid: { color: colors.grid }, border: { display: false }, ticks: { color: colors.text, precision: 0 }, beginAtZero: false },
-                    },
-                  }}
-                />
-              </div>
+                      scales: {
+                        x: {
+                          grid: { display: false },
+                          ticks: {
+                            color: colors.text,
+                            maxRotation: 0,
+                            autoSkipPadding: 12,
+                          },
+                        },
+                        y: {
+                          grid: { color: colors.grid },
+                          border: { display: false },
+                          ticks: { color: colors.text, precision: 0 },
+                          beginAtZero: false,
+                        },
+                      },
+                    }}
+                  />
+                </div>
+                {lines.length > 0 && (
+                  <div className="chart-legend">
+                    {lines.map((l, n) => (
+                      <span key={l.label}>
+                        <i
+                          style={{
+                            background: colors.lines[n % colors.lines.length],
+                          }}
+                        />
+                        {l.label}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </>
             ) : (
               <div className="empty">No completed sets for {ex.name} yet.</div>
             )}
@@ -170,12 +250,17 @@ export function Progress() {
             <>
               <div className="section-title">Recent sessions</div>
               <div className="card list-card">
-                {sessions.map(({ w, sets }) => (
+                {sessions.map(({ w, sets, stations }) => (
                   <div key={w.id} className="list-row" style={{ alignItems: 'flex-start' }}>
                     <div className="small dim" style={{ width: 64, flexShrink: 0 }}>
                       {fmtDate(w.startedAt, { day: 'numeric', month: 'short' })}
                     </div>
                     <div className="hist-sets grow">
+                      {stations.map((st) => (
+                        <span key={st} className="station-tag" style={{ marginLeft: 0 }}>
+                          📍 {st}
+                        </span>
+                      ))}
                       {sets.map((s, k) => (
                         <span key={k} className="hist-set">
                           {fmtSet(ex, s)}

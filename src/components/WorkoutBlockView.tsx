@@ -4,6 +4,7 @@ import { MUSCLE_LABELS } from '../data/muscles';
 import { primeAudio, tickFeedback } from '../lib/alert';
 import { itemSummary, weightStep } from '../lib/format';
 import { exerciseMap } from '../lib/muscleLoad';
+import { stationsFor } from '../lib/prefill';
 import {
   addRound,
   addSet,
@@ -20,6 +21,7 @@ import {
   toggleSet,
   toggleSkip,
   setPain,
+  setStation,
   toggleTrackPain,
   updateSetForward,
   type SetPatch,
@@ -32,6 +34,7 @@ import { HoldDisplay } from './HoldTimer';
 import { IconCheck, IconClose, IconMore, IconPlay } from './Icons';
 import { Sheet } from './Sheet';
 import { PainStrip } from './PainStrip';
+import { StationSheet, usesStations } from './StationSheet';
 import { NumInput, Stepper } from './Stepper';
 
 type Update = (fn: (w: Workout) => Workout) => void;
@@ -161,7 +164,13 @@ function SetRow({
             aria-label={`Start ${set.seconds} second timer for set ${index + 1} of ${ex.name}`}
             onClick={() => {
               primeAudio();
-              dispatch({ type: 'holdStart', itemId: item.id, set: index, seconds: set.seconds!, now: Date.now() });
+              dispatch({
+                type: 'holdStart',
+                itemId: item.id,
+                set: index,
+                seconds: set.seconds!,
+                now: Date.now(),
+              });
             }}
           >
             <IconPlay />
@@ -170,7 +179,9 @@ function SetRow({
       <button
         type="button"
         className={'tick' + (set.done ? ' on' : '')}
-        aria-label={hold ? `Stop timer and log set ${index + 1} of ${ex.name}` : `${set.done ? 'Untick' : 'Tick'} set ${index + 1} of ${ex.name}`}
+        aria-label={
+          hold ? `Stop timer and log set ${index + 1} of ${ex.name}` : `${set.done ? 'Untick' : 'Tick'} set ${index + 1} of ${ex.name}`
+        }
         aria-pressed={set.done}
         onClick={tap}
       >
@@ -192,13 +203,18 @@ function ItemHead({
   tag,
   onMenu,
   onHeadTap,
+  update,
 }: {
   ex: Exercise;
   item: WorkoutItem;
   tag?: string;
   onMenu: () => void;
   onHeadTap?: () => void;
+  update: Update;
 }) {
+  const { state } = useStore();
+  const [picking, setPicking] = useState(false);
+  const showStation = item.status !== 'skipped' && (!!item.station || usesStations(ex) || stationsFor(ex.id, state.history).length > 0);
   const muscles = ex.primary.map((m) => MUSCLE_LABELS[m]).join(', ');
   const text = (
     <>
@@ -219,19 +235,40 @@ function ItemHead({
     </>
   );
   return (
-    <div className="ex-head">
-      {onHeadTap ? (
-        <button type="button" className="grow ex-head-btn" onClick={onHeadTap} aria-label={`Collapse ${ex.name}`}>
-          {text}
+    <>
+      <div className="ex-head">
+        {onHeadTap ? (
+          <button type="button" className="grow ex-head-btn" onClick={onHeadTap} aria-label={`Collapse ${ex.name}`}>
+            {text}
+          </button>
+        ) : (
+          <div className="grow">{text}</div>
+        )}
+        <BodyMap load={exerciseMap(ex)} scaleMax={1} size="mini" />
+        <button type="button" className="icon-btn" aria-label={`Options for ${ex.name}`} onClick={onMenu}>
+          <IconMore />
         </button>
-      ) : (
-        <div className="grow">{text}</div>
+      </div>
+      {showStation && (
+        <button
+          type="button"
+          className={'station-chip' + (item.station ? ' set' : '')}
+          onClick={() => setPicking(true)}
+          aria-label={item.station ? `Station ${item.station}, change` : 'Set station'}
+        >
+          {item.station ? <>📍 {item.station}</> : '+ Station'}
+        </button>
       )}
-      <BodyMap load={exerciseMap(ex)} scaleMax={1} size="mini" />
-      <button type="button" className="icon-btn" aria-label={`Options for ${ex.name}`} onClick={onMenu}>
-        <IconMore />
-      </button>
-    </div>
+      {picking && (
+        <StationSheet
+          ex={ex}
+          current={item.station}
+          history={state.history}
+          onPick={(st) => update((w) => setStation(w, item.id, st, state.history, getExercise))}
+          onClose={() => setPicking(false)}
+        />
+      )}
+    </>
   );
 }
 
@@ -302,10 +339,7 @@ function ItemMenu({
           Split superset
         </button>
       )}
-      <button
-        className="menu-item danger"
-        onClick={() => (armed ? act((w) => removeItem(w, item.id)) : setArmed(true))}
-      >
+      <button className="menu-item danger" onClick={() => (armed ? act((w) => removeItem(w, item.id)) : setArmed(true))}>
         {armed ? `Tap again to remove ${ex.name}` : 'Remove from workout'}
       </button>
     </Sheet>
@@ -322,7 +356,7 @@ function SingleBlock({ block, index, count, update, current, onToggle }: BlockPr
   const nextSet = item.status === 'pending' ? item.sets.findIndex((s) => !s.done) : -1;
   return (
     <section className={'card ex-card' + cls + (current ? ' is-current' : '')}>
-      <ItemHead ex={ex} item={item} onMenu={() => setMenu(true)} onHeadTap={current ? undefined : onToggle} />
+      <ItemHead ex={ex} item={item} update={update} onMenu={() => setMenu(true)} onHeadTap={current ? undefined : onToggle} />
       {item.status !== 'skipped' && (
         <div className="sets">
           <SetHeader labels={fieldLabels(ex)} />
@@ -358,7 +392,11 @@ function SupersetBlock({ block, index, count, update, current, onToggle }: Block
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const startRest = useStartRest();
   const letter = LETTERS[index % 26];
-  const entries = block.items.map((item, n) => ({ item, ex: getExercise(item.exerciseId), tag: `${letter}${n + 1}` }));
+  const entries = block.items.map((item, n) => ({
+    item,
+    ex: getExercise(item.exerciseId),
+    tag: `${letter}${n + 1}`,
+  }));
   const active = entries.filter((e) => e.ex && e.item.status !== 'skipped');
   const rounds = Math.max(0, ...active.map((e) => e.item.sets.length));
   const complete = blockComplete(block);
@@ -378,7 +416,10 @@ function SupersetBlock({ block, index, count, update, current, onToggle }: Block
 
   // Rest only once the whole round is done, not between the exercises in it.
   const tickedIn = (itemId: string, round: number) => () => {
-    const others = { ...block, items: block.items.filter((i) => i.id !== itemId) };
+    const others = {
+      ...block,
+      items: block.items.filter((i) => i.id !== itemId),
+    };
     if (roundComplete(others, round)) startRest();
   };
 
@@ -391,7 +432,14 @@ function SupersetBlock({ block, index, count, update, current, onToggle }: Block
       {entries.map(({ item, ex, tag }) =>
         ex ? (
           <div key={item.id} className="ss-item-head">
-            <ItemHead ex={ex} item={item} tag={tag} onMenu={() => setMenuFor(item.id)} onHeadTap={current ? undefined : onToggle} />
+            <ItemHead
+              ex={ex}
+              item={item}
+              tag={tag}
+              update={update}
+              onMenu={() => setMenuFor(item.id)}
+              onHeadTap={current ? undefined : onToggle}
+            />
           </div>
         ) : null,
       )}

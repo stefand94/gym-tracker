@@ -9,7 +9,7 @@ import type {
   WorkoutItem,
 } from '../types';
 import { uid } from './id';
-import { lastPerformance } from './prefill';
+import { cleanStation, lastPerformance, lastStation } from './prefill';
 
 type Lookup = (id: string) => Exercise | undefined;
 
@@ -18,8 +18,9 @@ export function buildSets(
   exercise: Exercise,
   history: Workout[],
   routineItem?: RoutineItem,
+  station?: string,
 ): SetEntry[] {
-  const last = lastPerformance(exercise.id, history);
+  const last = lastPerformance(exercise.id, history, station);
   if (last && last.length > 0) {
     const count = routineItem?.sets ?? last.length;
     return Array.from({ length: count }, (_, i) => {
@@ -55,12 +56,14 @@ function pickFields(exercise: Exercise, s: SetEntry): SetEntry {
 }
 
 export function makeItem(exercise: Exercise, history: Workout[], routineItem?: RoutineItem): WorkoutItem {
+  const station = routineItem?.station ?? lastStation(exercise.id, history);
   return {
     id: uid(),
     exerciseId: exercise.id,
     status: 'pending',
-    sets: buildSets(exercise, history, routineItem),
+    sets: buildSets(exercise, history, routineItem, station),
     ...(routineItem?.trackPain ? { trackPain: true } : {}),
+    ...(station ? { station } : {}),
   };
 }
 
@@ -314,5 +317,24 @@ export function toggleTrackPain(w: Workout, itemId: string): Workout {
     if (!i.trackPain) return { ...i, trackPain: true };
     const { trackPain: _t, pain: _p, ...rest } = i;
     return rest;
+  });
+}
+
+/**
+ * Set (or clear) the station an item is done on. Unticked sets re-fill from the last time on that station,
+ * when there is one; otherwise they're left as they are.
+ */
+export function setStation(w: Workout, itemId: string, station: string | undefined, history: Workout[], lookup: Lookup): Workout {
+  return mapItem(w, itemId, (i) => {
+    const { station: _old, ...rest } = i;
+    const name = station ? cleanStation(station) : '';
+    if (!name) return rest;
+    const ex = lookup(i.exerciseId);
+    const last = ex ? lastPerformance(i.exerciseId, history, name, true) : null;
+    const sets =
+      ex && last
+        ? i.sets.map((s, idx) => (s.done ? s : pickFields(ex, { ...last[Math.min(idx, last.length - 1)], done: false })))
+        : i.sets;
+    return { ...rest, station: name, sets };
   });
 }

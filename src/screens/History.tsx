@@ -110,7 +110,9 @@ export function HistoryDetail() {
                   <div style={{ fontWeight: 700 }}>
                     {b.superset && <span className="ss-tag">SS{n + 1} </span>}
                     {ex?.name ?? i.exerciseId}{' '}
+                    {i.station && <span className="station-tag">📍 {i.station}</span>}{' '}
                     {i.status === 'skipped' && <span className="badge badge-skip">Skipped</span>}
+                    {i.pain !== undefined && <span className="station-tag">pain {i.pain}/10</span>}
                   </div>
                   {i.status !== 'skipped' && (
                     <div className="hist-sets">

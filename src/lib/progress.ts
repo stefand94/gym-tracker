@@ -1,4 +1,5 @@
 import type { Exercise, ExerciseType, SetEntry, Workout } from '../types';
+import { stationKey, stationsFor } from './prefill';
 
 export interface Metric {
   key: string;
@@ -50,20 +51,36 @@ export interface Point {
   value: number;
 }
 
-/** One point per finished workout that included done sets of this exercise, oldest first. */
-export function series(exercise: Exercise, metric: Metric, history: Workout[]): Point[] {
+/**
+ * One point per finished workout that included done sets of this exercise, oldest first.
+ * `station`: undefined = every station, null = sets with no station, a name = that station only.
+ */
+export function series(exercise: Exercise, metric: Metric, history: Workout[], station?: string | null): Point[] {
   const pts: Point[] = [];
   const sorted = history.filter((w) => w.finishedAt).sort((a, b) => (a.startedAt < b.startedAt ? -1 : 1));
+  const want = station ? stationKey(station) : station;
   for (const w of sorted) {
     const sets: SetEntry[] = [];
     for (const b of w.blocks)
-      for (const i of b.items)
-        if (i.exerciseId === exercise.id && i.status !== 'skipped') sets.push(...i.sets.filter((s) => s.done));
+      for (const i of b.items) {
+        if (i.exerciseId !== exercise.id || i.status === 'skipped') continue;
+        if (want !== undefined && (i.station ? stationKey(i.station) : null) !== want) continue;
+        sets.push(...i.sets.filter((s) => s.done));
+      }
     if (!sets.length) continue;
     const v = metric.compute(sets);
     if (v !== null) pts.push({ date: w.startedAt, value: v });
   }
   return pts;
+}
+
+/** The stations an exercise was done on (null = no station), most recent first. Empty when never done. */
+export function stationsIn(exercise: Exercise, history: Workout[]): (string | null)[] {
+  const named = stationsFor(exercise.id, history);
+  const unnamed = history.some(
+    (w) => w.finishedAt && w.blocks.some((b) => b.items.some((i) => i.exerciseId === exercise.id && !i.station && i.status !== 'skipped' && i.sets.some((s) => s.done))),
+  );
+  return unnamed ? [...named, null] : named;
 }
 
 /** Exercise ids that appear (with done sets) in history, most recently used first. */

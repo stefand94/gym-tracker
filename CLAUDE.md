@@ -65,7 +65,7 @@ entries win the lookup. Use his logged sets of it (workouts reference the id) to
   ] }
 ```
 `days` (optional, "mon"…"sun") schedules it: on that weekday Home shows it first under Today.
-Per-item `sets/reps/seconds/weight` are optional; when a workout starts, sets pre-fill from the last time the
+Per-item `sets/reps/seconds/weight/station` are optional (`station` is a free-text machine/cable tag like "Upstairs 1"; weights pre-fill from the last time on the same station); when a workout starts, sets pre-fill from the last time the
 exercise was done, then routine values, then exercise defaults.
 
 ## Checks

@@ -38,6 +38,8 @@ export interface RoutineItem {
   weight?: number;
   /** Ask for a 0–10 pain score on this exercise (rehab work). */
   trackPain?: boolean;
+  /** Machine / cable station to use, e.g. "Upstairs 1". */
+  station?: string;
 }
 
 export type RehabArea = 'hamstring';
@@ -81,6 +83,8 @@ export interface WorkoutItem {
   trackPain?: boolean;
   /** 0–10 pain during this exercise. */
   pain?: number;
+  /** Machine / cable station it was done on, e.g. "Upstairs 1" (weights differ between stations). */
+  station?: string;
 }
 
 export interface WorkoutBlock {
