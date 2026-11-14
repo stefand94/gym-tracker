@@ -775,7 +775,7 @@ button {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-dim);
-  margin: 16px 0 2px;
+  margin: 16px 0 0;
 }
 
 .list-label {
@@ -1367,20 +1367,148 @@ button {
   top: -8px;
   z-index: 1;
   background: var(--surface);
-  padding: 4px 0 10px;
+  padding: 0 0 8px;
+  margin: 0 -16px;
+  padding-inline: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 0.5px 0 var(--hairline);
+}
+
+.search-box {
+  position: relative;
+}
+
+.search-box .input {
+  padding-right: 44px;
+}
+
+.search-box input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.search-clear {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 16px;
+}
+
+.filter-row {
+  display: flex;
+  gap: 6px;
+}
+
+.filter-row .chip {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0 8px;
+}
+
+.filter-row .chip-muscle {
+  flex: 1.6 1 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chip-muscle.open {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.muscle-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  animation: fade 0.15s;
+}
+
+.muscle-grid .chip {
+  padding: 0 4px;
+  font-size: 13px;
 }
 
 .picker-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  padding: 10px 0;
-  min-height: 60px;
+  padding: 8px 0;
+  min-height: 56px;
   border: none;
   background: transparent;
   text-align: left;
   border-bottom: 0.5px solid var(--hairline);
+}
+
+.picker-item .bm-mini .bm-figure {
+  height: 40px;
+}
+
+.picker-text {
+  min-width: 0;
+}
+
+.picker-name {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.picker-meta {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tag-yours {
+  flex: none;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.picker-create {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  margin-top: 8px;
+  padding: 0 4px;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: left;
+}
+
+.picker-create-plus {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  font-size: 22px;
 }
 
 /* ---------- body screen ---------- */
