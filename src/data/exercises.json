@@ -109,7 +109,10 @@
       "sets": 3,
       "reps": 12,
       "weight": 10
-    }
+    },
+    "aliases": [
+      "cable fly"
+    ]
   },
   {
     "id": "chest-press-machine",
@@ -127,7 +130,11 @@
       "sets": 3,
       "reps": 10,
       "weight": 40
-    }
+    },
+    "aliases": [
+      "machine chest press",
+      "seated chest press"
+    ]
   },
   {
     "id": "pec-deck",
@@ -144,7 +151,12 @@
       "sets": 3,
       "reps": 12,
       "weight": 30
-    }
+    },
+    "aliases": [
+      "machine fly",
+      "chest fly machine",
+      "butterfly"
+    ]
   },
   {
     "id": "push-up",
@@ -199,7 +211,12 @@
       "sets": 3,
       "reps": 8,
       "weight": 30
-    }
+    },
+    "aliases": [
+      "ohp",
+      "military press",
+      "standing press"
+    ]
   },
   {
     "id": "dumbbell-shoulder-press",
@@ -218,7 +235,10 @@
       "sets": 3,
       "reps": 10,
       "weight": 12
-    }
+    },
+    "aliases": [
+      "seated dumbbell press"
+    ]
   },
   {
     "id": "arnold-press",
@@ -325,7 +345,11 @@
       "sets": 3,
       "reps": 12,
       "weight": 20
-    }
+    },
+    "aliases": [
+      "rear delt machine",
+      "reverse fly machine"
+    ]
   },
   {
     "id": "face-pull",
@@ -343,7 +367,10 @@
       "sets": 3,
       "reps": 15,
       "weight": 15
-    }
+    },
+    "aliases": [
+      "rope face pull"
+    ]
   },
   {
     "id": "cable-external-rotation",
@@ -362,7 +389,11 @@
       "sets": 3,
       "reps": 12,
       "weight": 2.5
-    }
+    },
+    "aliases": [
+      "rotator cuff",
+      "external rotation"
+    ]
   },
   {
     "id": "dumbbell-shrug",
@@ -444,7 +475,10 @@
       "sets": 3,
       "reps": 10,
       "weight": 18
-    }
+    },
+    "aliases": [
+      "single arm dumbbell row"
+    ]
   },
   {
     "id": "chest-supported-row",
@@ -504,7 +538,10 @@
       "sets": 3,
       "reps": 10,
       "weight": 45
-    }
+    },
+    "aliases": [
+      "wide grip pulldown"
+    ]
   },
   {
     "id": "straight-arm-pulldown",
@@ -522,7 +559,10 @@
       "sets": 3,
       "reps": 12,
       "weight": 20
-    }
+    },
+    "aliases": [
+      "lat prayer"
+    ]
   },
   {
     "id": "seated-cable-row",
@@ -541,7 +581,12 @@
       "sets": 3,
       "reps": 10,
       "weight": 40
-    }
+    },
+    "aliases": [
+      "seated row",
+      "cable row",
+      "low row"
+    ]
   },
   {
     "id": "pull-up",
@@ -593,7 +638,10 @@
     "defaults": {
       "sets": 3,
       "reps": 12
-    }
+    },
+    "aliases": [
+      "hyperextension"
+    ]
   },
   {
     "id": "hammer-curl",
@@ -610,7 +658,10 @@
       "sets": 3,
       "reps": 8,
       "weight": 10
-    }
+    },
+    "aliases": [
+      "neutral grip curl"
+    ]
   },
   {
     "id": "dumbbell-curl",
@@ -734,7 +785,10 @@
       "sets": 3,
       "reps": 12,
       "weight": 15
-    }
+    },
+    "aliases": [
+      "straight bar cable curl"
+    ]
   },
   {
     "id": "triceps-pushdown",
@@ -749,7 +803,11 @@
       "sets": 3,
       "reps": 12,
       "weight": 20
-    }
+    },
+    "aliases": [
+      "cable pushdown",
+      "straight bar pushdown"
+    ]
   },
   {
     "id": "triceps-rope-pushdown",
@@ -765,7 +823,10 @@
       "sets": 3,
       "reps": 12,
       "weight": 17.5
-    }
+    },
+    "aliases": [
+      "rope pushdown"
+    ]
   },
   {
     "id": "overhead-triceps-extension",
@@ -781,7 +842,10 @@
       "sets": 3,
       "reps": 12,
       "weight": 14
-    }
+    },
+    "aliases": [
+      "french press"
+    ]
   },
   {
     "id": "overhead-cable-triceps-extension",
@@ -848,7 +912,10 @@
       "sets": 3,
       "reps": 10,
       "weight": 20
-    }
+    },
+    "aliases": [
+      "lying triceps extension"
+    ]
   },
   {
     "id": "wrist-curl",
@@ -983,7 +1050,10 @@
       "reps": 8,
       "weight": 40
     },
-    "cue": "double-overhand grip; straps last set only"
+    "cue": "double-overhand grip; straps last set only",
+    "aliases": [
+      "stiff leg deadlift"
+    ]
   },
   {
     "id": "walking-lunge",
@@ -1025,7 +1095,12 @@
       "reps": 8,
       "weight": 10
     },
-    "cue": "bodyweight first, then light dumbbells"
+    "cue": "bodyweight first, then light dumbbells",
+    "aliases": [
+      "split squat",
+      "rear foot elevated split squat",
+      "bss"
+    ]
   },
   {
     "id": "step-up",
@@ -1060,7 +1135,10 @@
       "sets": 3,
       "reps": 12,
       "weight": 35
-    }
+    },
+    "aliases": [
+      "quad extension"
+    ]
   },
   {
     "id": "leg-curl",
@@ -1077,7 +1155,12 @@
       "sets": 3,
       "reps": 12,
       "weight": 30
-    }
+    },
+    "aliases": [
+      "hamstring curl",
+      "lying leg curl",
+      "seated leg curl"
+    ]
   },
   {
     "id": "hip-thrust",
@@ -1096,7 +1179,10 @@
       "sets": 3,
       "reps": 10,
       "weight": 40
-    }
+    },
+    "aliases": [
+      "barbell glute bridge"
+    ]
   },
   {
     "id": "cable-pull-through",
@@ -1153,7 +1239,10 @@
     "defaults": {
       "sets": 3,
       "reps": 12
-    }
+    },
+    "aliases": [
+      "hip bridge"
+    ]
   },
   {
     "id": "hip-abduction",
@@ -1170,7 +1259,10 @@
       "sets": 3,
       "reps": 15,
       "weight": 35
-    }
+    },
+    "aliases": [
+      "abductor machine"
+    ]
   },
   {
     "id": "hip-adduction",
@@ -1185,7 +1277,10 @@
       "sets": 3,
       "reps": 15,
       "weight": 35
-    }
+    },
+    "aliases": [
+      "adductor machine"
+    ]
   },
   {
     "id": "standing-calf-raise",
@@ -1200,7 +1295,10 @@
       "sets": 3,
       "reps": 15,
       "weight": 40
-    }
+    },
+    "aliases": [
+      "calf raise"
+    ]
   },
   {
     "id": "seated-calf-raise",
@@ -1337,7 +1435,10 @@
       "sets": 3,
       "reps": 12,
       "weight": 10
-    }
+    },
+    "aliases": [
+      "woodchopper"
+    ]
   },
   {
     "id": "decline-sit-up",
@@ -1388,7 +1489,10 @@
       "sets": 3,
       "seconds": 30
     },
-    "cue": "max hold"
+    "cue": "max hold",
+    "aliases": [
+      "hang"
+    ]
   },
   {
     "id": "neck-curl",
@@ -1424,7 +1528,11 @@
       "sets": 4,
       "reps": 5,
       "weight": 32
-    }
+    },
+    "aliases": [
+      "pull up machine",
+      "gravitron"
+    ]
   },
   {
     "id": "pull-up-negative",
@@ -1463,7 +1571,10 @@
       "sets": 3,
       "reps": 10,
       "weight": 32
-    }
+    },
+    "aliases": [
+      "seated machine row"
+    ]
   },
   {
     "id": "assisted-dip",
@@ -1482,7 +1593,10 @@
       "sets": 3,
       "reps": 8,
       "weight": 20
-    }
+    },
+    "aliases": [
+      "dip machine"
+    ]
   },
   {
     "id": "dead-bug",
@@ -1538,7 +1652,10 @@
       "sets": 3,
       "reps": 30,
       "weight": 20
-    }
+    },
+    "aliases": [
+      "farmers walk"
+    ]
   },
   {
     "id": "hamstring-iso-bridge",
@@ -1669,6 +1786,398 @@
     "defaults": {
       "sets": 3,
       "reps": 4
+    },
+    "aliases": [
+      "nordics"
+    ]
+  },
+  {
+    "id": "single-arm-cable-row",
+    "name": "Single-arm cable row",
+    "type": "weight",
+    "equipment": "Cable",
+    "cue": "let the shoulder blade reach forward, then pull to the hip",
+    "primary": [
+      "lats",
+      "upperBack"
+    ],
+    "secondary": [
+      "rearDelts",
+      "biceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 20
+    },
+    "aliases": [
+      "unilateral cable row"
+    ]
+  },
+  {
+    "id": "single-arm-lat-pulldown",
+    "name": "Single-arm lat pulldown",
+    "type": "weight",
+    "equipment": "Cable",
+    "cue": "pull the elbow down to your side",
+    "primary": [
+      "lats"
+    ],
+    "secondary": [
+      "biceps",
+      "upperBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 15
     }
+  },
+  {
+    "id": "neutral-grip-pulldown",
+    "name": "Neutral-grip lat pulldown",
+    "type": "machine",
+    "equipment": "Cable",
+    "primary": [
+      "lats"
+    ],
+    "secondary": [
+      "biceps",
+      "upperBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 40
+    },
+    "aliases": [
+      "close grip pulldown",
+      "v bar pulldown"
+    ]
+  },
+  {
+    "id": "dumbbell-pullover",
+    "name": "Dumbbell pullover",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "one dumbbell, both hands",
+    "cue": "only lower as far as the shoulders stay comfortable",
+    "primary": [
+      "lats",
+      "chest"
+    ],
+    "secondary": [
+      "triceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 12
+    }
+  },
+  {
+    "id": "cable-fly-high-to-low",
+    "name": "Cable fly (high to low)",
+    "type": "weight",
+    "equipment": "Cable",
+    "weightNote": "per side",
+    "primary": [
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 10
+    },
+    "aliases": [
+      "high cable fly",
+      "high to low crossover"
+    ]
+  },
+  {
+    "id": "cable-fly-low-to-high",
+    "name": "Cable fly (low to high)",
+    "type": "weight",
+    "equipment": "Cable",
+    "weightNote": "per side",
+    "primary": [
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 7.5
+    },
+    "aliases": [
+      "low cable fly",
+      "upper chest fly"
+    ]
+  },
+  {
+    "id": "smith-machine-bench-press",
+    "name": "Smith machine bench press",
+    "type": "weight",
+    "equipment": "Smith machine",
+    "weightNote": "plates only, not the bar",
+    "primary": [
+      "chest"
+    ],
+    "secondary": [
+      "frontDelts",
+      "triceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 40
+    },
+    "aliases": [
+      "smith bench"
+    ]
+  },
+  {
+    "id": "cable-rear-delt-fly",
+    "name": "Cable rear delt fly",
+    "type": "weight",
+    "equipment": "Cable",
+    "weightNote": "per side",
+    "primary": [
+      "rearDelts"
+    ],
+    "secondary": [
+      "upperBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 15,
+      "weight": 5
+    },
+    "aliases": [
+      "reverse cable fly",
+      "cable reverse fly"
+    ]
+  },
+  {
+    "id": "cable-y-raise",
+    "name": "Cable Y-raise",
+    "type": "weight",
+    "equipment": "Cable",
+    "weightNote": "per arm",
+    "cue": "thumb up, raise in a Y to eye height, light",
+    "primary": [
+      "sideDelts"
+    ],
+    "secondary": [
+      "traps",
+      "upperBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 5
+    }
+  },
+  {
+    "id": "landmine-press",
+    "name": "Landmine press",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "plates only · reps per arm",
+    "cue": "press up and forward; easy on the shoulder",
+    "primary": [
+      "frontDelts",
+      "chest"
+    ],
+    "secondary": [
+      "triceps",
+      "sideDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 10
+    },
+    "aliases": [
+      "half kneeling landmine press"
+    ]
+  },
+  {
+    "id": "machine-lateral-raise",
+    "name": "Machine lateral raise",
+    "type": "machine",
+    "equipment": "Machine",
+    "primary": [
+      "sideDelts"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 20
+    }
+  },
+  {
+    "id": "single-arm-cable-curl",
+    "name": "Single-arm cable curl",
+    "type": "weight",
+    "equipment": "Cable",
+    "primary": [
+      "biceps"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 10
+    }
+  },
+  {
+    "id": "bayesian-curl",
+    "name": "Bayesian cable curl",
+    "type": "weight",
+    "equipment": "Cable",
+    "weightNote": "per arm",
+    "cue": "face away from the stack, keep the elbow behind you",
+    "primary": [
+      "biceps"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 7.5
+    },
+    "aliases": [
+      "behind the body cable curl"
+    ]
+  },
+  {
+    "id": "reverse-grip-pushdown",
+    "name": "Reverse-grip pushdown",
+    "type": "weight",
+    "equipment": "Cable",
+    "primary": [
+      "triceps"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 15
+    },
+    "aliases": [
+      "underhand pushdown",
+      "supinated pushdown"
+    ]
+  },
+  {
+    "id": "single-arm-pushdown",
+    "name": "Single-arm pushdown",
+    "type": "weight",
+    "equipment": "Cable",
+    "primary": [
+      "triceps"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 7.5
+    },
+    "aliases": [
+      "single arm triceps pushdown"
+    ]
+  },
+  {
+    "id": "reverse-curl",
+    "name": "Reverse curl",
+    "type": "weight",
+    "equipment": "EZ bar",
+    "weightNote": "total bar weight",
+    "primary": [
+      "forearms",
+      "biceps"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 15
+    },
+    "aliases": [
+      "reverse grip curl",
+      "overhand curl"
+    ]
+  },
+  {
+    "id": "cable-glute-kickback",
+    "name": "Cable glute kickback",
+    "type": "weight",
+    "equipment": "Cable",
+    "weightNote": "reps per leg",
+    "primary": [
+      "glutes"
+    ],
+    "secondary": [
+      "hamstrings"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 10
+    }
+  },
+  {
+    "id": "cable-hip-abduction",
+    "name": "Cable hip abduction",
+    "type": "weight",
+    "equipment": "Cable",
+    "weightNote": "reps per leg",
+    "primary": [
+      "abductors"
+    ],
+    "secondary": [
+      "glutes"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 15,
+      "weight": 5
+    }
+  },
+  {
+    "id": "smith-machine-squat",
+    "name": "Smith machine squat",
+    "type": "weight",
+    "equipment": "Smith machine",
+    "weightNote": "plates only, not the bar",
+    "primary": [
+      "quads",
+      "glutes"
+    ],
+    "secondary": [
+      "hamstrings",
+      "adductors"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 40
+    },
+    "aliases": [
+      "smith squat"
+    ]
   }
 ]

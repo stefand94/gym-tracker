@@ -16,6 +16,7 @@ Stefan adds exercises and routines by asking Claude, not in the app. Weights are
   "equipment": "Dumbbells | Barbell | Cable | Machine | Bodyweight | …",
   "weightNote": "per dumbbell",          // optional hint shown on the card
   "cue": "lower over 4–5 s",             // optional coaching cue shown on the card
+  "aliases": ["other name people search"], // optional; search also folds one-arm/single, db, rdl, ez…
   "primary": ["biceps"],                  // 1 set credit each
   "secondary": ["forearms"],              // ½ set credit each
   "defaults": { "sets": 3, "reps": 10, "weight": 10 }   // timed: "seconds" instead of "reps"
