@@ -191,7 +191,10 @@
     "defaults": {
       "sets": 3,
       "reps": 10
-    }
+    },
+    "aliases": [
+      "parallel bar dip"
+    ]
   },
   {
     "id": "overhead-press",
@@ -293,7 +296,11 @@
       "sets": 3,
       "reps": 12,
       "weight": 6
-    }
+    },
+    "aliases": [
+      "side fly",
+      "side raise"
+    ]
   },
   {
     "id": "cable-lateral-raise",
@@ -310,7 +317,11 @@
       "sets": 3,
       "reps": 12,
       "weight": 5
-    }
+    },
+    "aliases": [
+      "cable side fly",
+      "low cable side raise"
+    ]
   },
   {
     "id": "rear-delt-fly",
@@ -328,7 +339,12 @@
       "sets": 3,
       "reps": 12,
       "weight": 6
-    }
+    },
+    "aliases": [
+      "bent over rear fly",
+      "bent over reverse fly",
+      "back fly"
+    ]
   },
   {
     "id": "reverse-pec-deck",
@@ -348,7 +364,8 @@
     },
     "aliases": [
       "rear delt machine",
-      "reverse fly machine"
+      "reverse fly machine",
+      "back fly"
     ]
   },
   {
@@ -679,7 +696,13 @@
       "sets": 3,
       "reps": 10,
       "weight": 10
-    }
+    },
+    "aliases": [
+      "flat curl",
+      "standing curl",
+      "seated curl",
+      "supinated curl"
+    ]
   },
   {
     "id": "incline-dumbbell-curl",
@@ -768,7 +791,12 @@
       "sets": 3,
       "reps": 10,
       "weight": 15
-    }
+    },
+    "aliases": [
+      "arm pad curl",
+      "scott curl",
+      "preacher bench curl"
+    ]
   },
   {
     "id": "cable-curl",
@@ -825,7 +853,8 @@
       "weight": 17.5
     },
     "aliases": [
-      "rope pushdown"
+      "rope pushdown",
+      "split rope pushdown"
     ]
   },
   {
@@ -1382,7 +1411,11 @@
     "defaults": {
       "sets": 3,
       "reps": 10
-    }
+    },
+    "aliases": [
+      "knee ups",
+      "captains chair"
+    ]
   },
   {
     "id": "cable-crunch",
@@ -1456,7 +1489,10 @@
     "defaults": {
       "sets": 3,
       "reps": 12
-    }
+    },
+    "aliases": [
+      "decline bench sit up"
+    ]
   },
   {
     "id": "russian-twist",
@@ -1960,7 +1996,8 @@
     },
     "aliases": [
       "reverse cable fly",
-      "cable reverse fly"
+      "cable reverse fly",
+      "back fly"
     ]
   },
   {
@@ -2179,5 +2216,305 @@
     "aliases": [
       "smith squat"
     ]
+  },
+  {
+    "id": "decline-barbell-bench-press",
+    "name": "Decline barbell bench press",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "aliases": [
+      "decline bench"
+    ],
+    "primary": [
+      "chest"
+    ],
+    "secondary": [
+      "triceps",
+      "frontDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 40
+    }
+  },
+  {
+    "id": "decline-dumbbell-press",
+    "name": "Decline dumbbell press",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "aliases": [
+      "decline bench"
+    ],
+    "primary": [
+      "chest"
+    ],
+    "secondary": [
+      "triceps",
+      "frontDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10,
+      "weight": 16
+    }
+  },
+  {
+    "id": "bench-dip",
+    "name": "Bench dip",
+    "type": "bodyweight",
+    "equipment": "Bench",
+    "cue": "shoulders down and back; stop at 90° (easy on the shoulder)",
+    "aliases": [
+      "triceps dip",
+      "chair dip"
+    ],
+    "primary": [
+      "triceps"
+    ],
+    "secondary": [
+      "chest",
+      "frontDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12
+    }
+  },
+  {
+    "id": "seated-dip-machine",
+    "name": "Seated dip machine",
+    "type": "machine",
+    "equipment": "Machine",
+    "aliases": [
+      "triceps dip machine",
+      "seated dip"
+    ],
+    "primary": [
+      "triceps"
+    ],
+    "secondary": [
+      "chest"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 40
+    }
+  },
+  {
+    "id": "machine-triceps-extension",
+    "name": "Triceps extension machine",
+    "type": "machine",
+    "equipment": "Machine",
+    "aliases": [
+      "triceps machine",
+      "triceps pushdown machine"
+    ],
+    "primary": [
+      "triceps"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 25
+    }
+  },
+  {
+    "id": "single-arm-cable-triceps-extension",
+    "name": "Single-arm cable triceps extension",
+    "type": "weight",
+    "equipment": "Cable",
+    "aliases": [
+      "one arm overhead cable extension",
+      "cross body triceps extension"
+    ],
+    "primary": [
+      "triceps"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 5
+    }
+  },
+  {
+    "id": "twenty-ones",
+    "name": "21s",
+    "type": "weight",
+    "equipment": "EZ bar",
+    "weightNote": "total bar weight",
+    "cue": "7 bottom half, 7 top half, 7 full",
+    "aliases": [
+      "twenty ones",
+      "21 curls"
+    ],
+    "primary": [
+      "biceps"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 21,
+      "weight": 15
+    }
+  },
+  {
+    "id": "front-raise",
+    "name": "Front raise",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "aliases": [
+      "front fly",
+      "front delt raise"
+    ],
+    "primary": [
+      "frontDelts"
+    ],
+    "secondary": [
+      "sideDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 5
+    }
+  },
+  {
+    "id": "cable-front-raise",
+    "name": "Cable front raise",
+    "type": "weight",
+    "equipment": "Cable",
+    "aliases": [
+      "low cable front raise"
+    ],
+    "primary": [
+      "frontDelts"
+    ],
+    "secondary": [
+      "sideDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 5
+    }
+  },
+  {
+    "id": "incline-y-raise",
+    "name": "Incline Y raise",
+    "type": "weight",
+    "equipment": "Dumbbells",
+    "weightNote": "per dumbbell",
+    "cue": "chest on an incline bench, thumbs up, light; good for the shoulder blades",
+    "aliases": [
+      "prone y raise",
+      "y raise"
+    ],
+    "primary": [
+      "traps",
+      "sideDelts"
+    ],
+    "secondary": [
+      "rearDelts",
+      "upperBack"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 3
+    }
+  },
+  {
+    "id": "band-pull-apart",
+    "name": "Band pull-apart",
+    "type": "bodyweight",
+    "equipment": "Band",
+    "cue": "arms straight, squeeze the shoulder blades together",
+    "aliases": [
+      "pull apart",
+      "back fly"
+    ],
+    "primary": [
+      "rearDelts",
+      "upperBack"
+    ],
+    "secondary": [
+      "traps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 15
+    }
+  },
+  {
+    "id": "six-inches",
+    "name": "6 inches",
+    "type": "timed",
+    "equipment": "Bodyweight",
+    "cue": "lower back pressed into the floor, heels 6 inches up",
+    "aliases": [
+      "six inches",
+      "six inch hold",
+      "leg hold"
+    ],
+    "primary": [
+      "abs"
+    ],
+    "secondary": [],
+    "defaults": {
+      "sets": 3,
+      "seconds": 30
+    }
+  },
+  {
+    "id": "barbell-shrug",
+    "name": "Barbell shrug",
+    "type": "weight",
+    "equipment": "Barbell",
+    "weightNote": "total bar weight",
+    "aliases": [
+      "shrugs"
+    ],
+    "primary": [
+      "traps"
+    ],
+    "secondary": [
+      "forearms"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 60
+    }
+  },
+  {
+    "id": "inverted-row",
+    "name": "Inverted row",
+    "type": "bodyweight",
+    "equipment": "Bodyweight",
+    "aliases": [
+      "australian pull up",
+      "body row"
+    ],
+    "primary": [
+      "upperBack",
+      "lats"
+    ],
+    "secondary": [
+      "biceps",
+      "rearDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 10
+    }
   }
 ]

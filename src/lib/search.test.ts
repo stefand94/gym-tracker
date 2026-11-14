@@ -49,6 +49,17 @@ describe('searchExercises', () => {
     expect(h.indexOf('leg-curl')).toBeLessThan(h.indexOf('romanian-deadlift'));
   });
 
+  it('finds the names Stefan uses at the gym', () => {
+    expect(ids('decline bench')).toContain('decline-barbell-bench-press');
+    expect(ids('split rope pushdown')[0]).toBe('triceps-rope-pushdown');
+    expect(ids('21s')[0]).toBe('twenty-ones');
+    expect(ids('6 inches')[0]).toBe('six-inches');
+    expect(ids('knee ups')[0]).toBe('hanging-knee-raise');
+    expect(ids('front fly')[0]).toBe('front-raise');
+    expect(ids('arm pad curl')[0]).toBe('preacher-curl');
+    expect(ids('one arm tricep extension cable')).toContain('single-arm-cable-triceps-extension');
+  });
+
   it('returns nothing for nonsense and everything for an empty query', () => {
     expect(ids('zzzq')).toEqual([]);
     expect(ids('  ')).toHaveLength(EXERCISES.length);
