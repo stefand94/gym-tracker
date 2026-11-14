@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useReducer, type ReactNode } from 'react';
-import type { Workout } from '../types';
+import { ROUTINES, setCustomExercises } from '../data/library';
+import { mergeVersioned } from '../lib/merge';
+import type { Exercise, Routine, Workout } from '../types';
 
 export interface SyncSettings {
   token: string;
@@ -8,7 +10,15 @@ export interface SyncSettings {
   branch: string;
 }
 
-export type QueueOp = { op: 'put'; id: string } | { op: 'delete'; id: string; path: string };
+/** What a queued op writes. Missing on ops queued before routines synced: those are workouts. */
+export type SyncKind = 'workout' | 'routine' | 'customExercises';
+
+/** `t` tells a re-queued op apart from the one a running sync already finished. */
+export type QueueOp =
+  | { op: 'put'; kind?: SyncKind; id: string; t?: number }
+  | { op: 'delete'; kind?: SyncKind; id: string; path: string; t?: number };
+
+export const CUSTOM_ID = 'custom';
 
 export interface SyncState {
   queue: QueueOp[];
@@ -48,6 +58,16 @@ export interface State {
   prefs: Prefs;
   rest: RestState | null;
   hold: HoldState | null;
+  routines: Routine[];
+  customExercises: Exercise[];
+  /** Blob sha of each routine/custom file last pulled, so unchanged files aren't fetched again. */
+  remoteShas: Record<string, string>;
+}
+
+export interface RemoteData {
+  routines: Routine[];
+  customExercises?: Exercise[];
+  shas: Record<string, string>;
 }
 
 type Action =
@@ -67,7 +87,11 @@ type Action =
   | { type: 'restAdjust'; seconds: number; now: number }
   | { type: 'restStop' }
   | { type: 'holdStart'; itemId: string; set: number; seconds: number; now: number }
-  | { type: 'holdStop' };
+  | { type: 'holdStop' }
+  | { type: 'routineSave'; routine: Routine; now: string }
+  | { type: 'routineArchive'; id: string; now: string }
+  | { type: 'exerciseSave'; exercise: Exercise; now: string }
+  | { type: 'remoteMerge'; remote: RemoteData };
 
 const KEY = 'gym-tracker:v1';
 
@@ -82,7 +106,17 @@ const DEFAULT_SETTINGS: SyncSettings = {
   branch: 'main',
 };
 
-function load(): State {
+/** Seeds are older than anything synced, so a copy from the data repo always replaces them. */
+const SEED_TIME = '2000-01-01T00:00:00.000Z';
+
+/** Add any bundled routine the user doesn't have yet (archived ones keep their id, so they stay gone). */
+export function withSeedRoutines(routines: Routine[]): Routine[] {
+  const have = new Set(routines.map((r) => r.id));
+  const missing = ROUTINES.filter((r) => !have.has(r.id)).map((r) => ({ ...r, updatedAt: r.updatedAt ?? SEED_TIME }));
+  return missing.length ? [...routines, ...missing] : routines;
+}
+
+export function load(): State {
   const base: State = {
     history: [],
     active: null,
@@ -91,6 +125,9 @@ function load(): State {
     prefs: DEFAULT_PREFS,
     rest: null,
     hold: null,
+    routines: withSeedRoutines([]),
+    customExercises: [],
+    remoteShas: {},
   };
   try {
     const raw = localStorage.getItem(KEY);
@@ -104,21 +141,33 @@ function load(): State {
       prefs: { ...DEFAULT_PREFS, ...saved.prefs },
       rest: saved.rest ?? null,
       hold: saved.hold ?? null,
+      routines: withSeedRoutines(saved.routines ?? []),
+      customExercises: saved.customExercises ?? [],
+      remoteShas: saved.remoteShas ?? {},
     };
   } catch {
     return base;
   }
 }
 
-function sameOp(a: QueueOp, b: QueueOp) {
-  return a.op === b.op && a.id === b.id;
+const kindOf = (op: QueueOp): SyncKind => op.kind ?? 'workout';
+const sameTarget = (a: QueueOp, b: { kind?: SyncKind; id: string }) => kindOf(a) === (b.kind ?? 'workout') && a.id === b.id;
+
+export function sameOp(a: QueueOp, b: QueueOp) {
+  return a.op === b.op && sameTarget(a, b) && a.t === b.t;
 }
 
-function enqueue(queue: QueueOp[], op: QueueOp): QueueOp[] {
-  return [...queue.filter((q) => q.id !== op.id), op];
+let seq = 0;
+export function enqueue(queue: QueueOp[], op: QueueOp): QueueOp[] {
+  const stamped = { ...op, t: Date.now() * 1000 + (seq++ % 1000) };
+  return [...queue.filter((q) => !sameTarget(q, op)), stamped];
 }
 
-function reducer(state: State, action: Action): State {
+export function isPending(queue: QueueOp[], kind: SyncKind, id: string): boolean {
+  return queue.some((q) => sameTarget(q, { kind, id }));
+}
+
+export function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'start':
       return { ...state, active: action.workout };
@@ -139,7 +188,7 @@ function reducer(state: State, action: Action): State {
     case 'discard':
       return { ...state, active: null, rest: null, hold: null };
     case 'delete': {
-      const queue = state.sync.queue.filter((q) => q.id !== action.id);
+      const queue = state.sync.queue.filter((q) => !sameTarget(q, { id: action.id }));
       return {
         ...state,
         history: state.history.filter((w) => w.id !== action.id),
@@ -151,7 +200,7 @@ function reducer(state: State, action: Action): State {
     }
     case 'merge': {
       const known = new Set(state.history.map((w) => w.id));
-      const deleting = new Set(state.sync.queue.filter((q) => q.op === 'delete').map((q) => q.id));
+      const deleting = new Set(state.sync.queue.filter((q) => q.op === 'delete' && kindOf(q) === 'workout').map((q) => q.id));
       const fresh = action.workouts.filter((w) => !known.has(w.id) && !deleting.has(w.id));
       return fresh.length ? { ...state, history: [...state.history, ...fresh] } : state;
     }
@@ -211,6 +260,39 @@ function reducer(state: State, action: Action): State {
       for (const w of fresh) queue = enqueue(queue, { op: 'put', id: w.id });
       return { ...state, history: [...state.history, ...fresh], sync: { ...state.sync, queue } };
     }
+    case 'routineSave': {
+      const routine = { ...action.routine, updatedAt: action.now };
+      const exists = state.routines.some((r) => r.id === routine.id);
+      return {
+        ...state,
+        routines: exists ? state.routines.map((r) => (r.id === routine.id ? routine : r)) : [...state.routines, routine],
+        sync: { ...state.sync, queue: enqueue(state.sync.queue, { op: 'put', kind: 'routine', id: routine.id }) },
+      };
+    }
+    case 'routineArchive': {
+      const r = state.routines.find((x) => x.id === action.id);
+      return r ? reducer(state, { type: 'routineSave', routine: { ...r, archived: true }, now: action.now }) : state;
+    }
+    case 'exerciseSave': {
+      const exercise: Exercise = { ...action.exercise, custom: true, updatedAt: action.now };
+      const exists = state.customExercises.some((e) => e.id === exercise.id);
+      return {
+        ...state,
+        customExercises: exists
+          ? state.customExercises.map((e) => (e.id === exercise.id ? exercise : e))
+          : [...state.customExercises, exercise],
+        sync: { ...state.sync, queue: enqueue(state.sync.queue, { op: 'put', kind: 'customExercises', id: CUSTOM_ID }) },
+      };
+    }
+    case 'remoteMerge': {
+      const { remote } = action;
+      const q = state.sync.queue;
+      const routines = mergeVersioned(state.routines, remote.routines, (id) => isPending(q, 'routine', id));
+      const customExercises = remote.customExercises
+        ? mergeVersioned(state.customExercises, remote.customExercises, () => isPending(q, 'customExercises', CUSTOM_ID))
+        : state.customExercises;
+      return { ...state, routines, customExercises, remoteShas: { ...state.remoteShas, ...remote.shas } };
+    }
   }
 }
 
@@ -223,12 +305,25 @@ const StoreContext = createContext<Ctx | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined, load);
+  // Keep getExercise() aware of custom exercises before anything below renders.
+  setCustomExercises(state.customExercises);
   useEffect(() => {
     try {
-      const { history, active, settings, sync, prefs, rest, hold } = state;
+      const { history, active, settings, sync, prefs, rest, hold, routines, customExercises, remoteShas } = state;
       localStorage.setItem(
         KEY,
-        JSON.stringify({ history, active, settings, prefs, rest, hold, sync: { queue: sync.queue, lastSync: sync.lastSync } }),
+        JSON.stringify({
+          history,
+          active,
+          settings,
+          prefs,
+          rest,
+          hold,
+          routines,
+          customExercises,
+          remoteShas,
+          sync: { queue: sync.queue, lastSync: sync.lastSync },
+        }),
       );
     } catch {
       /* storage full or unavailable */

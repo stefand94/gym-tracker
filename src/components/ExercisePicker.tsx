@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { EXERCISES } from '../data/library';
+import { allExercises } from '../data/library';
 import { MUSCLE_IDS, MUSCLE_LABELS, type MuscleId } from '../data/muscles';
 import { exerciseGroup, GROUP_LABELS, GROUPS, type Group } from '../lib/groups';
 import { exerciseMap } from '../lib/muscleLoad';
@@ -42,7 +42,7 @@ export function ExercisePicker({
   const [group, setGroup] = useState<Group | null>(null);
   const list = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return EXERCISES.filter(
+    return allExercises().filter(
       (e) =>
         (!needle || e.name.toLowerCase().includes(needle) || e.equipment.toLowerCase().includes(needle)) &&
         (!muscle || e.primary.includes(muscle) || e.secondary.includes(muscle)) &&

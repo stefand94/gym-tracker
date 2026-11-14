@@ -14,10 +14,18 @@ export function useSync() {
     if (running.current || !s.settings.token || !navigator.onLine) return;
     running.current = true;
     dispatch({ type: 'syncStart' });
-    const result = await runSync(s.settings, s.sync.queue, s.history);
+    const result = await runSync(s.settings, {
+      queue: s.sync.queue,
+      history: s.history,
+      routines: s.routines,
+      customExercises: s.customExercises,
+      remoteShas: s.remoteShas,
+    });
     if (result.pulled.length) dispatch({ type: 'merge', workouts: result.pulled });
     if (result.error) dispatch({ type: 'syncError', error: result.error, completed: result.completed });
     else dispatch({ type: 'syncDone', completed: result.completed, at: new Date().toISOString() });
+    // After the finished ops leave the queue, so our own just-pushed copies aren't treated as pending.
+    if (result.remote) dispatch({ type: 'remoteMerge', remote: result.remote });
     running.current = false;
   }, [dispatch]);
 

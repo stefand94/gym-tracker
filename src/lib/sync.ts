@@ -1,5 +1,6 @@
-import type { Workout } from '../types';
-import type { QueueOp, SyncSettings } from '../state/store';
+import type { Exercise, Routine, Workout } from '../types';
+import type { QueueOp, RemoteData, SyncSettings } from '../state/store';
+import { mergeForPush } from './merge';
 
 const API = 'https://api.github.com';
 
@@ -15,6 +16,22 @@ export function workoutPath(w: Pick<Workout, 'id' | 'startedAt'>): string {
 export function idFromPath(path: string): string | null {
   const m = /^workouts\/\d{4}\/\d{4}-\d{2}-\d{2}-(.+)\.json$/.exec(path);
   return m ? m[1] : null;
+}
+
+export const routinePath = (id: string) => `routines/${id}.json`;
+export const CUSTOM_PATH = 'exercises/custom.json';
+
+/** Routine id from routines/<id>.json */
+export function routineIdFromPath(path: string): string | null {
+  const m = /^routines\/([^/]+)\.json$/.exec(path);
+  return m ? m[1] : null;
+}
+
+function fromBase64(b64: string): string {
+  const bin = atob(b64.replace(/\s/g, ''));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
 }
 
 function toBase64(str: string): string {
@@ -66,19 +83,50 @@ async function existingSha(s: SyncSettings, path: string): Promise<string | unde
   }
 }
 
-export async function putWorkout(s: SyncSettings, w: Workout): Promise<void> {
-  const path = workoutPath(w);
-  const sha = await existingSha(s, path);
-  const date = w.startedAt.slice(0, 10);
+async function putJson(s: SyncSettings, path: string, data: unknown, message: string, sha?: string): Promise<void> {
   await gh(s, `/contents/${path}`, {
     method: 'PUT',
     body: JSON.stringify({
-      message: `Workout ${date}: ${w.name}`,
-      content: toBase64(JSON.stringify(w, null, 2) + '\n'),
+      message,
+      content: toBase64(JSON.stringify(data, null, 2) + '\n'),
       branch: s.branch,
       ...(sha ? { sha } : {}),
     }),
   });
+}
+
+export async function putWorkout(s: SyncSettings, w: Workout): Promise<void> {
+  const path = workoutPath(w);
+  await putJson(s, path, w, `Workout ${w.startedAt.slice(0, 10)}: ${w.name}`, await existingSha(s, path));
+}
+
+export async function putRoutine(s: SyncSettings, r: Routine): Promise<void> {
+  const path = routinePath(r.id);
+  await putJson(s, path, r, `${r.archived ? 'Archive' : 'Save'} routine: ${r.name}`, await existingSha(s, path));
+}
+
+/** Fetch–merge–put, so edits Claude made to custom.json in the repo are never overwritten. */
+export async function putCustomExercises(s: SyncSettings, local: Exercise[]): Promise<void> {
+  for (let attempt = 0; ; attempt++) {
+    let remote: Exercise[] = [];
+    let sha: string | undefined;
+    try {
+      const res = await gh(s, `/contents/${CUSTOM_PATH}?ref=${s.branch}`);
+      const file = await res.json();
+      sha = file.sha;
+      remote = JSON.parse(fromBase64(file.content));
+    } catch (e) {
+      if (!(e instanceof GitHubError && e.status === 404)) throw e;
+    }
+    try {
+      await putJson(s, CUSTOM_PATH, mergeForPush(remote, local), 'Save custom exercises', sha);
+      return;
+    } catch (e) {
+      // Someone else wrote the file between our read and write: read again and retry once.
+      if (attempt === 0 && e instanceof GitHubError && (e.status === 409 || e.status === 422)) continue;
+      throw e;
+    }
+  }
 }
 
 export async function deleteWorkout(s: SyncSettings, path: string): Promise<void> {
@@ -90,22 +138,43 @@ export async function deleteWorkout(s: SyncSettings, path: string): Promise<void
   });
 }
 
-/** Download every workout in the repo whose id isn't in `known`. */
-export async function pullWorkouts(s: SyncSettings, known: Set<string>): Promise<Workout[]> {
-  let tree: { path: string; type: string }[];
+async function raw<T>(s: SyncSettings, path: string): Promise<T> {
+  const res = await gh(s, `/contents/${path}?ref=${s.branch}`, {}, 'application/vnd.github.raw+json');
+  return res.json();
+}
+
+export interface PullResult {
+  workouts: Workout[];
+  remote: RemoteData;
+}
+
+/**
+ * Download every workout whose id isn't in `known`, plus each routine file and custom.json
+ * whose sha differs from the one we last pulled.
+ */
+export async function pullAll(s: SyncSettings, known: Set<string>, shas: Record<string, string>): Promise<PullResult> {
+  const empty: PullResult = { workouts: [], remote: { routines: [], shas: {} } };
+  let tree: { path: string; type: string; sha: string }[];
   try {
     const res = await gh(s, `/git/trees/${s.branch}?recursive=1`);
     tree = (await res.json()).tree;
   } catch (e) {
     // Empty repo / branch missing: nothing to pull yet.
-    if (e instanceof GitHubError && (e.status === 404 || e.status === 409)) return [];
+    if (e instanceof GitHubError && (e.status === 404 || e.status === 409)) return empty;
     throw e;
   }
-  const missing = tree.filter((t) => t.type === 'blob' && idFromPath(t.path) && !known.has(idFromPath(t.path)!));
-  const out: Workout[] = [];
-  for (const t of missing) {
-    const res = await gh(s, `/contents/${t.path}?ref=${s.branch}`, {}, 'application/vnd.github.raw+json');
-    out.push(await res.json());
+  const blobs = tree.filter((t) => t.type === 'blob');
+  const out = empty;
+  for (const t of blobs) {
+    const id = idFromPath(t.path);
+    if (id && !known.has(id)) out.workouts.push(await raw<Workout>(s, t.path));
+  }
+  for (const t of blobs) {
+    if (shas[t.path] === t.sha) continue;
+    if (routineIdFromPath(t.path)) out.remote.routines.push(await raw<Routine>(s, t.path));
+    else if (t.path === CUSTOM_PATH) out.remote.customExercises = await raw<Exercise[]>(s, t.path);
+    else continue;
+    out.remote.shas[t.path] = t.sha;
   }
   return out;
 }
@@ -121,28 +190,43 @@ export async function testConnection(s: SyncSettings): Promise<string> {
   return repo.full_name;
 }
 
+export interface SyncInput {
+  queue: QueueOp[];
+  history: Workout[];
+  routines: Routine[];
+  customExercises: Exercise[];
+  remoteShas: Record<string, string>;
+}
+
 export interface RunResult {
   completed: QueueOp[];
   pulled: Workout[];
+  remote?: RemoteData;
   error?: string;
 }
 
-export async function runSync(s: SyncSettings, queue: QueueOp[], history: Workout[]): Promise<RunResult> {
+export async function runSync(s: SyncSettings, input: SyncInput): Promise<RunResult> {
+  const { queue, history, routines, customExercises, remoteShas } = input;
   const completed: QueueOp[] = [];
   try {
     for (const op of queue) {
-      if (op.op === 'put') {
+      const kind = op.kind ?? 'workout';
+      if (op.op === 'delete') await deleteWorkout(s, op.path);
+      else if (kind === 'workout') {
         const w = history.find((h) => h.id === op.id);
         if (w) await putWorkout(s, w);
+      } else if (kind === 'routine') {
+        const r = routines.find((x) => x.id === op.id);
+        if (r) await putRoutine(s, r);
       } else {
-        await deleteWorkout(s, op.path);
+        await putCustomExercises(s, customExercises);
       }
       completed.push(op);
     }
     const known = new Set(history.map((w) => w.id));
     for (const op of queue) if (op.op === 'delete') known.add(op.id);
-    const pulled = await pullWorkouts(s, known);
-    return { completed, pulled };
+    const { workouts, remote } = await pullAll(s, known, remoteShas);
+    return { completed, pulled: workouts, remote };
   } catch (e) {
     return { completed, pulled: [], error: e instanceof Error ? e.message : String(e) };
   }

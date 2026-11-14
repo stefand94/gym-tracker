@@ -21,6 +21,13 @@ export interface Exercise {
   primary: MuscleId[];
   secondary: MuscleId[];
   defaults: ExerciseDefaults;
+  /** Other names people search for, e.g. "lying triceps extension". */
+  aliases?: string[];
+  /** Created in the app (lives in the data repo's exercises/custom.json). */
+  custom?: boolean;
+  /** A custom exercise whose muscles/type Claude has checked. */
+  reviewed?: boolean;
+  updatedAt?: string;
 }
 
 export interface RoutineItem {
@@ -51,6 +58,10 @@ export interface Routine {
   /** Marks a rehab phase routine. */
   rehab?: { area: RehabArea; phase: number };
   blocks: RoutineBlock[];
+  /** ISO time of the last edit; the newer copy wins when syncing. */
+  updatedAt?: string;
+  /** Deleted routines are kept (and synced) as archived so they don't come back. */
+  archived?: boolean;
 }
 
 export interface SetEntry {

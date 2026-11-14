@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BodyMap } from '../components/BodyMap';
 import { IconSettings } from '../components/Icons';
 import { ConfirmSheet } from '../components/Sheet';
-import { getExercise, ROUTINES } from '../data/library';
+import { getExercise } from '../data/library';
 import { doneSetCount, fmtDate, relDay } from '../lib/format';
 import { loadSince, workoutLoad } from '../lib/muscleLoad';
 import { finishedNewestFirst } from '../lib/prefill';
@@ -52,8 +52,9 @@ export function Home() {
 
   const active = state.active;
   const prog = active ? workoutProgress(active) : null;
-  const today = active ? null : todaysRoutine(ROUTINES, state.history);
-  const others = ROUTINES.filter((r) => r !== today);
+  const routines = state.routines.filter((r) => !r.archived);
+  const today = active ? null : todaysRoutine(routines, state.history);
+  const others = routines.filter((r) => r !== today);
   const startRoutine = (r: Routine) => start(workoutFromRoutine(r, state.history, getExercise));
 
   return (

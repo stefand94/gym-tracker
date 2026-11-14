@@ -12,7 +12,7 @@ import { Line } from 'react-chartjs-2';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BodyMap } from '../components/BodyMap';
 import { ExercisePicker } from '../components/ExercisePicker';
-import { EXERCISES, getExercise } from '../data/library';
+import { allExercises, getExercise } from '../data/library';
 import { MUSCLE_LABELS } from '../data/muscles';
 import { fmtDate, fmtNum, fmtSet } from '../lib/format';
 import { exerciseMap } from '../lib/muscleLoad';
@@ -202,7 +202,7 @@ export function Progress() {
           }}
         />
       )}
-      {EXERCISES.length === 0 && <div className="empty">No exercises in the library.</div>}
+      {allExercises().length === 0 && <div className="empty">No exercises in the library.</div>}
     </div>
   );
 }

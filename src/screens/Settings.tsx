@@ -33,7 +33,7 @@ export function Settings({ syncNow }: { syncNow: () => void }) {
   };
 
   const exportJson = () => {
-    const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), history: state.history }, null, 2)], {
+    const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), history: state.history, routines: state.routines, customExercises: state.customExercises }, null, 2)], {
       type: 'application/json',
     });
     const a = document.createElement('a');

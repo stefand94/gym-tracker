@@ -37,7 +37,24 @@ Adding a new muscle means adding it to `muscles.ts` **and** drawing its region i
 Push / pull / legs / core (picker filter, Body balance card) is derived from `primary` muscles in
 `src/lib/groups.ts` — no tag to set; a new muscle also needs a group there.
 
-## Adding a routine — `src/data/routines.json`
+## Routines live in the data repo — `stefand94/gym-tracker-data/routines/<id>.json`
+
+The app keeps routines as synced user data (one file per routine). **Edit them there, not in
+`src/data/routines.json`**, which is only the seed for a fresh install. Always set `updatedAt` to the
+current ISO time when changing one (the app also takes a repo copy when it has no unsynced edit of its own).
+Deleting = `"archived": true` (don't remove the file, or the app re-uploads its copy). Read/write with
+`gh api repos/stefand94/gym-tracker-data/contents/routines/<id>.json` (PUT needs the current `sha`).
+New routine ids must not collide with bundled seed ids. Same shape as below.
+
+## Custom exercises — `gym-tracker-data/exercises/custom.json`
+
+Exercises Stefan creates in the app are stored there (`custom: true`, `reviewed: false`), quick-entered
+with rough muscles. To review: read the file, fix `type`, `equipment`, `primary`/`secondary`, `cue`,
+`defaults`, set `reviewed: true`, bump `updatedAt`, and PUT it back (keep every entry; never change an
+`id`). Optionally promote a reviewed one into `src/data/exercises.json` with the same id — bundled
+entries win the lookup. Use his logged sets of it (workouts reference the id) to sanity-check.
+
+## Routine shape (seed: `src/data/routines.json`)
 
 ```json
 { "id": "push", "name": "Push", "description": "optional subtitle", "days": ["mon"],
