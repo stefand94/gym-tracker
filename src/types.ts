@@ -9,6 +9,12 @@ export interface ExerciseDefaults {
   weight?: number;
 }
 
+/** A short written guide: 3–4 steps and the most common mistake. */
+export interface HowTo {
+  steps: string[];
+  mistake?: string;
+}
+
 export interface Exercise {
   id: string;
   name: string;
@@ -21,6 +27,10 @@ export interface Exercise {
   primary: MuscleId[];
   secondary: MuscleId[];
   defaults: ExerciseDefaults;
+  /** Written guide for custom exercises (bundled ones are in data/howto.json). */
+  howto?: HowTo;
+  /** A specific video to show instead of a YouTube search. */
+  video?: string;
   /** Other names people search for, e.g. "lying triceps extension". */
   aliases?: string[];
   /** Created in the app (lives in the data repo's exercises/custom.json). */

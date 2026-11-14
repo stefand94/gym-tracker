@@ -28,6 +28,7 @@ import {
 import { useStore } from '../state/store';
 import type { Exercise, SetEntry, Workout, WorkoutBlock, WorkoutItem } from '../types';
 import { BodyMap } from './BodyMap';
+import { HowToSheet } from './HowToSheet';
 import { ExercisePicker } from './ExercisePicker';
 import { HoldDisplay } from './HoldTimer';
 import { IconCheck, IconClose, IconMore, IconPlay } from './Icons';
@@ -295,6 +296,7 @@ function ItemMenu({
   const { state } = useStore();
   const [armed, setArmed] = useState(false);
   const [replacing, setReplacing] = useState(false);
+  const [howTo, setHowTo] = useState(false);
   const act = (fn: (w: Workout) => Workout) => {
     update(fn);
     onClose();
@@ -308,8 +310,12 @@ function ItemMenu({
         onPick={(next) => act((w) => replaceItem(w, item.id, next, state.history))}
       />
     );
+  if (howTo) return <HowToSheet ex={ex} onClose={onClose} />;
   return (
     <Sheet title={ex.name} onClose={onClose}>
+      <button className="menu-item" onClick={() => setHowTo(true)}>
+        How to do it
+      </button>
       <button className="menu-item" onClick={() => setReplacing(true)}>
         Replace exercise…
       </button>

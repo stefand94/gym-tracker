@@ -9,34 +9,41 @@ import { exerciseMap } from '../lib/muscleLoad';
 import { rankReplacements } from '../lib/similar';
 import type { Exercise } from '../types';
 import { BodyMap } from './BodyMap';
+import { HowToSheet } from './HowToSheet';
+import { IconInfo } from './Icons';
 import { Sheet } from './Sheet';
 
 const RECENT_MAX = 8;
 
-function Row({ e, onPick }: { e: Exercise; onPick: (e: Exercise) => void }) {
+type Pick = (e: Exercise) => void;
+
+function Row({ e, onPick, onHowTo }: { e: Exercise; onPick: Pick; onHowTo: Pick }) {
   return (
-    <button className="picker-item" onClick={() => onPick(e)}>
-      <BodyMap load={exerciseMap(e)} scaleMax={1} size="mini" />
-      <div className="grow picker-text">
-        <div className="picker-name">
-          {e.name}
-          {e.custom && <span className="tag-yours">Yours</span>}
+    <div className="picker-row">
+      <button className="picker-item" onClick={() => onPick(e)}>
+        <BodyMap load={exerciseMap(e)} scaleMax={1} size="mini" />
+        <div className="grow picker-text">
+          <div className="picker-name">
+            {e.name}
+            {e.custom && <span className="tag-yours">Yours</span>}
+          </div>
+          <div className="picker-meta">{[e.equipment, e.primary.map((m) => MUSCLE_LABELS[m]).join(', ')].filter(Boolean).join(' · ')}</div>
         </div>
-        <div className="picker-meta">
-          {[e.equipment, e.primary.map((m) => MUSCLE_LABELS[m]).join(', ')].filter(Boolean).join(' · ')}
-        </div>
-      </div>
-    </button>
+      </button>
+      <button className="icon-btn picker-howto" aria-label={`How to do ${e.name}`} onClick={() => onHowTo(e)}>
+        <IconInfo />
+      </button>
+    </div>
   );
 }
 
-function Section({ label, list, onPick }: { label: string; list: Exercise[]; onPick: (e: Exercise) => void }) {
+function Section({ label, list, onPick, onHowTo }: { label: string; list: Exercise[]; onPick: Pick; onHowTo: Pick }) {
   if (!list.length) return null;
   return (
     <>
       <div className="picker-label">{label}</div>
       {list.map((e) => (
-        <Row key={e.id} e={e} onPick={onPick} />
+        <Row key={e.id} e={e} onPick={onPick} onHowTo={onHowTo} />
       ))}
     </>
   );
@@ -64,6 +71,7 @@ export function ExercisePicker({
   const [muscle, setMuscle] = useState<MuscleId | null>(null);
   const [group, setGroup] = useState<Group | null>(null);
   const [musclesOpen, setMusclesOpen] = useState(false);
+  const [howTo, setHowTo] = useState<Exercise | null>(null);
   const custom = state.customExercises;
 
   const filtered = useMemo(
@@ -156,15 +164,20 @@ export function ExercisePicker({
 
       {ranked ? (
         <>
-          <Section label={`Same muscles as ${similarTo!.name}`} list={ranked.close} onPick={onPick} />
-          <Section label={ranked.close.length ? 'Other exercises' : 'All exercises'} list={ranked.other} onPick={onPick} />
+          <Section label={`Same muscles as ${similarTo!.name}`} list={ranked.close} onPick={onPick} onHowTo={setHowTo} />
+          <Section
+            label={ranked.close.length ? 'Other exercises' : 'All exercises'}
+            list={ranked.other}
+            onPick={onPick}
+            onHowTo={setHowTo}
+          />
         </>
       ) : results ? (
-        <Section label={`${results.length} result${results.length === 1 ? '' : 's'}`} list={results} onPick={onPick} />
+        <Section label={`${results.length} result${results.length === 1 ? '' : 's'}`} list={results} onPick={onPick} onHowTo={setHowTo} />
       ) : (
         <>
-          <Section label="Recent" list={recent} onPick={onPick} />
-          <Section label={group || muscle ? 'Matching exercises' : 'All exercises'} list={az} onPick={onPick} />
+          <Section label="Recent" list={recent} onPick={onPick} onHowTo={setHowTo} />
+          <Section label={group || muscle ? 'Matching exercises' : 'All exercises'} list={az} onPick={onPick} onHowTo={setHowTo} />
         </>
       )}
       {!count && <div className="empty">No exercises match.</div>}
@@ -174,6 +187,7 @@ export function ExercisePicker({
           {searching ? `Create “${q.trim()}”` : 'Create an exercise'}
         </button>
       )}
+      {howTo && <HowToSheet ex={howTo} onClose={() => setHowTo(null)} />}
     </Sheet>
   );
 }

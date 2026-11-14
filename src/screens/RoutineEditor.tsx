@@ -3,7 +3,8 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { BlockDnd, DragHandle, type DndBlock } from '../components/BlockDnd';
 import { ExerciseEditor } from '../components/ExerciseEditor';
 import { ExercisePicker } from '../components/ExercisePicker';
-import { IconBack, IconClose, IconPlus } from '../components/Icons';
+import { HowToSheet } from '../components/HowToSheet';
+import { IconBack, IconClose, IconInfo, IconPlus } from '../components/Icons';
 import { ConfirmSheet } from '../components/Sheet';
 import { StationSheet, usesStations } from '../components/StationSheet';
 import { Stepper } from '../components/Stepper';
@@ -325,6 +326,7 @@ function ItemEditor({
   onStation: () => void;
 }) {
   const { state } = useStore();
+  const [howTo, setHowTo] = useState(false);
   const ex = getExercise(item.exerciseId);
   const last = useMemo(() => lastPerformance(item.exerciseId, state.history, item.station), [item.exerciseId, item.station, state.history]);
   if (!ex) return null;
@@ -348,10 +350,14 @@ function ItemEditor({
             {ex.weightNote ? ` · ${ex.weightNote}` : ''}
           </div>
         </div>
+        <button className="icon-btn" aria-label={`How to do ${ex.name}`} onClick={() => setHowTo(true)}>
+          <IconInfo />
+        </button>
         <button className="icon-btn" aria-label={`Remove ${ex.name}`} onClick={onRemove}>
           <IconClose />
         </button>
       </div>
+      {howTo && <HowToSheet ex={ex} onClose={() => setHowTo(false)} />}
       {station && (
         <button type="button" className={'station-chip' + (item.station ? ' set' : '')} onClick={onStation}>
           {item.station ? <>📍 {item.station}</> : '+ Station'}

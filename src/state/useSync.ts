@@ -20,6 +20,7 @@ export function useSync() {
       routines: s.routines,
       customExercises: s.customExercises,
       remoteShas: s.remoteShas,
+      videos: s.videos,
     });
     if (result.pulled.length) dispatch({ type: 'merge', workouts: result.pulled });
     if (result.error) dispatch({ type: 'syncError', error: result.error, completed: result.completed });

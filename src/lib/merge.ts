@@ -27,3 +27,14 @@ export function mergeForPush<T extends Versioned>(remote: T[], local: T[]): T[] 
   }
   return [...byId.values()];
 }
+
+export interface Stamped {
+  updatedAt: string;
+}
+
+/** Merge two keyed maps entry by entry, the newer `updatedAt` winning (e.g. pinned videos). */
+export function mergeKeyed<T extends Stamped>(base: Record<string, T>, incoming: Record<string, T>): Record<string, T> {
+  const out = { ...base };
+  for (const [k, v] of Object.entries(incoming)) if (!out[k] || newer(v.updatedAt, out[k].updatedAt)) out[k] = v;
+  return out;
+}

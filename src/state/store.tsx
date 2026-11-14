@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useReducer, type ReactNode } from 'react';
 import { ROUTINES, setCustomExercises } from '../data/library';
-import { mergeVersioned } from '../lib/merge';
+import { mergeKeyed, mergeVersioned } from '../lib/merge';
 import type { Exercise, Routine, Workout } from '../types';
 
 export interface SyncSettings {
@@ -11,14 +11,20 @@ export interface SyncSettings {
 }
 
 /** What a queued op writes. Missing on ops queued before routines synced: those are workouts. */
-export type SyncKind = 'workout' | 'routine' | 'customExercises';
+export type SyncKind = 'workout' | 'routine' | 'customExercises' | 'videos';
 
 /** `t` tells a re-queued op apart from the one a running sync already finished. */
 export type QueueOp =
-  | { op: 'put'; kind?: SyncKind; id: string; t?: number }
-  | { op: 'delete'; kind?: SyncKind; id: string; path: string; t?: number };
+  { op: 'put'; kind?: SyncKind; id: string; t?: number } | { op: 'delete'; kind?: SyncKind; id: string; path: string; t?: number };
 
 export const CUSTOM_ID = 'custom';
+export const VIDEOS_ID = 'videos';
+
+/** A video pinned to an exercise; an empty url is a removed pin (kept so the removal syncs). */
+export interface VideoPin {
+  url: string;
+  updatedAt: string;
+}
 
 export interface SyncState {
   queue: QueueOp[];
@@ -62,11 +68,14 @@ export interface State {
   customExercises: Exercise[];
   /** Blob sha of each routine/custom file last pulled, so unchanged files aren't fetched again. */
   remoteShas: Record<string, string>;
+  /** Pinned how-to videos by exercise id (synced as exercises/videos.json). */
+  videos: Record<string, VideoPin>;
 }
 
 export interface RemoteData {
   routines: Routine[];
   customExercises?: Exercise[];
+  videos?: Record<string, VideoPin>;
   shas: Record<string, string>;
 }
 
@@ -92,6 +101,7 @@ type Action =
   | { type: 'routineArchive'; id: string; now: string }
   | { type: 'exerciseSave'; exercise: Exercise; now: string }
   | { type: 'remoteMerge'; remote: RemoteData }
+  | { type: 'videoPin'; exerciseId: string; url: string; now: string }
   | { type: 'historyUpdate'; workout: Workout };
 
 const KEY = 'gym-tracker:v1';
@@ -129,6 +139,7 @@ export function load(): State {
     routines: withSeedRoutines([]),
     customExercises: [],
     remoteShas: {},
+    videos: {},
   };
   try {
     const raw = localStorage.getItem(KEY);
@@ -145,6 +156,7 @@ export function load(): State {
       routines: withSeedRoutines(saved.routines ?? []),
       customExercises: saved.customExercises ?? [],
       remoteShas: saved.remoteShas ?? {},
+      videos: saved.videos ?? {},
     };
   } catch {
     return base;
@@ -301,8 +313,16 @@ export function reducer(state: State, action: Action): State {
       const customExercises = remote.customExercises
         ? mergeVersioned(state.customExercises, remote.customExercises, () => isPending(q, 'customExercises', CUSTOM_ID))
         : state.customExercises;
-      return { ...state, routines, customExercises, remoteShas: { ...state.remoteShas, ...remote.shas } };
+      // a pin still waiting to sync is newer than the copy we pulled, so a plain newest-wins merge keeps it
+      const videos = remote.videos ? mergeKeyed(state.videos, remote.videos) : state.videos;
+      return { ...state, routines, customExercises, videos, remoteShas: { ...state.remoteShas, ...remote.shas } };
     }
+    case 'videoPin':
+      return {
+        ...state,
+        videos: { ...state.videos, [action.exerciseId]: { url: action.url, updatedAt: action.now } },
+        sync: { ...state.sync, queue: enqueue(state.sync.queue, { op: 'put', kind: 'videos', id: VIDEOS_ID }) },
+      };
   }
 }
 
@@ -319,7 +339,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   setCustomExercises(state.customExercises);
   useEffect(() => {
     try {
-      const { history, active, settings, sync, prefs, rest, hold, routines, customExercises, remoteShas } = state;
+      const { history, active, settings, sync, prefs, rest, hold, routines, customExercises, remoteShas, videos } = state;
       localStorage.setItem(
         KEY,
         JSON.stringify({
@@ -332,6 +352,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           routines,
           customExercises,
           remoteShas,
+          videos,
           sync: { queue: sync.queue, lastSync: sync.lastSync },
         }),
       );

@@ -29,6 +29,11 @@ Stefan adds exercises and routines by asking Claude, not in the app. Weights are
 - Assisted machines (pull-up, dip): `weight` type, `equipment: "Machine"`, weight = kg of assistance
   (`weightNote: "assistance (less = harder)"`). Carries: `weight` type with reps = metres.
 - Never change an existing `id` — logged workouts reference it.
+- Also add a how-to to `src/data/howto.json` under the same id: `{ "steps": [3–4 short steps], "mistake": "…" }`, in
+  your own words (a test checks every bundled exercise has one). The app's How-to sheet shows it with a YouTube
+  search for "<name> form"; an optional `"video": "<url>"` on the exercise replaces the search. Custom exercises can
+  carry their own `howto`. Videos Stefan pins in the app live in `gym-tracker-data/exercises/videos.json`
+  (`{ "<exerciseId>": { "url", "updatedAt" } }`, empty url = removed).
 
 Muscle ids (`src/data/muscles.ts`, drawn in `src/components/BodyMap.tsx`):
 neck, traps, frontDelts, sideDelts, rearDelts, chest, biceps, triceps, forearms, lats, upperBack,

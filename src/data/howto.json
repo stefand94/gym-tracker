@@ -1,0 +1,502 @@
+{
+  "barbell-bench-press": {
+    "steps": ["Lie with eyes under the bar, feet flat, shoulder blades pulled back and down", "Grip a bit wider than shoulders, unrack with straight arms", "Lower to mid-chest with elbows about 45° from your body", "Press up and slightly back over the shoulders"],
+    "mistake": "Flaring elbows straight out to the sides — hard on the shoulders"
+  },
+  "dumbbell-bench-press": {
+    "steps": ["Sit with the dumbbells on your thighs, lie back and kick them up", "Shoulder blades back and down, feet planted", "Lower until the dumbbells are level with your chest, elbows ~45°", "Press up and slightly together"],
+    "mistake": "Dropping too deep with flared elbows — stop at a comfortable stretch"
+  },
+  "incline-dumbbell-press": {
+    "steps": ["Set the bench to about 30°", "Kick the dumbbells up, shoulder blades pinned back", "Lower to the upper chest, elbows a little tucked", "Press up over the upper chest"],
+    "mistake": "Bench too steep — above ~45° it turns into a shoulder press"
+  },
+  "incline-barbell-bench-press": {
+    "steps": ["Bench at about 30°, eyes under the bar", "Shoulder blades back, grip just outside shoulder width", "Lower to the upper chest just below the collarbones", "Press straight up"],
+    "mistake": "Bouncing the bar off the chest instead of a controlled touch"
+  },
+  "dumbbell-fly": {
+    "steps": ["Lie flat, dumbbells above the chest, palms facing each other", "Keep a soft, fixed bend in the elbows", "Open the arms wide until you feel a chest stretch", "Hug the weights back up along the same arc"],
+    "mistake": "Bending the elbows more as you lower — that makes it a press"
+  },
+  "cable-crossover": {
+    "steps": ["Pulleys high, a handle in each hand, step forward into a split stance", "Lean slightly forward, soft bend in the elbows", "Bring the hands together in front of your lower chest", "Let them open back slowly to a stretch"],
+    "mistake": "Going too heavy and turning it into a pushing movement"
+  },
+  "chest-press-machine": {
+    "steps": ["Set the seat so the handles line up with mid-chest", "Back flat on the pad, shoulder blades back", "Press out without locking the elbows hard", "Return slowly until you feel a chest stretch"],
+    "mistake": "Seat too low or high, so the shoulders take over"
+  },
+  "pec-deck": {
+    "steps": ["Seat so the handles are at chest height", "Soft bend in the elbows, back on the pad", "Squeeze the handles together in front of you", "Open slowly until the chest is stretched, not the shoulder"],
+    "mistake": "Letting the arms go too far back and straining the front of the shoulder"
+  },
+  "push-up": {
+    "steps": ["Hands just wider than shoulders, body in a straight line", "Brace your abs and glutes", "Lower until the chest is a fist above the floor, elbows ~45°", "Push the floor away to straight arms"],
+    "mistake": "Hips sagging — keep the plank all the way through"
+  },
+  "dip": {
+    "steps": ["Support yourself on straight arms, shoulders down away from your ears", "Lean slightly forward for chest, upright for triceps", "Lower until the upper arms are about parallel to the floor", "Press back up to straight arms"],
+    "mistake": "Sinking too deep with shrugged shoulders — rough on the shoulder joint"
+  },
+  "overhead-press": {
+    "steps": ["Bar on the front of the shoulders, grip just outside shoulder width", "Squeeze glutes and abs, ribs down", "Press straight up, moving your head back out of the way", "Finish with the bar over mid-foot, head through"],
+    "mistake": "Leaning back into a standing incline press — keep the ribs down"
+  },
+  "dumbbell-shoulder-press": {
+    "steps": ["Sit upright, dumbbells at shoulder height, palms forward", "Elbows slightly in front of the body", "Press up until the arms are straight overhead", "Lower back to ear level under control"],
+    "mistake": "Arching the lower back off the bench to finish reps"
+  },
+  "arnold-press": {
+    "steps": ["Sit upright, dumbbells in front of the shoulders, palms facing you", "As you press up, rotate the palms so they face forward at the top", "Lock out overhead without clashing the weights", "Reverse the twist on the way down to palms facing you"],
+    "mistake": "Rushing the rotation — it should be one smooth turn through the press"
+  },
+  "machine-shoulder-press": {
+    "steps": ["Set the seat so the handles start at shoulder height", "Back flat against the pad", "Press up without fully locking the elbows", "Lower slowly to the start"],
+    "mistake": "Seat too low, so the shoulders start in a deep, stressed position"
+  },
+  "lateral-raise": {
+    "steps": ["Stand tall, dumbbells at your sides, slight lean forward", "Soft bend in the elbows", "Raise the arms out to the sides to shoulder height, leading with the elbows", "Lower slowly over 2–3 seconds"],
+    "mistake": "Swinging the weight up with the body — go lighter"
+  },
+  "cable-lateral-raise": {
+    "steps": ["Low pulley, handle in the far hand, cable across your body", "Stand side-on, hold the frame with the other hand", "Raise the arm out to the side to shoulder height", "Lower slowly, keep tension at the bottom"],
+    "mistake": "Shrugging the shoulder up as you raise"
+  },
+  "rear-delt-fly": {
+    "steps": ["Hinge forward until the chest is nearly parallel to the floor", "Dumbbells hanging under the chest, soft elbows", "Raise the arms out to the sides, thinking about pushing the weights wide", "Lower slowly"],
+    "mistake": "Squeezing the shoulder blades hard — that shifts it to the upper back"
+  },
+  "reverse-pec-deck": {
+    "steps": ["Face the pad, handles at shoulder height", "Arms nearly straight, palms facing down or in", "Sweep the arms back until they're in line with your body", "Return slowly"],
+    "mistake": "Going too heavy and jerking the handles back"
+  },
+  "face-pull": {
+    "steps": ["Rope at upper-chest to face height, thumbs toward you", "Step back, arms straight, slight lean back", "Pull the rope toward your face, splitting the ends past your ears", "Finish with the elbows high and hands rotated back"],
+    "mistake": "Pulling to the chest with low elbows — it becomes a row"
+  },
+  "cable-external-rotation": {
+    "steps": ["Pulley at elbow height, stand side-on with the far hand on the handle", "Elbow bent 90° and pinned to your side (a towel helps)", "Rotate the forearm out away from your belly", "Return slowly"],
+    "mistake": "Letting the elbow drift away from the body — keep it light"
+  },
+  "dumbbell-shrug": {
+    "steps": ["Stand tall, dumbbells at your sides", "Lift the shoulders straight up toward the ears", "Pause a second at the top", "Lower all the way down"],
+    "mistake": "Rolling the shoulders in circles — straight up and down"
+  },
+  "deadlift": {
+    "steps": ["Bar over mid-foot, shins close, grip just outside the legs", "Chest up, back flat, pull the slack out of the bar", "Push the floor away, keeping the bar close to your legs", "Stand tall, then hinge back down the same path"],
+    "mistake": "Rounding the lower back off the floor"
+  },
+  "barbell-row": {
+    "steps": ["Hinge to about 45°, back flat, bar hanging at arm's length", "Grip just outside shoulder width", "Row the bar to your lower ribs, elbows back", "Lower under control without standing up"],
+    "mistake": "Standing more upright each rep to heave the weight"
+  },
+  "one-arm-dumbbell-row": {
+    "steps": ["One knee and hand on the bench, back flat", "Dumbbell hanging straight down", "Pull it toward your hip, elbow close to the body", "Lower until the arm is straight and the shoulder stretches"],
+    "mistake": "Twisting the torso open to lift more"
+  },
+  "chest-supported-row": {
+    "steps": ["Lie chest-down on an incline bench, dumbbells hanging", "Keep the chest on the pad throughout", "Row the dumbbells up toward the hips", "Lower to a full stretch"],
+    "mistake": "Lifting the chest off the pad to cheat reps"
+  },
+  "t-bar-row": {
+    "steps": ["Straddle the bar, hinge forward with a flat back", "Grip the handle, arms straight", "Row toward your chest, elbows close", "Lower under control"],
+    "mistake": "Rounding the back as the weight goes up"
+  },
+  "lat-pulldown": {
+    "steps": ["Thighs under the pad, grip just wider than shoulders", "Slight lean back, chest up", "Pull the bar to your upper chest, elbows down and back", "Let it rise until the arms are straight"],
+    "mistake": "Leaning way back and yanking with the body"
+  },
+  "straight-arm-pulldown": {
+    "steps": ["High pulley, bar or rope, step back and hinge slightly", "Arms nearly straight above you", "Sweep the bar down to your thighs using the lats", "Let it rise slowly to the start"],
+    "mistake": "Bending the elbows so the triceps take over"
+  },
+  "seated-cable-row": {
+    "steps": ["Sit with feet on the plates, knees soft, back tall", "Arms straight, let the shoulders reach forward a little", "Pull the handle to your belly, elbows close", "Return slowly to a stretch"],
+    "mistake": "Rocking back and forth to move the weight"
+  },
+  "pull-up": {
+    "steps": ["Hang from the bar, hands just wider than shoulders, palms away", "Pull the shoulder blades down first", "Pull until the chin clears the bar", "Lower all the way to straight arms"],
+    "mistake": "Half reps — finish each one from a full hang"
+  },
+  "chin-up": {
+    "steps": ["Hang with palms facing you, hands shoulder width", "Brace and pull the shoulders down", "Pull the chest toward the bar until the chin is over", "Lower slowly to straight arms"],
+    "mistake": "Kicking the legs to get over the bar"
+  },
+  "back-extension": {
+    "steps": ["Hips on the pad edge, ankles locked in", "Cross arms over your chest", "Lower with a flat back until you feel the hamstrings", "Rise until the body is straight — no further"],
+    "mistake": "Over-arching at the top"
+  },
+  "hammer-curl": {
+    "steps": ["Stand tall, dumbbells at your sides, palms facing in", "Elbows pinned to your sides", "Curl up keeping the thumbs on top", "Lower slowly to straight arms"],
+    "mistake": "Swinging the elbows forward"
+  },
+  "dumbbell-curl": {
+    "steps": ["Stand or sit tall, dumbbells at your sides, palms forward", "Keep the elbows by your sides", "Curl up and squeeze at the top", "Lower over 2–3 seconds to straight arms"],
+    "mistake": "Swinging the body to get the weight up"
+  },
+  "incline-dumbbell-curl": {
+    "steps": ["Bench at about 45°, lie back with arms hanging straight", "Palms forward, elbows staying behind the body", "Curl up without moving the upper arm", "Lower to a full stretch"],
+    "mistake": "Bringing the elbows forward as you curl"
+  },
+  "concentration-curl": {
+    "steps": ["Sit, elbow braced against the inside of your thigh", "Arm hanging straight with the dumbbell", "Curl up toward the shoulder and squeeze", "Lower slowly to straight"],
+    "mistake": "Using the shoulder to lift — only the forearm moves"
+  },
+  "barbell-curl": {
+    "steps": ["Stand tall, shoulder-width underhand grip", "Elbows at your sides", "Curl the bar up to the chest", "Lower slowly to straight arms"],
+    "mistake": "Leaning back to swing the bar up"
+  },
+  "ez-bar-curl": {
+    "steps": ["Grip the angled parts of the EZ bar, palms up", "Stand tall, elbows at your sides", "Curl up to the chest", "Lower all the way under control"],
+    "mistake": "Cutting the bottom half of the rep short"
+  },
+  "preacher-curl": {
+    "steps": ["Armpits snug over the top of the pad, arms down the pad", "Grip the EZ bar palms up", "Curl up without lifting the elbows", "Lower slowly to nearly straight"],
+    "mistake": "Dropping fast at the bottom — that's where elbows get hurt"
+  },
+  "cable-curl": {
+    "steps": ["Low pulley with a bar, stand close", "Elbows at your sides, palms up", "Curl the bar to your chest", "Lower slowly, keeping tension"],
+    "mistake": "Stepping too far back so the elbows drift forward"
+  },
+  "triceps-pushdown": {
+    "steps": ["High pulley with a bar, overhand grip", "Elbows tucked at your sides, slight forward lean", "Push down until the arms are straight", "Let it come back up to about 90°"],
+    "mistake": "Elbows coming forward so the shoulders help"
+  },
+  "triceps-rope-pushdown": {
+    "steps": ["High pulley with a rope, thumbs on top", "Elbows pinned to your sides", "Push down and split the rope ends apart at the bottom", "Return to about 90° at the elbow"],
+    "mistake": "Leaning over the rope and pushing with body weight"
+  },
+  "overhead-triceps-extension": {
+    "steps": ["Hold one dumbbell overhead with both hands under the top plate", "Keep elbows pointing forward, close to your head", "Lower behind your head to a deep stretch", "Extend back up to straight arms"],
+    "mistake": "Elbows flaring wide — keep them narrow"
+  },
+  "overhead-cable-triceps-extension": {
+    "steps": ["Rope on a low or mid pulley, face away from the stack", "Rope behind your head, elbows pointing forward", "Extend the arms forward and up until straight", "Let the hands come back behind your head slowly"],
+    "mistake": "Moving the elbows instead of only the forearms"
+  },
+  "triceps-kickback": {
+    "steps": ["Hinge forward, upper arm parallel to the floor and tight to your side", "Elbow bent 90°", "Straighten the arm back until it's in line with your body", "Return slowly to 90°"],
+    "mistake": "Letting the upper arm drop and swinging the weight"
+  },
+  "close-grip-bench-press": {
+    "steps": ["Grip the bar about shoulder width", "Shoulder blades back, feet planted", "Lower to the lower chest, elbows tucked close", "Press up to lockout"],
+    "mistake": "Grip too narrow — it strains the wrists"
+  },
+  "skull-crusher": {
+    "steps": ["Lie flat, bar or EZ bar over the chest with straight arms", "Tilt the arms slightly back toward your head", "Bend the elbows to lower the bar toward your forehead or just behind", "Extend back up"],
+    "mistake": "Elbows flaring out wide"
+  },
+  "wrist-curl": {
+    "steps": ["Sit, forearms on your thighs, wrists over the knees, palms up", "Let the dumbbell roll down to the fingertips", "Curl the wrist up as far as it goes", "Lower slowly"],
+    "mistake": "Lifting the forearms off the thighs"
+  },
+  "back-squat": {
+    "steps": ["Bar on the upper back, feet shoulder width, toes out slightly", "Brace your abs, chest up", "Sit down and back with knees tracking over toes", "Drive up through the whole foot"],
+    "mistake": "Knees caving in on the way up"
+  },
+  "goblet-squat": {
+    "steps": ["Hold a dumbbell vertically at your chest", "Feet shoulder width, toes slightly out", "Squat down between your knees, chest up", "Stand up through the whole foot"],
+    "mistake": "Heels lifting — sit back and keep the feet flat"
+  },
+  "front-squat": {
+    "steps": ["Bar on the front of the shoulders, elbows high", "Feet shoulder width, brace hard", "Squat straight down keeping the torso upright", "Drive up, elbows staying high"],
+    "mistake": "Elbows dropping so the bar rolls forward"
+  },
+  "hack-squat": {
+    "steps": ["Back flat on the pad, shoulders under the pads", "Feet shoulder width in the middle of the platform", "Lower until thighs are about parallel", "Press up without locking the knees hard"],
+    "mistake": "Heels lifting off the platform"
+  },
+  "leg-press": {
+    "steps": ["Back and hips flat on the seat, feet shoulder width on the platform", "Release the safeties", "Lower until the knees are about 90° without the hips rolling up", "Press back up without locking out"],
+    "mistake": "Lowering so far the lower back lifts off the pad"
+  },
+  "romanian-deadlift": {
+    "steps": ["Stand holding the bar, soft knees", "Push the hips back, bar sliding down the thighs", "Stop when you feel a strong hamstring stretch, back flat", "Drive the hips forward to stand"],
+    "mistake": "Rounding the back to reach lower"
+  },
+  "walking-lunge": {
+    "steps": ["Dumbbells at your sides, stand tall", "Step forward and lower until the back knee nearly touches", "Push through the front heel and step through", "Alternate legs"],
+    "mistake": "Steps too short so the front knee goes way past the toes"
+  },
+  "bulgarian-split-squat": {
+    "steps": ["Back foot laces-down on a bench, front foot well forward", "Torso tall, dumbbells at your sides", "Lower straight down until the front thigh is about parallel", "Drive up through the front heel"],
+    "mistake": "Front foot too close to the bench"
+  },
+  "step-up": {
+    "steps": ["Stand facing a box or bench, dumbbells at your sides", "Place the whole foot on the box", "Drive through that heel to stand on top", "Lower slowly with the same leg"],
+    "mistake": "Pushing off the back foot instead of the top leg"
+  },
+  "leg-extension": {
+    "steps": ["Set the back pad so the knees line up with the pivot", "Ankle pad on the lower shin", "Extend the legs until straight, squeeze the quads", "Lower slowly"],
+    "mistake": "Kicking the weight up with momentum"
+  },
+  "leg-curl": {
+    "steps": ["Line the knees up with the pivot, pad just above the heels", "Hold the handles, hips down", "Curl the heels toward your glutes", "Lower slowly over 2–3 seconds"],
+    "mistake": "Hips lifting off the pad to finish the rep"
+  },
+  "hip-thrust": {
+    "steps": ["Upper back on a bench, bar over the hips (use a pad)", "Feet flat, about hip width, knees bent", "Drive the hips up until the body is flat from knees to shoulders", "Squeeze the glutes, then lower"],
+    "mistake": "Arching the lower back at the top instead of squeezing the glutes"
+  },
+  "cable-pull-through": {
+    "steps": ["Low pulley with a rope, face away, rope between your legs", "Walk forward, feet wide", "Hinge back letting the rope pull through", "Drive the hips forward to stand and squeeze"],
+    "mistake": "Squatting down instead of hinging at the hips"
+  },
+  "kettlebell-swing": {
+    "steps": ["Kettlebell in front of you, hinge and grip it", "Hike it back between your legs", "Snap the hips forward to float it to chest height", "Let it fall back and hinge into the next rep"],
+    "mistake": "Lifting with the arms — the hips do the work"
+  },
+  "glute-bridge": {
+    "steps": ["Lie on your back, knees bent, feet flat", "Press the lower back down, brace", "Drive the hips up until knees, hips and shoulders line up", "Squeeze a second, then lower"],
+    "mistake": "Pushing through the toes instead of the heels"
+  },
+  "hip-abduction": {
+    "steps": ["Sit with the pads on the outside of your knees", "Sit tall or lean slightly forward", "Push the knees out as wide as is comfortable", "Return slowly"],
+    "mistake": "Letting the weight slam back together"
+  },
+  "hip-adduction": {
+    "steps": ["Sit with the pads on the inside of your knees", "Start at a comfortable stretch", "Squeeze the legs together", "Open slowly"],
+    "mistake": "Starting too wide and straining the groin"
+  },
+  "standing-calf-raise": {
+    "steps": ["Shoulders under the pads, balls of the feet on the edge", "Let the heels drop to a full stretch", "Rise onto the toes as high as possible", "Pause, then lower slowly"],
+    "mistake": "Bouncing at the bottom"
+  },
+  "seated-calf-raise": {
+    "steps": ["Pad on the lower thighs, balls of the feet on the step", "Release the lock, drop the heels to a stretch", "Push up onto the toes", "Pause at the top, lower slowly"],
+    "mistake": "Short, fast reps — use the full range"
+  },
+  "plank": {
+    "steps": ["Forearms on the floor, elbows under the shoulders", "Legs straight, on your toes", "Squeeze glutes and abs so the body is one straight line", "Breathe and hold"],
+    "mistake": "Hips sagging or piking up"
+  },
+  "side-plank": {
+    "steps": ["Lie on your side, elbow under the shoulder", "Stack the feet or stagger them", "Lift the hips so the body is straight", "Hold without letting the hips drop"],
+    "mistake": "Hips drifting back behind the shoulders"
+  },
+  "hanging-leg-raise": {
+    "steps": ["Hang from the bar, shoulders engaged", "Legs straight, slight tilt of the pelvis", "Raise the legs to at least hip height", "Lower slowly without swinging"],
+    "mistake": "Swinging to get the legs up"
+  },
+  "hanging-knee-raise": {
+    "steps": ["Hang from the bar or rest on the captain's chair pads", "Brace the abs", "Pull the knees up toward the chest, curling the pelvis", "Lower slowly"],
+    "mistake": "Only lifting the thighs without curling the hips up"
+  },
+  "cable-crunch": {
+    "steps": ["Rope on a high pulley, kneel facing the stack", "Hands holding the rope by your head", "Crunch down, bringing the ribs toward the hips", "Return slowly, keeping the hips still"],
+    "mistake": "Sitting back with the hips instead of curling the spine"
+  },
+  "ab-wheel-rollout": {
+    "steps": ["Kneel holding the wheel under the shoulders", "Brace hard, tuck the pelvis slightly", "Roll forward only as far as the back stays flat", "Pull back to the start using the abs"],
+    "mistake": "Letting the lower back arch at the far point"
+  },
+  "cable-woodchop": {
+    "steps": ["Pulley high, stand side-on, both hands on the handle", "Arms long, feet wide", "Pull diagonally down across the body, rotating through the torso", "Return slowly"],
+    "mistake": "Pulling with the arms instead of turning the torso"
+  },
+  "decline-sit-up": {
+    "steps": ["Hook your feet under the pads on a decline bench", "Arms crossed or hands by the head (don't pull the neck)", "Lower back slowly to parallel or just below", "Curl back up"],
+    "mistake": "Yanking on the neck to come up"
+  },
+  "russian-twist": {
+    "steps": ["Sit, knees bent, lean back to about 45°", "Feet on the floor or lifted for harder", "Rotate the torso side to side, hands or weight beside the hip", "Keep the chest up"],
+    "mistake": "Only moving the arms — the shoulders should turn"
+  },
+  "dead-hang": {
+    "steps": ["Grip the bar shoulder width", "Hang with straight arms", "Keep a light shoulder engagement, don't fully slump", "Breathe and hold"],
+    "mistake": "Holding your breath"
+  },
+  "neck-curl": {
+    "steps": ["Lie on a bench with your head off the end, face up", "Plate on the forehead on a towel, held with both hands", "Lower the head back slowly", "Curl the chin toward the chest"],
+    "mistake": "Going heavy or fast — keep it light and slow"
+  },
+  "assisted-pull-up": {
+    "steps": ["Set the assistance, kneel or stand on the platform", "Grip just wider than shoulders", "Pull the chin over the bar", "Lower slowly to straight arms"],
+    "mistake": "Too much assistance for too long — drop it a little every couple of weeks"
+  },
+  "pull-up-negative": {
+    "steps": ["Step or jump up so your chin is over the bar", "Hold the top for a moment", "Lower yourself as slowly as you can (4–5 s)", "Step down and reset"],
+    "mistake": "Dropping the last third — control it all the way"
+  },
+  "machine-row": {
+    "steps": ["Chest against the pad, seat so the handles are at mid-chest", "Arms straight, reach forward a little", "Row the handles back, elbows close", "Return slowly to a stretch"],
+    "mistake": "Pulling the chest off the pad"
+  },
+  "assisted-dip": {
+    "steps": ["Set the assistance, kneel on the pad, hands on the bars", "Shoulders down away from the ears", "Lower until the upper arms are about parallel", "Press back up"],
+    "mistake": "Dropping too deep — stop where the shoulders feel fine"
+  },
+  "dead-bug": {
+    "steps": ["Lie on your back, arms up, knees over hips at 90°", "Press the lower back into the floor", "Lower one arm back and the opposite leg out", "Return and switch sides"],
+    "mistake": "The lower back lifting off the floor"
+  },
+  "pallof-press": {
+    "steps": ["Pulley at chest height, stand side-on, handle at your chest", "Feet hip width, brace", "Press the handle straight out and hold a second", "Bring it back without turning toward the stack"],
+    "mistake": "Standing too close so there's no pull to resist"
+  },
+  "farmer-carry": {
+    "steps": ["Pick up heavy dumbbells, stand tall", "Shoulders back and down, abs braced", "Walk with short, steady steps", "Set them down with a flat back"],
+    "mistake": "Leaning or shrugging — stay tall"
+  },
+  "hamstring-iso-bridge": {
+    "steps": ["Lie on your back, knees bent about 90°", "Dig the heels into the floor as if pulling them toward you", "Lift the hips a little and hold at 30–50% effort", "Breathe — no pain"],
+    "mistake": "Pushing too hard — this is about gentle tension"
+  },
+  "long-lever-bridge-hold": {
+    "steps": ["Lie on your back, heels further out, knees nearly straight", "Press the heels down", "Lift the hips and hold", "Lower slowly"],
+    "mistake": "Arching the lower back to get higher"
+  },
+  "single-leg-glute-bridge": {
+    "steps": ["Lie on your back, one knee bent, the other leg straight up or out", "Drive through the heel of the bent leg", "Lift until the hips are level and in line", "Squeeze a second, lower"],
+    "mistake": "Hips tilting to one side"
+  },
+  "dumbbell-romanian-deadlift": {
+    "steps": ["Hold the dumbbells in front of the thighs, soft knees", "Push the hips back, sliding the weights down the legs", "Stop at the first good stretch, back flat", "Squeeze the glutes to stand"],
+    "mistake": "Bending the knees more as you go down — it turns into a squat"
+  },
+  "single-leg-rdl": {
+    "steps": ["Stand on one leg, dumbbell in the opposite hand", "Hinge forward, the free leg reaching back", "Keep the hips square to the floor", "Stand back up slowly"],
+    "mistake": "Hips opening up toward the ceiling"
+  },
+  "slider-hamstring-curl": {
+    "steps": ["Lie on your back, heels on sliders or a towel", "Lift the hips into a bridge", "Slide the heels out slowly (about 3 s)", "Curl them back in keeping the hips up"],
+    "mistake": "Hips dropping as the legs go out"
+  },
+  "nordic-curl": {
+    "steps": ["Kneel with your ankles anchored", "Body straight from knees to head", "Lower forward as slowly as you can", "Catch yourself with your hands, push back up"],
+    "mistake": "Bending at the hips — keep a straight line"
+  },
+  "single-arm-cable-row": {
+    "steps": ["Pulley at chest height or low, stand or kneel side-on", "Let the shoulder blade reach forward at the start", "Pull the elbow back toward your hip", "Return slowly to the stretch"],
+    "mistake": "Twisting the whole body to pull"
+  },
+  "single-arm-lat-pulldown": {
+    "steps": ["High pulley with a handle, sit or kneel below it", "Arm straight up, slight lean", "Pull the elbow down to your side", "Let it rise slowly to a stretch"],
+    "mistake": "Shrugging the shoulder up at the top"
+  },
+  "neutral-grip-pulldown": {
+    "steps": ["Thighs under the pad, grab the parallel handles", "Slight lean back, chest up", "Pull to the upper chest, elbows close to your sides", "Let it rise until the arms are straight"],
+    "mistake": "Leaning back too far and rowing it"
+  },
+  "dumbbell-pullover": {
+    "steps": ["Lie across or along a bench, dumbbell held over the chest with both hands", "Slight bend in the elbows", "Lower it back behind your head to a comfortable stretch", "Pull it back over the chest"],
+    "mistake": "Going too deep and straining the shoulders"
+  },
+  "cable-fly-high-to-low": {
+    "steps": ["Pulleys high, handles in each hand, split stance", "Soft elbows, chest up", "Sweep the hands down and together in front of your hips", "Return slowly"],
+    "mistake": "Pressing instead of sweeping"
+  },
+  "cable-fly-low-to-high": {
+    "steps": ["Pulleys low, handles in each hand, step forward", "Palms facing up and forward, soft elbows", "Sweep the hands up and together to upper-chest height", "Lower slowly"],
+    "mistake": "Using the front of the shoulders to lift — keep it chest-driven and light"
+  },
+  "smith-machine-bench-press": {
+    "steps": ["Set the bench so the bar comes down over mid-chest", "Shoulder blades back, grip a bit wider than shoulders", "Lower to the chest, elbows ~45°", "Press up"],
+    "mistake": "Bench in the wrong spot so the bar lands on the neck or belly"
+  },
+  "cable-rear-delt-fly": {
+    "steps": ["Pulleys at shoulder height, cross the cables (left hand takes the right cable)", "Arms straight in front of you", "Sweep the arms out wide and back", "Return slowly"],
+    "mistake": "Bending the elbows and rowing"
+  },
+  "cable-y-raise": {
+    "steps": ["Low pulley, stand side-on or cross the cables", "Thumb up, arm straight", "Raise in a Y shape up to eye height", "Lower slowly — keep it light"],
+    "mistake": "Shrugging the shoulders up"
+  },
+  "landmine-press": {
+    "steps": ["Bar end in a landmine, hold the end at your shoulder", "Split stance, brace", "Press up and forward until the arm is straight", "Lower back to the shoulder"],
+    "mistake": "Leaning back to press"
+  },
+  "machine-lateral-raise": {
+    "steps": ["Set the seat so the pivot lines up with your shoulders", "Pads on the outside of the arms", "Raise the arms to shoulder height", "Lower slowly"],
+    "mistake": "Shrugging the shoulders as you lift"
+  },
+  "single-arm-cable-curl": {
+    "steps": ["Low pulley with a handle, stand facing it", "Elbow at your side, palm up", "Curl up and squeeze", "Lower slowly"],
+    "mistake": "Letting the elbow drift forward"
+  },
+  "bayesian-curl": {
+    "steps": ["Low pulley, face away from the stack, handle in one hand", "Step forward so the arm is pulled behind you", "Curl up keeping the elbow back", "Lower to a full stretch"],
+    "mistake": "The elbow swinging forward to finish the curl"
+  },
+  "reverse-grip-pushdown": {
+    "steps": ["High pulley with a bar, underhand grip", "Elbows tucked at your sides", "Push down until the arms are straight", "Return slowly to 90°"],
+    "mistake": "Going too heavy — the wrists won't like it"
+  },
+  "single-arm-pushdown": {
+    "steps": ["High pulley with a handle", "Elbow at your side", "Push down until the arm is straight", "Return slowly"],
+    "mistake": "The elbow drifting away from the body"
+  },
+  "reverse-curl": {
+    "steps": ["Hold the EZ bar overhand, shoulder width", "Elbows at your sides", "Curl up keeping the wrists straight", "Lower slowly"],
+    "mistake": "Wrists bending back under the bar"
+  },
+  "cable-glute-kickback": {
+    "steps": ["Ankle strap on a low pulley, face the stack", "Hold the frame, slight forward lean", "Kick the leg straight back by squeezing the glute", "Return slowly"],
+    "mistake": "Arching the lower back to kick higher"
+  },
+  "cable-hip-abduction": {
+    "steps": ["Ankle strap on a low pulley, stand side-on (strap on the far leg)", "Hold the frame, stand tall", "Lift the leg out to the side", "Return slowly"],
+    "mistake": "Leaning over to lift the leg higher"
+  },
+  "smith-machine-squat": {
+    "steps": ["Bar on the upper back, feet slightly in front of the bar", "Brace, unhook", "Squat down until the thighs are about parallel", "Drive up through the whole foot"],
+    "mistake": "Feet directly under the bar so the knees shoot forward"
+  },
+  "decline-barbell-bench-press": {
+    "steps": ["Hook your legs in on a decline bench, eyes under the bar", "Shoulder blades back", "Lower to the lower chest", "Press up over the lower chest"],
+    "mistake": "Unracking without a spotter when going heavy"
+  },
+  "decline-dumbbell-press": {
+    "steps": ["Hook your legs in on a decline bench, dumbbells on the chest", "Shoulder blades back", "Press up over the lower chest", "Lower until level with the chest"],
+    "mistake": "Letting the dumbbells drift toward the face"
+  },
+  "bench-dip": {
+    "steps": ["Hands on the bench edge behind you, legs out in front", "Shoulders down and back", "Lower until the elbows are at about 90°", "Press back up"],
+    "mistake": "Going lower than 90° — it strains the front of the shoulder"
+  },
+  "seated-dip-machine": {
+    "steps": ["Sit with the handles at your sides", "Shoulders down, chest up", "Press the handles down until the arms are straight", "Return slowly"],
+    "mistake": "Shrugging the shoulders as the handles come up"
+  },
+  "machine-triceps-extension": {
+    "steps": ["Set the seat so the elbows line up with the pivot", "Upper arms on the pad", "Extend the arms until straight", "Return slowly"],
+    "mistake": "Lifting the elbows off the pad"
+  },
+  "single-arm-cable-triceps-extension": {
+    "steps": ["Handle on a pulley, face away or stand side-on", "Upper arm still, elbow bent", "Straighten the arm fully", "Return slowly"],
+    "mistake": "Moving the upper arm — only the forearm should move"
+  },
+  "twenty-ones": {
+    "steps": ["Hold the EZ bar palms up, elbows at your sides", "7 reps from the bottom to halfway", "7 reps from halfway to the top", "7 full reps — no rest between"],
+    "mistake": "Starting too heavy — go about 20% lighter than normal curls"
+  },
+  "front-raise": {
+    "steps": ["Stand tall, dumbbells in front of the thighs", "Soft bend in the elbows", "Raise in front of you to shoulder height", "Lower slowly"],
+    "mistake": "Swinging the weights up with the back"
+  },
+  "cable-front-raise": {
+    "steps": ["Low pulley, face away from the stack, handle between your legs", "Arm straight, soft elbow", "Raise in front to shoulder height", "Lower slowly"],
+    "mistake": "Raising above shoulder height and shrugging"
+  },
+  "incline-y-raise": {
+    "steps": ["Lie chest-down on an incline bench, light dumbbells hanging", "Thumbs pointing up", "Raise the arms in a Y shape, shoulder blades moving down", "Lower slowly"],
+    "mistake": "Shrugging up — think about the shoulder blades sliding down"
+  },
+  "band-pull-apart": {
+    "steps": ["Hold a band in front of you at shoulder height, arms straight", "Hands about shoulder width", "Pull the band apart until it touches your chest", "Squeeze the shoulder blades, return slowly"],
+    "mistake": "Bending the elbows to make it easier"
+  },
+  "six-inches": {
+    "steps": ["Lie on your back, hands under the hips or by your sides", "Press the lower back into the floor", "Lift both heels about 6 inches and hold", "Keep breathing"],
+    "mistake": "The lower back arching off the floor"
+  },
+  "barbell-shrug": {
+    "steps": ["Hold the bar at arm's length, shoulder-width grip", "Stand tall", "Lift the shoulders straight up toward the ears", "Pause, lower all the way"],
+    "mistake": "Bending the elbows to pull the bar up"
+  },
+  "inverted-row": {
+    "steps": ["Lie under a bar (Smith or rack) set at waist height", "Grip just wider than shoulders, body straight, heels on the floor", "Pull your chest to the bar", "Lower to straight arms"],
+    "mistake": "Hips sagging — keep the plank"
+  }
+}

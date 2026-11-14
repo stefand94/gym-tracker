@@ -1,6 +1,6 @@
 import type { Exercise, Routine, Workout } from '../types';
-import type { QueueOp, RemoteData, SyncSettings } from '../state/store';
-import { mergeForPush } from './merge';
+import type { QueueOp, RemoteData, SyncSettings, VideoPin } from '../state/store';
+import { mergeForPush, mergeKeyed } from './merge';
 
 const API = 'https://api.github.com';
 
@@ -20,6 +20,7 @@ export function idFromPath(path: string): string | null {
 
 export const routinePath = (id: string) => `routines/${id}.json`;
 export const CUSTOM_PATH = 'exercises/custom.json';
+export const VIDEOS_PATH = 'exercises/videos.json';
 
 /** Routine id from routines/<id>.json */
 export function routineIdFromPath(path: string): string | null {
@@ -105,13 +106,13 @@ export async function putRoutine(s: SyncSettings, r: Routine): Promise<void> {
   await putJson(s, path, r, `${r.archived ? 'Archive' : 'Save'} routine: ${r.name}`, await existingSha(s, path));
 }
 
-/** Fetch–merge–put, so edits Claude made to custom.json in the repo are never overwritten. */
-export async function putCustomExercises(s: SyncSettings, local: Exercise[]): Promise<void> {
+/** Fetch–merge–put, so edits made to the file in the repo (e.g. by Claude) are never overwritten. */
+async function mergePut<T>(s: SyncSettings, path: string, empty: T, merge: (remote: T) => T, message: string): Promise<void> {
   for (let attempt = 0; ; attempt++) {
-    let remote: Exercise[] = [];
+    let remote = empty;
     let sha: string | undefined;
     try {
-      const res = await gh(s, `/contents/${CUSTOM_PATH}?ref=${s.branch}`);
+      const res = await gh(s, `/contents/${path}?ref=${s.branch}`);
       const file = await res.json();
       sha = file.sha;
       remote = JSON.parse(fromBase64(file.content));
@@ -119,7 +120,7 @@ export async function putCustomExercises(s: SyncSettings, local: Exercise[]): Pr
       if (!(e instanceof GitHubError && e.status === 404)) throw e;
     }
     try {
-      await putJson(s, CUSTOM_PATH, mergeForPush(remote, local), 'Save custom exercises', sha);
+      await putJson(s, path, merge(remote), message, sha);
       return;
     } catch (e) {
       // Someone else wrote the file between our read and write: read again and retry once.
@@ -128,6 +129,12 @@ export async function putCustomExercises(s: SyncSettings, local: Exercise[]): Pr
     }
   }
 }
+
+export const putCustomExercises = (s: SyncSettings, local: Exercise[]) =>
+  mergePut<Exercise[]>(s, CUSTOM_PATH, [], (remote) => mergeForPush(remote, local), 'Save custom exercises');
+
+export const putVideos = (s: SyncSettings, local: Record<string, VideoPin>) =>
+  mergePut<Record<string, VideoPin>>(s, VIDEOS_PATH, {}, (remote) => mergeKeyed(remote, local), 'Save pinned videos');
 
 export async function deleteWorkout(s: SyncSettings, path: string): Promise<void> {
   const sha = await existingSha(s, path);
@@ -173,6 +180,7 @@ export async function pullAll(s: SyncSettings, known: Set<string>, shas: Record<
     if (shas[t.path] === t.sha) continue;
     if (routineIdFromPath(t.path)) out.remote.routines.push(await raw<Routine>(s, t.path));
     else if (t.path === CUSTOM_PATH) out.remote.customExercises = await raw<Exercise[]>(s, t.path);
+    else if (t.path === VIDEOS_PATH) out.remote.videos = await raw<Record<string, VideoPin>>(s, t.path);
     else continue;
     out.remote.shas[t.path] = t.sha;
   }
@@ -196,6 +204,7 @@ export interface SyncInput {
   routines: Routine[];
   customExercises: Exercise[];
   remoteShas: Record<string, string>;
+  videos?: Record<string, VideoPin>;
 }
 
 export interface RunResult {
@@ -206,7 +215,7 @@ export interface RunResult {
 }
 
 export async function runSync(s: SyncSettings, input: SyncInput): Promise<RunResult> {
-  const { queue, history, routines, customExercises, remoteShas } = input;
+  const { queue, history, routines, customExercises, remoteShas, videos = {} } = input;
   const completed: QueueOp[] = [];
   try {
     for (const op of queue) {
@@ -218,6 +227,8 @@ export async function runSync(s: SyncSettings, input: SyncInput): Promise<RunRes
       } else if (kind === 'routine') {
         const r = routines.find((x) => x.id === op.id);
         if (r) await putRoutine(s, r);
+      } else if (kind === 'videos') {
+        await putVideos(s, videos);
       } else {
         await putCustomExercises(s, customExercises);
       }
