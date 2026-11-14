@@ -39,3 +39,9 @@ export const IconPlay = () => (
 export const IconClose = () => (
   <svg viewBox="0 0 24 24" {...p}><path d="M6 6l12 12M18 6 6 18" /></svg>
 );
+export const IconGrip = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="9" cy="6" r="1.6" /><circle cx="15" cy="6" r="1.6" /><circle cx="9" cy="12" r="1.6" />
+    <circle cx="15" cy="12" r="1.6" /><circle cx="9" cy="18" r="1.6" /><circle cx="15" cy="18" r="1.6" />
+  </svg>
+);

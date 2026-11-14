@@ -10,7 +10,6 @@ import {
   addSet,
   blockComplete,
   completeHold,
-  moveBlock,
   removeItem,
   removeSet,
   replaceItem,
@@ -35,6 +34,7 @@ import { IconCheck, IconClose, IconMore, IconPlay } from './Icons';
 import { Sheet } from './Sheet';
 import { PainStrip } from './PainStrip';
 import { StationSheet, usesStations } from './StationSheet';
+import { DragHandle, type DragSpec } from './BlockDnd';
 import { NumInput, Stepper } from './Stepper';
 
 type Update = (fn: (w: Workout) => Workout) => void;
@@ -204,6 +204,7 @@ function ItemHead({
   onMenu,
   onHeadTap,
   update,
+  drag,
 }: {
   ex: Exercise;
   item: WorkoutItem;
@@ -211,6 +212,7 @@ function ItemHead({
   onMenu: () => void;
   onHeadTap?: () => void;
   update: Update;
+  drag: DragSpec;
 }) {
   const { state } = useStore();
   const [picking, setPicking] = useState(false);
@@ -237,6 +239,7 @@ function ItemHead({
   return (
     <>
       <div className="ex-head">
+        <DragHandle spec={drag} className="grip-head" />
         {onHeadTap ? (
           <button type="button" className="grow ex-head-btn" onClick={onHeadTap} aria-label={`Collapse ${ex.name}`}>
             {text}
@@ -325,12 +328,6 @@ function ItemMenu({
       <button className="menu-item" disabled={item.sets.length <= 1} onClick={() => act((w) => removeSet(w, item.id))}>
         Remove last set
       </button>
-      <button className="menu-item" disabled={index === 0} onClick={() => act((w) => moveBlock(w, block.id, -1))}>
-        Move up
-      </button>
-      <button className="menu-item" disabled={index >= count - 1} onClick={() => act((w) => moveBlock(w, block.id, 1))}>
-        Move down
-      </button>
       <button className="menu-item" disabled={index >= count - 1} onClick={() => act((w) => supersetWithNext(w, block.id))}>
         Superset with next exercise
       </button>
@@ -356,7 +353,14 @@ function SingleBlock({ block, index, count, update, current, onToggle }: BlockPr
   const nextSet = item.status === 'pending' ? item.sets.findIndex((s) => !s.done) : -1;
   return (
     <section className={'card ex-card' + cls + (current ? ' is-current' : '')}>
-      <ItemHead ex={ex} item={item} update={update} onMenu={() => setMenu(true)} onHeadTap={current ? undefined : onToggle} />
+      <ItemHead
+        ex={ex}
+        item={item}
+        update={update}
+        drag={{ key: `i:${item.id}`, ids: [item.id], label: ex.name }}
+        onMenu={() => setMenu(true)}
+        onHeadTap={current ? undefined : onToggle}
+      />
       {item.status !== 'skipped' && (
         <div className="sets">
           <SetHeader labels={fieldLabels(ex)} />
@@ -426,7 +430,10 @@ function SupersetBlock({ block, index, count, update, current, onToggle }: Block
   return (
     <section className={'card ex-card ss-block' + (complete ? ' is-done' : '') + (current ? ' is-current' : '')}>
       <div className="spread ss-top">
-        <span className="badge badge-ss">Superset {letter}</span>
+        <span className="ss-grab">
+          <DragHandle spec={{ key: `b:${block.id}`, ids: block.items.map((i) => i.id), label: `Superset ${letter}` }} />
+          <span className="badge badge-ss">Superset {letter}</span>
+        </span>
         {complete && <span className="badge badge-done">Done</span>}
       </div>
       {entries.map(({ item, ex, tag }) =>
@@ -437,6 +444,7 @@ function SupersetBlock({ block, index, count, update, current, onToggle }: Block
               item={item}
               tag={tag}
               update={update}
+              drag={{ key: `i:${item.id}`, ids: [item.id], label: ex.name }}
               onMenu={() => setMenuFor(item.id)}
               onHeadTap={current ? undefined : onToggle}
             />
@@ -521,12 +529,18 @@ function CollapsedBlock({ block, index, onToggle }: BlockProps) {
     const sub = block.superset
       ? `Superset · ${Math.max(...block.items.map((i) => i.sets.length))} rounds`
       : itemSummary(getExercise(first.exerciseId), first);
+    const spec: DragSpec = block.superset
+      ? { key: `b:${block.id}`, ids: block.items.map((i) => i.id), label: `Superset ${letter}` }
+      : { key: `i:${first.id}`, ids: [first.id], label: names };
     return (
-      <button type="button" className="crow crow-next" onClick={onToggle}>
-        <span className="crow-mark">{block.superset ? letter : index + 1}</span>
-        <span className="crow-name">{names}</span>
-        <span className="crow-sum num">{sub}</span>
-      </button>
+      <div className="crow-wrap">
+        <DragHandle spec={spec} className="grip-row" />
+        <button type="button" className="crow crow-next" onClick={onToggle}>
+          <span className="crow-mark">{block.superset ? letter : index + 1}</span>
+          <span className="crow-name">{names}</span>
+          <span className="crow-sum num">{sub}</span>
+        </button>
+      </div>
     );
   }
   return (

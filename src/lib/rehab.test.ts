@@ -73,9 +73,11 @@ describe('rehab', () => {
   it('expands the dose when a routine starts', () => {
     const state = rehabState(hist(session(2, 1)), routines);
     const w = workoutFromRoutine(upper, [], getExercise, new Date(), (b) => doseItems(b, state, routines));
-    const last = w.blocks[w.blocks.length - 1].items.map((i) => i.exerciseId);
-    expect(last).toEqual(phase(2).blocks.flatMap((b) => b.items).slice(0, 2).map((i) => i.exerciseId));
-    expect(w.blocks[w.blocks.length - 1].items.every((i) => i.trackPain)).toBe(true);
+    // the dose's two exercises come one after the other, each its own block
+    const last = w.blocks.slice(-2);
+    expect(last.map((b) => b.items.length)).toEqual([1, 1]);
+    expect(last.map((b) => b.items[0].exerciseId)).toEqual(phase(2).blocks.flatMap((b) => b.items).slice(0, 2).map((i) => i.exerciseId));
+    expect(last.every((b) => b.items[0].trackPain)).toBe(true);
   });
 
   it('asks the next morning, once', () => {

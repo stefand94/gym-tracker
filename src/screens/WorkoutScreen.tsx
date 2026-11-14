@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { BlockDnd, type DndBlock } from '../components/BlockDnd';
 import { BodyMap } from '../components/BodyMap';
 import { ExerciseEditor } from '../components/ExerciseEditor';
 import { ExercisePicker } from '../components/ExercisePicker';
@@ -11,9 +12,9 @@ import { WorkoutBlockView } from '../components/WorkoutBlockView';
 import { getExercise } from '../data/library';
 import { workoutLoad } from '../lib/muscleLoad';
 import { useWakeLock } from '../lib/useWakeLock';
-import { addExercise, blockComplete, currentBlockIndex, workoutProgress } from '../lib/workout';
+import { addExercise, blockComplete, currentBlockIndex, moveInWorkout, sameLayout, workoutProgress } from '../lib/workout';
 import { useStore } from '../state/store';
-import type { Workout } from '../types';
+import type { Workout, WorkoutBlock } from '../types';
 
 function Elapsed({ startedAt }: { startedAt: string }) {
   const [now, setNow] = useState(Date.now());
@@ -37,6 +38,7 @@ export function WorkoutScreen() {
   /** Blocks opened or closed by hand; everything else follows "only the current block is open". */
   const [override, setOverride] = useState<Record<string, boolean>>({});
   const headRef = useRef<HTMLDivElement>(null);
+  const undoBlocks = useRef<WorkoutBlock[] | null>(null);
   const w = state.active;
   const update = useCallback((fn: (w: Workout) => Workout) => dispatch({ type: 'updateActive', fn }), [dispatch]);
   useWakeLock(!!w);
@@ -101,6 +103,33 @@ export function WorkoutScreen() {
   const finish = () => (prog.done > 0 && left === 0 ? doFinish() : setAsk('finish'));
 
   const toggle = (id: string, open: boolean) => setOverride((o) => ({ ...o, [id]: !open }));
+  const dndBlocks: DndBlock[] = w.blocks.map((b) => ({
+    id: b.id,
+    superset: b.superset,
+    items: b.items.map((i) => ({ id: i.id, name: getExercise(i.exerciseId)?.name ?? i.exerciseId })),
+  }));
+  const onMove = (ids: string[], target: Parameters<typeof moveInWorkout>[2]) => {
+    const next = moveInWorkout(w, ids, target);
+    if (sameLayout(next.blocks, w.blocks)) return false;
+    undoBlocks.current = w.blocks;
+    update(() => next);
+    const landed = next.blocks.find((b) => b.items.some((i) => i.id === ids[0]));
+    if (landed) scrollToBlock(landed.id);
+    return true;
+  };
+  const onUndo = () => {
+    const prev = undoBlocks.current;
+    // Restore the order, but keep anything ticked since the move.
+    if (prev)
+      update((x) => {
+        const now = new Map(x.blocks.flatMap((b) => b.items).map((i) => [i.id, i]));
+        const blocks = prev
+          .map((b) => ({ ...b, items: b.items.flatMap((i) => (now.has(i.id) ? [now.get(i.id)!] : [])) }))
+          .filter((b) => b.items.length);
+        return { ...x, blocks };
+      });
+    undoBlocks.current = null;
+  };
   let shownNextLabel = false;
 
   return (
@@ -130,28 +159,30 @@ export function WorkoutScreen() {
       </div>
       <HoldWatcher />
 
-      <div className="wo-list">
-        {w.blocks.map((b, i) => {
-          const open = override[b.id] ?? i === cur;
-          const upcoming = !open && i > cur && cur >= 0 && !blockComplete(b);
-          const label = upcoming && !shownNextLabel;
-          if (label) shownNextLabel = true;
-          return (
-            <div key={b.id} id={`blk-${b.id}`} className="wo-block">
-              {label && <div className="list-label">Up next</div>}
-              <WorkoutBlockView
-                block={b}
-                index={i}
-                count={w.blocks.length}
-                update={update}
-                open={open}
-                current={i === cur}
-                onToggle={() => toggle(b.id, open)}
-              />
-            </div>
-          );
-        })}
-      </div>
+      <BlockDnd blocks={dndBlocks} onMove={onMove} onUndo={onUndo}>
+        <div className="wo-list">
+          {w.blocks.map((b, i) => {
+            const open = override[b.id] ?? i === cur;
+            const upcoming = !open && i > cur && cur >= 0 && !blockComplete(b);
+            const label = upcoming && !shownNextLabel;
+            if (label) shownNextLabel = true;
+            return (
+              <div key={b.id} id={`blk-${b.id}`} className="wo-block">
+                {label && <div className="list-label">Up next</div>}
+                <WorkoutBlockView
+                  block={b}
+                  index={i}
+                  count={w.blocks.length}
+                  update={update}
+                  open={open}
+                  current={i === cur}
+                  onToggle={() => toggle(b.id, open)}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </BlockDnd>
 
       {!w.blocks.length && <div className="empty">No exercises yet. Add one below.</div>}
       {w.blocks.length > 0 && cur === -1 && (

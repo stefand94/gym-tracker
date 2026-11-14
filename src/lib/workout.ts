@@ -83,7 +83,9 @@ export function workoutFromRoutine(
         return ex ? makeItem(ex, history, ri) : null;
       })
       .filter((x): x is WorkoutItem => x !== null);
-    if (items.length) blocks.push({ id: uid(), superset: !!rb.superset && items.length > 1, items });
+    if (rb.superset && items.length > 1) blocks.push({ id: uid(), superset: true, items });
+    // a plain block with several exercises means "one after the other": one block each
+    else for (const item of items) blocks.push({ id: uid(), superset: false, items: [item] });
   }
   return { id: uid(), routineId: routine.id, name: routine.name, startedAt: now.toISOString(), blocks };
 }
@@ -337,4 +339,61 @@ export function setStation(w: Workout, itemId: string, station: string | undefin
         : i.sets;
     return { ...rest, station: name, sets };
   });
+}
+
+/** Where a dragged exercise lands: a new block in gap n (0 = before the first block), or into a block as a superset. */
+export type DropTarget = { gap: number } | { join: string };
+
+interface BlockLike<I extends { id: string }> {
+  id: string;
+  superset?: boolean;
+  items: I[];
+}
+
+/**
+ * Move items (one exercise, or every exercise of a block) to a gap between blocks or into another block.
+ * Blocks left empty disappear; a superset left with one exercise becomes a plain block. Moving a whole block
+ * keeps its id. Generic so the routine editor can use it too.
+ */
+export function moveItems<I extends { id: string }, B extends BlockLike<I>>(
+  blocks: B[],
+  ids: string[],
+  target: DropTarget,
+  newId: () => string = uid,
+): B[] {
+  const set = new Set(ids);
+  const moving = blocks.flatMap((b) => b.items.filter((i) => set.has(i.id)));
+  if (!moving.length) return blocks;
+  const whole = blocks.find((b) => b.items.length === moving.length && b.items.every((i) => set.has(i.id)));
+  const without = (b: B): B | null => {
+    const items = b.items.filter((i) => !set.has(i.id));
+    if (!items.length) return null;
+    return items.length === b.items.length ? b : { ...b, items, superset: !!b.superset && items.length > 1 };
+  };
+
+  if ('join' in target) {
+    const t = blocks.find((b) => b.id === target.join);
+    if (!t || t.items.every((i) => set.has(i.id)) || moving.every((i) => t.items.includes(i))) return blocks;
+    return blocks.flatMap((b) =>
+      b.id === t.id ? [{ ...b, superset: true, items: [...b.items.filter((i) => !set.has(i.id)), ...moving] }] : (without(b) ?? []),
+    );
+  }
+
+  const rows: (B | null)[] = [...blocks];
+  rows.splice(Math.max(0, Math.min(target.gap, blocks.length)), 0, null);
+  return rows.flatMap((b) => {
+    if (b) return without(b) ?? [];
+    return [whole ? whole : ({ id: newId(), superset: moving.length > 1, items: moving } as unknown as B)];
+  });
+}
+
+export function moveInWorkout(w: Workout, ids: string[], target: DropTarget): Workout {
+  const blocks = moveItems(w.blocks, ids, target);
+  return blocks === w.blocks ? w : { ...w, blocks };
+}
+
+/** Same blocks, same exercises, same order? */
+export function sameLayout(a: { id: string; items: { id: string }[] }[], b: { id: string; items: { id: string }[] }[]): boolean {
+  const sig = (x: typeof a) => x.map((bl) => bl.items.map((i) => i.id).join(',')).join('|');
+  return sig(a) === sig(b);
 }
