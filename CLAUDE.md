@@ -58,13 +58,16 @@ entries win the lookup. Use his logged sets of it (workouts reference the id) to
 ## Routine shape (seed: `src/data/routines.json`)
 
 ```json
-{ "id": "push", "name": "Push", "description": "optional subtitle", "days": ["mon"],
+{ "id": "push", "name": "Push", "description": "optional subtitle",
   "blocks": [
     { "items": [{ "exerciseId": "barbell-bench-press" }] },
     { "superset": true, "items": [{ "exerciseId": "lateral-raise" }, { "exerciseId": "triceps-pushdown", "sets": 3, "reps": 12, "weight": 20 }] }
   ] }
 ```
-`days` (optional, "mon"…"sun") schedules it: on that weekday Home shows it first under Today.
+No weekdays (`days` is no longer used): Home suggests the routine that best hits muscles that are behind over the
+last 7 days and rested over 48 h (`src/lib/suggest.ts`); routines with leg work outside the `rehabDose` block are held
+back while a rehab is unfinished. Stefan can also build and edit routines in the app (`src/screens/RoutineEditor.tsx`)
+and update one from the finish screen, so read the repo copy before changing a routine.
 Per-item `sets/reps/seconds/weight/station` are optional (`station` is a free-text machine/cable tag like "Upstairs 1"; weights pre-fill from the last time on the same station); when a workout starts, sets pre-fill from the last time the
 exercise was done, then routine values, then exercise defaults.
 

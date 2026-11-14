@@ -8,6 +8,7 @@ import { MUSCLE_LABELS, MUSCLE_IDS } from '../data/muscles';
 import { doneSetCount, duration, exerciseCount, fmtDate, fmtSet } from '../lib/format';
 import { workoutLoad } from '../lib/muscleLoad';
 import { finishedNewestFirst } from '../lib/prefill';
+import { describeChanges, routineFromWorkout, routineWithWorkout, sameRoutineLayout } from '../lib/routineEdit';
 import { workoutPath } from '../lib/sync';
 import { useStore } from '../state/store';
 import type { Workout } from '../types';
@@ -56,8 +57,14 @@ export function HistoryDetail() {
   const { state, dispatch } = useStore();
   const nav = useNavigate();
   const [ask, setAsk] = useState(false);
+  const [routineAnswer, setRoutineAnswer] = useState<'updated' | 'kept' | null>(null);
   const w = state.history.find((x) => x.id === id);
   if (!w) return <div className="empty">Workout not found.</div>;
+  const justFinishedHere = params.get('done') === '1';
+  // Finished from a routine but laid out differently: offer to make today's layout the routine's.
+  const routine = justFinishedHere ? state.routines.find((r) => r.id === w.routineId && !r.archived && !r.rehab) : undefined;
+  const updated = routine && routineAnswer !== 'updated' ? routineWithWorkout(routine, w, state.history, getExercise) : undefined;
+  const differs = !!routine && !!updated && !sameRoutineLayout(routine, updated);
   const load = workoutLoad(w, getExercise);
   const hit = MUSCLE_IDS.filter((m) => load[m] > 0).sort((a, b) => load[b] - load[a]);
   const justFinished = params.get('done') === '1';
@@ -76,6 +83,32 @@ export function HistoryDetail() {
       <div className="dim small" style={{ marginTop: -10, marginBottom: 16 }}>
         {fmtDate(w.startedAt, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} · {duration(w)}
       </div>
+
+      {differs && !routineAnswer && (
+        <div className="card update-card">
+          <div className="routine-name">Update {routine!.name}?</div>
+          <div className="small dim">Today was different. {describeChanges(routine!, updated!, getExercise)}.</div>
+          <div className="update-actions">
+            <button
+              className="btn btn-primary grow"
+              onClick={() => {
+                dispatch({ type: 'routineSave', routine: updated!, now: new Date().toISOString() });
+                setRoutineAnswer('updated');
+              }}
+            >
+              Update routine
+            </button>
+            <button className="btn grow" onClick={() => setRoutineAnswer('kept')}>
+              Keep as is
+            </button>
+          </div>
+        </div>
+      )}
+      {routineAnswer === 'updated' && routine && (
+        <div className="card update-card small" role="status">
+          ✓ {routine.name} updated. Next time it starts this way.
+        </div>
+      )}
 
       <div className="stat-grid">
         <div className="stat">
@@ -109,8 +142,7 @@ export function HistoryDetail() {
                 <div className="grow">
                   <div style={{ fontWeight: 700 }}>
                     {b.superset && <span className="ss-tag">SS{n + 1} </span>}
-                    {ex?.name ?? i.exerciseId}{' '}
-                    {i.station && <span className="station-tag">📍 {i.station}</span>}{' '}
+                    {ex?.name ?? i.exerciseId} {i.station && <span className="station-tag">📍 {i.station}</span>}{' '}
                     {i.status === 'skipped' && <span className="badge badge-skip">Skipped</span>}
                     {i.pain !== undefined && <span className="station-tag">pain {i.pain}/10</span>}
                   </div>
@@ -125,7 +157,11 @@ export function HistoryDetail() {
                   )}
                 </div>
                 {ex && (
-                  <Link to={`/progress/${ex.id}`} className="small" style={{ color: 'var(--accent)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                  <Link
+                    to={`/progress/${ex.id}`}
+                    className="small"
+                    style={{ color: 'var(--accent)', fontWeight: 700, whiteSpace: 'nowrap' }}
+                  >
                     Progress
                   </Link>
                 )}
@@ -136,10 +172,13 @@ export function HistoryDetail() {
       </div>
 
       <button
-        className="btn btn-ghost btn-danger btn-block"
+        className="btn btn-ghost btn-block"
         style={{ marginTop: 20 }}
-        onClick={() => setAsk(true)}
+        onClick={() => nav('/routines/new', { state: { draft: routineFromWorkout(w, getExercise) } })}
       >
+        Save as routine
+      </button>
+      <button className="btn btn-ghost btn-danger btn-block" style={{ marginTop: 8 }} onClick={() => setAsk(true)}>
         Delete workout
       </button>
       {ask && (

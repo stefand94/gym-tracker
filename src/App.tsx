@@ -5,6 +5,7 @@ import { Body } from './screens/Body';
 import { HistoryDetail, HistoryList } from './screens/History';
 import { Home } from './screens/Home';
 import { Progress } from './screens/Progress';
+import { RoutineEditor } from './screens/RoutineEditor';
 import { Settings } from './screens/Settings';
 import { WorkoutScreen } from './screens/WorkoutScreen';
 import { useStore } from './state/store';
@@ -51,6 +52,8 @@ export function App() {
           <Route path="/history" element={<HistoryList />} />
           <Route path="/history/:id" element={<HistoryDetail />} />
           <Route path="/settings" element={<Settings syncNow={sync} />} />
+          <Route path="/routines/new" element={<RoutineEditor key="new" />} />
+          <Route path="/routines/:id" element={<RoutineEditor />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </main>

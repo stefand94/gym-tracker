@@ -11,6 +11,7 @@ import { ConfirmSheet } from '../components/Sheet';
 import { WorkoutBlockView } from '../components/WorkoutBlockView';
 import { getExercise } from '../data/library';
 import { workoutLoad } from '../lib/muscleLoad';
+import { routineFromWorkout } from '../lib/routineEdit';
 import { useWakeLock } from '../lib/useWakeLock';
 import { addExercise, blockComplete, currentBlockIndex, moveInWorkout, sameLayout, workoutProgress } from '../lib/workout';
 import { useStore } from '../state/store';
@@ -218,6 +219,12 @@ export function WorkoutScreen() {
             Finish workout
           </button>
         )}
+        <button
+          className="btn btn-ghost btn-block"
+          onClick={() => nav('/routines/new', { state: { draft: routineFromWorkout(w, getExercise) } })}
+        >
+          Save as routine
+        </button>
         <button className="btn btn-ghost btn-danger btn-block" onClick={() => setAsk('discard')}>
           Discard workout
         </button>

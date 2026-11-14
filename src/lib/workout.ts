@@ -1,25 +1,11 @@
-import type {
-  Exercise,
-  Routine,
-  RoutineBlock,
-  RoutineItem,
-  SetEntry,
-  Workout,
-  WorkoutBlock,
-  WorkoutItem,
-} from '../types';
+import type { Exercise, Routine, RoutineBlock, RoutineItem, SetEntry, Workout, WorkoutBlock, WorkoutItem } from '../types';
 import { uid } from './id';
 import { cleanStation, lastPerformance, lastStation } from './prefill';
 
 type Lookup = (id: string) => Exercise | undefined;
 
 /** Build the starting sets for an exercise: last time's actual sets → routine defaults → exercise defaults. */
-export function buildSets(
-  exercise: Exercise,
-  history: Workout[],
-  routineItem?: RoutineItem,
-  station?: string,
-): SetEntry[] {
+export function buildSets(exercise: Exercise, history: Workout[], routineItem?: RoutineItem, station?: string): SetEntry[] {
   const last = lastPerformance(exercise.id, history, station);
   if (last && last.length > 0) {
     const count = routineItem?.sets ?? last.length;
@@ -83,9 +69,10 @@ export function workoutFromRoutine(
         return ex ? makeItem(ex, history, ri) : null;
       })
       .filter((x): x is WorkoutItem => x !== null);
-    if (rb.superset && items.length > 1) blocks.push({ id: uid(), superset: true, items });
+    const mark = rb.rehabDose ? { rehabDose: rb.rehabDose } : {};
+    if (rb.superset && items.length > 1) blocks.push({ id: uid(), superset: true, items, ...mark });
     // a plain block with several exercises means "one after the other": one block each
-    else for (const item of items) blocks.push({ id: uid(), superset: false, items: [item] });
+    else for (const item of items) blocks.push({ id: uid(), superset: false, items: [item], ...mark });
   }
   return { id: uid(), routineId: routine.id, name: routine.name, startedAt: now.toISOString(), blocks };
 }
@@ -113,9 +100,7 @@ function mapItem(w: Workout, itemId: string, fn: (i: WorkoutItem) => WorkoutItem
   return {
     ...w,
     blocks: w.blocks.map((b) =>
-      b.items.some((i) => i.id === itemId)
-        ? { ...b, items: b.items.map((i) => (i.id === itemId ? deriveStatus(fn(i)) : i)) }
-        : b,
+      b.items.some((i) => i.id === itemId) ? { ...b, items: b.items.map((i) => (i.id === itemId ? deriveStatus(fn(i)) : i)) } : b,
     ),
   };
 }
@@ -154,9 +139,7 @@ export function toggleComplete(w: Workout, itemId: string): Workout {
 
 export function toggleSkip(w: Workout, itemId: string): Workout {
   return mapItem(w, itemId, (i) =>
-    i.status === 'skipped'
-      ? { ...i, status: 'pending' }
-      : { ...i, status: 'skipped', sets: i.sets.map((s) => ({ ...s, done: false })) },
+    i.status === 'skipped' ? { ...i, status: 'pending' } : { ...i, status: 'skipped', sets: i.sets.map((s) => ({ ...s, done: false })) },
   );
 }
 
@@ -282,9 +265,7 @@ export function currentBlockIndex(w: Workout): number {
 
 /** True when every non-skipped exercise in the block that has a set at this round has ticked it. */
 export function roundComplete(block: WorkoutBlock, round: number): boolean {
-  return block.items
-    .filter((i) => i.status !== 'skipped' && round < i.sets.length)
-    .every((i) => i.sets[round].done);
+  return block.items.filter((i) => i.status !== 'skipped' && round < i.sets.length).every((i) => i.sets[round].done);
 }
 
 /** Add one set to every non-skipped exercise in a block (a new superset round). */
@@ -334,9 +315,7 @@ export function setStation(w: Workout, itemId: string, station: string | undefin
     const ex = lookup(i.exerciseId);
     const last = ex ? lastPerformance(i.exerciseId, history, name, true) : null;
     const sets =
-      ex && last
-        ? i.sets.map((s, idx) => (s.done ? s : pickFields(ex, { ...last[Math.min(idx, last.length - 1)], done: false })))
-        : i.sets;
+      ex && last ? i.sets.map((s, idx) => (s.done ? s : pickFields(ex, { ...last[Math.min(idx, last.length - 1)], done: false }))) : i.sets;
     return { ...rest, station: name, sets };
   });
 }

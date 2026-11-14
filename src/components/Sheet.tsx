@@ -130,6 +130,7 @@ export function ConfirmSheet({
   onConfirm,
   onClose,
   extra,
+  cancelLabel = 'Keep going',
 }: {
   title: string;
   body?: ReactNode;
@@ -138,17 +139,22 @@ export function ConfirmSheet({
   onConfirm: () => void;
   onClose: () => void;
   extra?: ReactNode;
+  cancelLabel?: string;
 }) {
   return (
     <Sheet title={title} onClose={onClose}>
-      {body && <p className="dim" style={{ margin: '0 0 16px', lineHeight: 1.45 }}>{body}</p>}
+      {body && (
+        <p className="dim" style={{ margin: '0 0 16px', lineHeight: 1.45 }}>
+          {body}
+        </p>
+      )}
       <div className="stack">
         <button className={'btn btn-block btn-lg ' + (danger ? 'btn-danger-solid' : 'btn-primary')} onClick={onConfirm}>
           {confirmLabel}
         </button>
         {extra}
         <button className="btn btn-block btn-lg" onClick={onClose}>
-          Keep going
+          {cancelLabel}
         </button>
       </div>
     </Sheet>

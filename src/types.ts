@@ -55,8 +55,8 @@ export interface Routine {
   id: string;
   name: string;
   description?: string;
-  /** Weekdays it's scheduled for ("mon" … "sun"). Today's routine is shown first on Home. */
-  days?: ('sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat')[];
+  /** No longer used (Home suggests from muscle load instead); kept so old data still type-checks. */
+  days?: string[];
   /** Marks a rehab phase routine. */
   rehab?: { area: RehabArea; phase: number };
   blocks: RoutineBlock[];
@@ -91,6 +91,8 @@ export interface WorkoutBlock {
   id: string;
   superset: boolean;
   items: WorkoutItem[];
+  /** Came from a routine's rehab dose block (so "update routine" keeps it a dose block). */
+  rehabDose?: RehabArea;
 }
 
 export interface Workout {

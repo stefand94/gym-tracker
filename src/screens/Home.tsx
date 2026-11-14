@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BodyMap } from '../components/BodyMap';
-import { IconSettings } from '../components/Icons';
+import { IconMore, IconPlus, IconSettings } from '../components/Icons';
 import { PainStrip } from '../components/PainStrip';
-import { ConfirmSheet } from '../components/Sheet';
-import { getExercise } from '../data/library';
+import { ConfirmSheet, Sheet } from '../components/Sheet';
+import { getExercise, ROUTINES } from '../data/library';
 import { doneSetCount, fmtDate, relDay } from '../lib/format';
 import { loadSince, workoutLoad } from '../lib/muscleLoad';
 import { finishedNewestFirst } from '../lib/prefill';
 import { AREA_LABELS, doseItems, morningCheck, rehabState, rehabStatus, STREAK } from '../lib/rehab';
-import { daysLabel, todaysRoutine } from '../lib/schedule';
+import { newRoutineId } from '../lib/routineEdit';
+import { suggest, type Suggestion } from '../lib/suggest';
 import { emptyWorkout, workoutFromRoutine, workoutProgress } from '../lib/workout';
 import { useStore } from '../state/store';
 import type { Routine, Workout } from '../types';
@@ -22,7 +23,7 @@ function routineSummary(r: Routine): string {
 }
 
 function routineMeta(r: Routine): string {
-  return [daysLabel(r.days), r.description ?? routineSummary(r)].filter(Boolean).join(' · ');
+  return r.description ?? routineSummary(r);
 }
 
 function routineLoad(r: Routine) {
@@ -55,9 +56,21 @@ export function Home() {
   const active = state.active;
   const prog = active ? workoutProgress(active) : null;
   const routines = state.routines.filter((r) => !r.archived);
-  const today = active ? null : todaysRoutine(routines, state.history);
-  const others = routines.filter((r) => r !== today);
   const rehab = rehabState(state.history, state.routines);
+  const ranked = suggest(routines, state.history, getExercise, rehab);
+  const top = !active && ranked[0] && !ranked[0].blocked ? ranked[0] : null;
+  const rest: (Suggestion | { routine: Routine; reason?: undefined; blocked?: undefined })[] = [
+    ...ranked.filter((s) => s !== top),
+    ...routines.filter((r) => r.rehab).map((routine) => ({ routine })),
+  ];
+  const [menu, setMenu] = useState<Routine | null>(null);
+  const [deleting, setDeleting] = useState<Routine | null>(null);
+  const duplicate = (r: Routine) => {
+    const name = `${r.name} copy`;
+    const id = newRoutineId(name, [...state.routines.map((x) => x.id), ...ROUTINES.map((x) => x.id)]);
+    dispatch({ type: 'routineSave', routine: { ...r, id, name, rehab: undefined, days: undefined }, now: new Date().toISOString() });
+    nav(`/routines/${id}`);
+  };
   const startRoutine = (r: Routine) =>
     start(workoutFromRoutine(r, state.history, getExercise, new Date(), (rb) => doseItems(rb, rehab, state.routines)));
   const morning = morningCheck(state.history);
@@ -95,7 +108,9 @@ export function Home() {
               Skip
             </button>
           </div>
-          <div className="small dim">After {morning.name}, {relDay(morning.startedAt).toLowerCase()}</div>
+          <div className="small dim">
+            After {morning.name}, {relDay(morning.startedAt).toLowerCase()}
+          </div>
           <PainStrip label="Pain now" value={undefined} onChange={(v) => v !== undefined && answerMorning(v)} />
         </div>
       )}
@@ -122,35 +137,53 @@ export function Home() {
         </div>
       )}
 
-      {today && (
-        <button className="card today" onClick={() => startRoutine(today)}>
-          <div className="today-label">Today</div>
-          <div className="spread today-top">
-            <div className="grow">
-              <div className="today-name">{today.name}</div>
-              <div className="routine-meta">{today.description ?? daysLabel(today.days)}</div>
+      {top && (
+        <div className="card today">
+          <button className="today-main" onClick={() => startRoutine(top.routine)}>
+            <div className="today-label">Suggested</div>
+            <div className="spread today-top">
+              <div className="grow">
+                <div className="today-name">{top.routine.name}</div>
+                <div className="routine-meta">{top.reason}</div>
+              </div>
+              <BodyMap load={routineLoad(top.routine)} size="mini" />
             </div>
-            <BodyMap load={routineLoad(today)} size="mini" />
-          </div>
-          <div className="today-list">{routineSummary(today)}</div>
-          <span className="btn btn-primary btn-block btn-lg today-go">Start {today.name}</span>
-        </button>
+            <div className="today-list">{routineSummary(top.routine)}</div>
+            <span className="btn btn-primary btn-block btn-lg today-go">Start {top.routine.name}</span>
+          </button>
+          <button className="icon-btn card-menu" aria-label={`${top.routine.name} options`} onClick={() => setMenu(top.routine)}>
+            <IconMore />
+          </button>
+        </div>
       )}
 
-      <div className="section-title">{today ? 'Other workouts' : 'Start a workout'}</div>
+      <div className="section-title">{top ? 'Other workouts' : 'Start a workout'}</div>
       <div className="stack">
-        {others.map((r) => (
-          <button key={r.id} className="card routine" onClick={() => startRoutine(r)}>
-            <BodyMap load={routineLoad(r)} size="mini" />
-            <div className="grow">
-              <div className="routine-name">{r.name}</div>
-              <div className="routine-meta">{routineMeta(r)}</div>
-            </div>
-          </button>
+        {rest.map(({ routine: r, blocked }) => (
+          <div key={r.id} className={'card routine' + (blocked ? ' is-later' : '')}>
+            <button className="routine-main" onClick={() => startRoutine(r)}>
+              <BodyMap load={routineLoad(r)} size="mini" />
+              <div className="grow">
+                <div className="routine-name">{r.name}</div>
+                <div className="routine-meta">
+                  {blocked && <span className="later-tag">{blocked}</span>}
+                  {routineMeta(r)}
+                </div>
+              </div>
+            </button>
+            <button className="icon-btn card-menu" aria-label={`${r.name} options`} onClick={() => setMenu(r)}>
+              <IconMore />
+            </button>
+          </div>
         ))}
-        <button className="btn btn-block" onClick={() => start(emptyWorkout())}>
-          Empty workout
-        </button>
+        <div className="home-actions">
+          <button className="btn grow" onClick={() => nav('/routines/new')}>
+            <IconPlus /> New workout
+          </button>
+          <button className="btn grow" onClick={() => start(emptyWorkout())}>
+            Empty workout
+          </button>
+        </div>
       </div>
 
       <div className="section-title">Last 7 days</div>
@@ -180,6 +213,45 @@ export function Home() {
             ))}
           </div>
         </>
+      )}
+      {menu && (
+        <Sheet title={menu.name} onClose={() => setMenu(null)}>
+          <button className="menu-item" onClick={() => nav(`/routines/${menu.id}`)}>
+            Edit
+          </button>
+          <button
+            className="menu-item"
+            onClick={() => {
+              setMenu(null);
+              duplicate(menu);
+            }}
+          >
+            Duplicate
+          </button>
+          <button
+            className="menu-item danger"
+            onClick={() => {
+              setDeleting(menu);
+              setMenu(null);
+            }}
+          >
+            Delete
+          </button>
+        </Sheet>
+      )}
+      {deleting && (
+        <ConfirmSheet
+          title={`Delete ${deleting.name}?`}
+          body="Your logged workouts stay in History."
+          confirmLabel="Delete workout"
+          cancelLabel="Keep it"
+          danger
+          onConfirm={() => {
+            dispatch({ type: 'routineArchive', id: deleting.id, now: new Date().toISOString() });
+            setDeleting(null);
+          }}
+          onClose={() => setDeleting(null)}
+        />
       )}
       {pending && (
         <ConfirmSheet
