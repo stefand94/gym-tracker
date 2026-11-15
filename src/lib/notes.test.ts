@@ -6,8 +6,12 @@ import {
   dismissSuggestion,
   findItem,
   notePrompt,
-  setItemNote,
-  setWorkoutNote,
+  addItemNote,
+  addNote,
+  addReply,
+  removeItemNote,
+  removeNote,
+  threadOf,
   swapInRoutine,
   toSuggestions,
   unreadNote,
@@ -28,25 +32,61 @@ const raw = (r: Partial<RawSuggestion>): RawSuggestion => ({
 });
 
 describe('notes', () => {
-  it('saves a note, and an edit drops suggestions read from the old text', () => {
+  it('keeps a note as a chat: each message adds a line, a reply marks it read, deleting the last removes it', () => {
     let w = start();
     const id = w.blocks[0].items[0].id;
-    w = setItemNote(w, id, '  shoulder twinge  ');
-    expect(findItem(w, id)!.note).toBe('shoulder twinge');
+    w = addItemNote(w, id, '  shoulder\n twinge  ', 't1');
+    expect(findItem(w, id)).toMatchObject({ note: 'shoulder twinge', noteThread: [{ from: 'me', text: 'shoulder twinge', at: 't1' }] });
     expect(unreadNote(findItem(w, id)!)).toBe(true);
-    w = { ...w, blocks: w.blocks.map((b) => ({ ...b, items: b.items.map((i) => (i.id === id ? { ...i, noteSuggestions: [] } : i)) })) };
+    expect(addItemNote(w, id, '  ', 't')).toEqual(w);
+    const pain = { kind: 'pain' as const, pain: 2, label: 'Pain 2/10' };
+    w = {
+      ...w,
+      blocks: w.blocks.map((b) => ({ ...b, items: b.items.map((i) => (i.id === id ? addReply(i, 1, ' Which set? ', [pain], 't2') : i)) })),
+    };
     expect(unreadNote(findItem(w, id)!)).toBe(false);
-    expect(setItemNote(w, id, 'shoulder twinge')).toEqual(w); // unchanged text: still read
-    const edited = setItemNote(w, id, 'shoulder twinge, sharp on set 3');
-    expect(findItem(edited, id)!.noteSuggestions).toBeUndefined();
-    expect(findItem(setItemNote(edited, id, ' '), id)!.note).toBeUndefined();
-    expect(setWorkoutNote(w, ' slept badly ').note).toBe('slept badly');
-    expect('note' in setWorkoutNote({ ...w, note: 'x' }, '')).toBe(false);
+    w = addItemNote(w, id, 'set 3, sharp', 't3');
+    const item = findItem(w, id)!;
+    expect(item.note).toBe('shoulder twinge\nset 3, sharp');
+    expect(threadOf(item).map((m) => m.from)).toEqual(['me', 'claude', 'me']);
+    expect(unreadNote(item)).toBe(true);
+    // a reply to the first two only goes before the newer message; a newer pain chip replaces the old one
+    const late = addReply(item, 2, '', [{ ...pain, pain: 6, label: 'Pain 6/10' }], 't4');
+    expect(threadOf(late).map((m) => m.from)).toEqual(['me', 'claude', 'claude', 'me']);
+    expect(unreadNote(late)).toBe(true);
+    expect(late.noteSuggestions).toEqual([{ ...pain, pain: 6, label: 'Pain 6/10' }]);
+    // the prompt shows the chat so far and only the new message as the note
+    const p = notePrompt(item, getExercise(item.exerciseId)!, false);
+    expect(p).toMatch(/Earlier in this note:\nStefan: shoulder twinge\nYou: Which set\?/);
+    expect(p).toMatch(/Note: """set 3, sharp"""/);
+    expect(p).toMatch(/waiting for his tap: Pain 2\/10/);
+    // deleting
+    expect(removeItemNote(w, id, 1)).toEqual(w); // Claude's messages stay
+    const one = removeItemNote(w, id, 0);
+    expect(findItem(one, id)!.note).toBe('set 3, sharp');
+    const none = removeItemNote(one, id, 1);
+    expect(findItem(none, id)).not.toHaveProperty('note');
+    expect(findItem(none, id)).not.toHaveProperty('noteThread');
+    expect(findItem(none, id)).not.toHaveProperty('noteSuggestions');
+    // session notes
+    const s = addNote(addNote(w, ' slept badly ', 'a'), 'legs fine', 'b');
+    expect(s.note).toBe('slept badly\nlegs fine');
+    expect(removeNote(removeNote(s, 0), 0)).not.toHaveProperty('note');
+  });
+
+  it('reads notes written before threads', () => {
+    const item = { ...start().blocks[0].items[0], note: 'old note' };
+    expect(threadOf(item)).toEqual([{ from: 'me', text: 'old note', at: '' }]);
+    expect(unreadNote(item)).toBe(true);
+    expect(unreadNote({ ...item, noteSuggestions: [] })).toBe(false);
+    const next = addNote({ ...item, noteSuggestions: [] }, 'new one', 't');
+    expect(next.note).toBe('old note\nnew one');
+    expect(unreadNote(next as typeof item)).toBe(true);
   });
 
   it('asks only for what the note says, with what is logged', () => {
     const w0 = start();
-    const w = setItemNote(w0, w0.blocks[0].items[0].id, 'used upstairs 2');
+    const w = addItemNote(w0, w0.blocks[0].items[0].id, 'used upstairs 2', 't');
     const item = w.blocks[0].items[0];
     const p = notePrompt(item, getExercise(item.exerciseId)!, true);
     expect(p).toMatch(/Note: """used upstairs 2"""/);
@@ -91,7 +131,7 @@ describe('notes', () => {
   it('applies a suggestion to the log and removes it; dismissing just removes it', () => {
     let w = start();
     const item = w.blocks[0].items[0];
-    w = setItemNote(w, item.id, 'x');
+    w = addItemNote(w, item.id, 'x', 't');
     const suggestions = [
       { kind: 'pain' as const, pain: 3, label: 'Pain 3/10' },
       { kind: 'sets' as const, sets: [{ weight: 22.5, reps: 6 }], label: '22.5 × 6' },

@@ -17,8 +17,8 @@ import { addExercise, blockComplete, currentBlockIndex, moveInWorkout, sameLayou
 import { useStore } from '../state/store';
 import { useClaude } from '../state/useClaude';
 import { AskSheet } from '../components/AskSheet';
-import { NoteSheet, WorkoutNoteCard } from '../components/NoteSheet';
-import { setWorkoutNote } from '../lib/notes';
+import { NoteChat, WorkoutNoteCard } from '../components/NoteSheet';
+import { addNote, removeNote, threadOf } from '../lib/notes';
 import type { Workout, WorkoutBlock } from '../types';
 
 function Elapsed({ startedAt }: { startedAt: string }) {
@@ -278,11 +278,12 @@ export function WorkoutScreen() {
 
       {asking && <AskSheet from={{ kind: 'workout', workout: w }} onClose={() => setAsking(false)} />}
       {noting && (
-        <NoteSheet
+        <NoteChat
           title="Session note"
-          initial={w.note}
+          thread={threadOf(w)}
           placeholder="How's it going? Energy, sleep, anything that hurt…"
-          onSave={(t) => update((x) => setWorkoutNote(x, t))}
+          onSend={(t) => update((x) => addNote(x, t, new Date().toISOString()))}
+          onRemove={(k) => update((x) => removeNote(x, k))}
           onClose={() => setNoting(false)}
         />
       )}

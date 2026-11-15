@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ROUTINES, getExercise } from '../data/library';
 import { askPrompt, blocksToAppend, readAnswer, type AskFrom, type RawAnswer } from './ask';
+
 import type { AiItem } from './aiValidate';
 import { rehabState } from './rehab';
 import { workoutFromRoutine } from './workout';
@@ -71,5 +72,20 @@ describe('Ask', () => {
     const r = readAnswer(answer({}), ctx({ kind: 'workout', workout: w }));
     expect(r.blocks.some((b) => b.rehabDose)).toBe(true);
     expect(blocksToAppend(r.blocks, w).some((b) => b.rehabDose)).toBe(false);
+  });
+
+  it('gives a follow-up the chat so far', () => {
+    const first = readAnswer(answer({}), ctx());
+    const p = askPrompt('swap face pulls for rear delt flys', { kind: 'home' }, getExercise, [
+      { q: 'shoulders today', result: first },
+      { q: 'failed one' },
+    ]);
+    expect(p).toMatch(/follow-up/);
+    expect(p).toMatch(
+      /Stefan: """shoulders today"""\nYou: kind today · Side delts at 2 of 10 sets this week · plan "Shoulders": lateral-raise \+ face-pull/,
+    );
+    expect(p).not.toMatch(/failed one/);
+    expect(p).toMatch(/Stefan asks: """swap face pulls/);
+    expect(askPrompt('x', { kind: 'home' }, getExercise)).not.toMatch(/follow-up/);
   });
 });

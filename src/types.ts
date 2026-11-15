@@ -95,10 +95,19 @@ export interface WorkoutItem {
   pain?: number;
   /** Machine / cable station it was done on, e.g. "Upstairs 1" (weights differ between stations). */
   station?: string;
-  /** Free-text note (typed or dictated), e.g. "left shoulder clicked on the last set". */
+  /** Free-text note (typed or dictated), e.g. "left shoulder clicked on the last set": all of Stefan's messages, one per line. */
   note?: string;
+  /** The note as a chat, oldest first: Stefan's messages and Claude's replies (`note` is kept in step with it). */
+  noteThread?: NoteMessage[];
   /** Changes Claude read out of the note, waiting for a tap (accepted ones are applied and removed). */
   noteSuggestions?: NoteSuggestion[];
+}
+
+/** One message in a note thread. A Claude message with empty text means "read, nothing to say". */
+export interface NoteMessage {
+  from: 'me' | 'claude';
+  text: string;
+  at: string;
 }
 
 /** One change Claude read out of a note. */
@@ -125,6 +134,8 @@ export interface Workout {
   blocks: WorkoutBlock[];
   /** 0–10 pain the morning after (rehab check-in); null = dismissed without answering. */
   nextDayPain?: number | null;
-  /** Free-text note about the whole session. */
+  /** Free-text note about the whole session: all its messages, one per line. */
   note?: string;
+  /** The session note's messages, oldest first. */
+  noteThread?: NoteMessage[];
 }

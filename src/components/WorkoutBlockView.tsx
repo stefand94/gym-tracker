@@ -33,8 +33,7 @@ import { ExercisePicker } from './ExercisePicker';
 import { HoldDisplay } from './HoldTimer';
 import { IconCheck, IconClose, IconMore, IconPlay } from './Icons';
 import { Sheet } from './Sheet';
-import { ItemNote, NoteSheet } from './NoteSheet';
-import { setItemNote } from '../lib/notes';
+import { ItemNote } from './NoteSheet';
 import { PainStrip } from './PainStrip';
 import { StationSheet, usesStations } from './StationSheet';
 import { DragHandle, type DragSpec } from './BlockDnd';
@@ -208,6 +207,8 @@ function ItemHead({
   onHeadTap,
   update,
   drag,
+  noteOpen,
+  onNote,
 }: {
   ex: Exercise;
   item: WorkoutItem;
@@ -216,6 +217,8 @@ function ItemHead({
   onHeadTap?: () => void;
   update: Update;
   drag: DragSpec;
+  noteOpen: boolean;
+  onNote: (open: boolean) => void;
 }) {
   const { state } = useStore();
   const [picking, setPicking] = useState(false);
@@ -265,7 +268,7 @@ function ItemHead({
           {item.station ? <>📍 {item.station}</> : '+ Station'}
         </button>
       )}
-      <ItemNote ex={ex} item={item} update={update} />
+      <ItemNote ex={ex} item={item} update={update} open={noteOpen} onOpen={onNote} />
       {picking && (
         <StationSheet
           ex={ex}
@@ -287,6 +290,7 @@ function ItemMenu({
   count,
   update,
   onClose,
+  onNote,
 }: {
   ex: Exercise;
   item: WorkoutItem;
@@ -295,12 +299,12 @@ function ItemMenu({
   count: number;
   update: Update;
   onClose: () => void;
+  onNote: () => void;
 }) {
   const { state } = useStore();
   const [armed, setArmed] = useState(false);
   const [replacing, setReplacing] = useState(false);
   const [howTo, setHowTo] = useState(false);
-  const [noting, setNoting] = useState(false);
   const act = (fn: (w: Workout) => Workout) => {
     update(fn);
     onClose();
@@ -315,20 +319,16 @@ function ItemMenu({
       />
     );
   if (howTo) return <HowToSheet ex={ex} onClose={onClose} />;
-  if (noting)
-    return (
-      <NoteSheet
-        title={`Note · ${ex.name}`}
-        initial={item.note}
-        placeholder="e.g. left shoulder twinged on set 3, used Upstairs 2"
-        onSave={(t) => update((w) => setItemNote(w, item.id, t))}
-        onClose={onClose}
-      />
-    );
   return (
     <Sheet title={ex.name} onClose={onClose}>
-      <button className="menu-item" onClick={() => setNoting(true)}>
-        {item.note ? 'Edit note' : 'Add a note'}
+      <button
+        className="menu-item"
+        onClick={() => {
+          onClose();
+          onNote();
+        }}
+      >
+        {item.note ? 'Open note' : 'Add a note'}
       </button>
       <button className="menu-item" onClick={() => setHowTo(true)}>
         How to do it
@@ -370,6 +370,7 @@ function SingleBlock({ block, index, count, update, current, onToggle }: BlockPr
   const item = block.items[0];
   const ex = getExercise(item.exerciseId);
   const [menu, setMenu] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
   const startRest = useStartRest();
   if (!ex) return <div className="card dim">Unknown exercise: {item.exerciseId}</div>;
   const cls = item.status === 'done' ? ' is-done' : item.status === 'skipped' ? ' is-skipped' : '';
@@ -383,6 +384,8 @@ function SingleBlock({ block, index, count, update, current, onToggle }: BlockPr
         drag={{ key: `i:${item.id}`, ids: [item.id], label: ex.name }}
         onMenu={() => setMenu(true)}
         onHeadTap={current ? undefined : onToggle}
+        noteOpen={noteOpen}
+        onNote={setNoteOpen}
       />
       {item.status !== 'skipped' && (
         <div className="sets">
@@ -410,13 +413,25 @@ function SingleBlock({ block, index, count, update, current, onToggle }: BlockPr
           {item.status === 'done' ? 'Undo all' : 'Complete all'}
         </button>
       </div>
-      {menu && <ItemMenu ex={ex} item={item} block={block} index={index} count={count} update={update} onClose={() => setMenu(false)} />}
+      {menu && (
+        <ItemMenu
+          ex={ex}
+          item={item}
+          block={block}
+          index={index}
+          count={count}
+          update={update}
+          onClose={() => setMenu(false)}
+          onNote={() => setNoteOpen(true)}
+        />
+      )}
     </section>
   );
 }
 
 function SupersetBlock({ block, index, count, update, current, onToggle }: BlockProps) {
   const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [noteFor, setNoteFor] = useState<string | null>(null);
   const startRest = useStartRest();
   const letter = LETTERS[index % 26];
   const entries = block.items.map((item, n) => ({
@@ -470,6 +485,8 @@ function SupersetBlock({ block, index, count, update, current, onToggle }: Block
               drag={{ key: `i:${item.id}`, ids: [item.id], label: ex.name }}
               onMenu={() => setMenuFor(item.id)}
               onHeadTap={current ? undefined : onToggle}
+              noteOpen={noteFor === item.id}
+              onNote={(o) => setNoteFor(o ? item.id : null)}
             />
           </div>
         ) : null,
@@ -536,6 +553,7 @@ function SupersetBlock({ block, index, count, update, current, onToggle }: Block
           count={count}
           update={update}
           onClose={() => setMenuFor(null)}
+          onNote={() => setNoteFor(menuEntry.item.id)}
         />
       )}
     </section>

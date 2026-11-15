@@ -11,8 +11,8 @@ import { finishedNewestFirst } from '../lib/prefill';
 import { describeChanges, routineFromWorkout, routineWithWorkout, sameRoutineLayout } from '../lib/routineEdit';
 import { workoutPath } from '../lib/sync';
 import { useStore } from '../state/store';
-import { NoteSheet, WorkoutNoteCard } from '../components/NoteSheet';
-import { setWorkoutNote } from '../lib/notes';
+import { NoteChat, WorkoutNoteCard } from '../components/NoteSheet';
+import { addNote, removeNote, threadOf } from '../lib/notes';
 import type { Workout } from '../types';
 
 export function HistoryList() {
@@ -89,11 +89,12 @@ export function HistoryDetail() {
 
       <WorkoutNoteCard note={w.note} onEdit={() => setNoting(true)} />
       {noting && (
-        <NoteSheet
+        <NoteChat
           title="Session note"
-          initial={w.note}
+          thread={threadOf(w)}
           placeholder="How did it go? Energy, sleep, anything that hurt…"
-          onSave={(t) => dispatch({ type: 'historyUpdate', workout: setWorkoutNote(w, t) })}
+          onSend={(t) => dispatch({ type: 'historyUpdate', workout: addNote(w, t, new Date().toISOString()) })}
+          onRemove={(k) => dispatch({ type: 'historyUpdate', workout: removeNote(w, k) })}
           onClose={() => setNoting(false)}
         />
       )}
@@ -160,7 +161,7 @@ export function HistoryDetail() {
                     {i.status === 'skipped' && <span className="badge badge-skip">Skipped</span>}
                     {i.pain !== undefined && <span className="station-tag">pain {i.pain}/10</span>}
                   </div>
-                  {i.note && <div className="hist-note">“{i.note}”</div>}
+                  {i.note && <div className="hist-note note-pre">“{i.note}”</div>}
                   {i.status !== 'skipped' && (
                     <div className="hist-sets">
                       {i.sets.map((s, k) => (

@@ -1,4 +1,4 @@
-import type { Exercise, NoteSuggestion, Routine, Workout, WorkoutItem } from '../types';
+import type { Exercise, NoteMessage, NoteSuggestion, Routine, Workout, WorkoutItem } from '../types';
 import { deriveStatus, setPain, setStation } from './workout';
 
 type Lookup = (id: string) => Exercise | undefined;
@@ -10,24 +10,64 @@ const mapItem = (w: Workout, itemId: string, fn: (i: WorkoutItem) => WorkoutItem
 
 export const findItem = (w: Workout, itemId: string) => w.blocks.flatMap((b) => b.items).find((i) => i.id === itemId);
 
-/** Saves an exercise note. A changed note drops the old suggestions (they were read from the old text). */
-export function setItemNote(w: Workout, itemId: string, text: string): Workout {
-  const note = text.trim() || undefined;
-  return mapItem(w, itemId, (i) => {
-    if (i.note === note) return i;
-    const { noteSuggestions: _, note: __, ...rest } = i;
-    return note ? { ...rest, note } : rest;
-  });
+type Noted = { note?: string; noteThread?: NoteMessage[]; noteSuggestions?: NoteSuggestion[] };
+
+/** The note as a chat. Notes from before threads become one message (read, if Claude had read it). */
+export function threadOf(x: Noted): NoteMessage[] {
+  if (x.noteThread) return x.noteThread;
+  if (!x.note) return [];
+  const me: NoteMessage = { from: 'me', text: x.note, at: '' };
+  return x.noteSuggestions === undefined ? [me] : [me, { from: 'claude', text: '', at: '' }];
 }
 
-export function setWorkoutNote(w: Workout, text: string): Workout {
-  const note = text.trim() || undefined;
-  const { note: _, ...rest } = w;
-  return note ? { ...rest, note } : rest;
+/** `note` is always Stefan's messages, one per line (what History, Ask and the data repo read). */
+function withThread<T extends Noted>(x: T, thread: NoteMessage[]): T {
+  const { note: _, noteThread: __, ...rest } = x;
+  const mine = thread.filter((m) => m.from === 'me');
+  if (!mine.length) {
+    const { noteSuggestions: ___, ...bare } = rest as T;
+    return bare as T;
+  }
+  return { ...rest, note: mine.map((m) => m.text).join('\n'), noteThread: thread } as T;
 }
 
-/** Notes that have text but haven't been read by Claude yet (`noteSuggestions` is set, maybe empty, once read). */
-export const unreadNote = (i: WorkoutItem) => !!i.note && i.noteSuggestions === undefined;
+const clean = (text: string) => text.replace(/\s*\n\s*/g, ' ').trim();
+
+/** Adds one of Stefan's messages to a note (an empty one does nothing). */
+export function addNote<T extends Noted>(x: T, text: string, at: string): T {
+  const t = clean(text);
+  return t ? withThread(x, [...threadOf(x), { from: 'me', text: t, at }]) : x;
+}
+
+/** Removes one of Stefan's messages; removing the last one removes the note (and its chips). */
+export function removeNote<T extends Noted>(x: T, index: number): T {
+  const thread = threadOf(x);
+  return thread[index]?.from === 'me'
+    ? withThread(
+        x,
+        thread.filter((_, k) => k !== index),
+      )
+    : x;
+}
+
+/**
+ * Claude's reply to the first `seen` messages: put right after them (so anything Stefan sent meanwhile still
+ * counts as unread), with its chips merged into the waiting ones (a newer chip of the same kind replaces an older one).
+ */
+export function addReply<T extends Noted>(x: T, seen: number, reply: string, suggestions: NoteSuggestion[], at: string): T {
+  const thread = threadOf(x);
+  const k = Math.min(seen, thread.length);
+  const next = [...thread.slice(0, k), { from: 'claude' as const, text: reply.trim().slice(0, 300), at }, ...thread.slice(k)];
+  const kinds = new Set(suggestions.map((s) => s.kind));
+  const kept = (x.noteSuggestions ?? []).filter((s) => !kinds.has(s.kind));
+  return { ...withThread(x, next), noteSuggestions: [...kept, ...suggestions] };
+}
+
+export const addItemNote = (w: Workout, itemId: string, text: string, at: string) => mapItem(w, itemId, (i) => addNote(i, text, at));
+export const removeItemNote = (w: Workout, itemId: string, index: number) => mapItem(w, itemId, (i) => removeNote(i, index));
+
+/** Stefan has written something Claude hasn't replied to yet. */
+export const unreadNote = (i: WorkoutItem) => threadOf(i).at(-1)?.from === 'me';
 
 // ---- What Claude reads out of a note ----
 
@@ -43,8 +83,13 @@ export interface RawSuggestion {
 export const NOTE_SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['suggestions'],
+  required: ['reply', 'suggestions'],
   properties: {
+    reply: {
+      type: 'string',
+      description:
+        'One short line back to Stefan, like a training partner: what you took from it, or a question if something is unclear. Empty if the chips say it all.',
+    },
     suggestions: {
       type: 'array',
       items: {
@@ -81,22 +126,31 @@ const setText = (s: { weight?: number; reps?: number; seconds?: number }) =>
   s.seconds !== undefined ? `${s.seconds}s` : `${s.weight !== undefined ? `${s.weight} kg × ` : ''}${s.reps ?? '?'}`;
 
 export function notePrompt(item: WorkoutItem, ex: Exercise, canSwap: boolean): string {
+  const thread = threadOf(item);
+  const lastReply = thread.map((m) => m.from).lastIndexOf('claude');
+  const earlier = thread.slice(0, lastReply + 1).filter((m) => m.text);
+  const fresh = thread.slice(lastReply + 1).map((m) => m.text);
+  const waiting = item.noteSuggestions ?? [];
   return [
-    `Stefan wrote a note on "${ex.name}" (${ex.id}, ${ex.type}${ex.weightNote ? `, kg ${ex.weightNote}` : ''}) during his workout.`,
+    `Stefan is writing notes on "${ex.name}" (${ex.id}, ${ex.type}${ex.weightNote ? `, kg ${ex.weightNote}` : ''}) during his workout, like a chat with you.`,
     `Logged so far: ${item.sets.map((s, i) => `set ${i + 1} ${setText(s)}${s.done ? ' ✓' : ''}`).join('; ')}.`,
     item.station ? `Station: ${item.station}.` : '',
     item.pain !== undefined ? `Pain logged: ${item.pain}/10.` : '',
+    earlier.length ? `Earlier in this note:\n${earlier.map((m) => `${m.from === 'me' ? 'Stefan' : 'You'}: ${m.text}`).join('\n')}` : '',
+    waiting.length ? `Already suggested, waiting for his tap: ${waiting.map((s) => s.label).join('; ')}.` : '',
     '',
-    `Note: """${item.note}"""`,
+    `Note: """${fresh.join('\n')}"""`,
     '',
-    'Turn the note into changes to his log, only ones the note clearly says:',
+    'Turn what he just wrote into changes to his log, only ones it clearly says (earlier messages are context;',
+    'if he is answering your question, use the answer):',
     '- pain: a pain or discomfort level (0–10). Translate words: twinge ≈ 2, sore ≈ 3–4, sharp/had to stop ≈ 6+.',
     '- station: the machine or cable he used, if named.',
     '- sets: what he actually did when it differs from what is logged. List every set from set 1, all of them.',
     canSwap
       ? '- swap: an exercise from the catalogue to do instead next time, if he says this one did not work for him.'
       : '- (no swaps: this workout is not from a routine)',
-    'Return an empty list if the note is just a remark. Never invent numbers.',
+    'Return an empty list if it is just a remark. Never invent numbers. Do not repeat a suggestion that is already waiting.',
+    'reply: one short line, no praise words. Ask a question only when an answer would change his log (e.g. which set hurt).',
   ]
     .filter((l) => l !== '')
     .join('\n');

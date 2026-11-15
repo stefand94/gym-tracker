@@ -54,3 +54,6 @@ export const IconNote = () => (
 export const IconSpark = () => (
   <svg viewBox="0 0 24 24" {...p}><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" /><path d="M18.5 15.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z" /></svg>
 );
+export const IconSend = () => (
+  <svg viewBox="0 0 24 24" {...p} strokeWidth={2.5}><path d="M12 19V5M6 11l6-6 6 6" /></svg>
+);

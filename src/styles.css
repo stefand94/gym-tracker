@@ -280,7 +280,9 @@ button {
   text-decoration: none;
   color: var(--text);
   white-space: nowrap;
-  transition: transform 0.1s, opacity 0.1s;
+  transition:
+    transform 0.1s,
+    opacity 0.1s;
 }
 
 .btn svg {
@@ -1101,8 +1103,12 @@ button {
 }
 
 @keyframes hold-pulse {
-  from { transform: scale(1.18); }
-  to { transform: scale(1); }
+  from {
+    transform: scale(1.18);
+  }
+  to {
+    transform: scale(1);
+  }
 }
 
 .set-row.holding .tick {
@@ -1241,7 +1247,10 @@ button {
   align-items: center;
   justify-content: center;
   color: transparent;
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.1s;
 }
 
 .tick:active {
@@ -2951,4 +2960,184 @@ body.dragging .grip {
 .checkin-card .link-btn.small {
   margin-top: 6px;
   padding: 0;
+}
+
+/* ---------- Chats: notes and Ask ---------- */
+
+.sheet-tall:has(> .chat) {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.chat-empty {
+  padding: 4px 2px;
+}
+
+.chat-new {
+  align-self: flex-end;
+  margin-top: -6px;
+}
+
+.chat-turn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.chat-me {
+  align-items: flex-end;
+}
+
+.bubble {
+  max-width: 85%;
+  padding: 9px 13px;
+  border: none;
+  border-radius: 18px;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.4;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.bubble-me {
+  border-bottom-right-radius: 6px;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.bubble-claude {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  border-bottom-left-radius: 6px;
+  background: var(--well);
+  color: var(--text);
+}
+
+.bubble-claude svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  margin-top: 3px;
+  color: var(--accent);
+}
+
+.bubble-actions {
+  display: flex;
+  gap: 16px;
+  padding: 0 6px;
+}
+
+.note-extras {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.composer-input {
+  flex: 1;
+  min-height: 44px;
+  max-height: 120px;
+  padding: 11px 14px;
+  border-radius: 22px;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.3;
+  resize: none;
+}
+
+.composer-send {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.composer-send:disabled {
+  opacity: 0.35;
+}
+
+.composer-send svg {
+  width: 20px;
+  height: 20px;
+}
+
+.chat .ask-result {
+  margin-top: 0;
+}
+
+.chat .ask-busy {
+  margin-top: 0;
+}
+
+.chat .ask-busy span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chat .ask-error {
+  margin-top: 0;
+}
+
+.note-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.note-lines .note-line-claude {
+  color: var(--text-dim);
+}
+
+.note-line-claude svg {
+  width: 13px;
+  height: 13px;
+  margin: 0 5px 0 0;
+  vertical-align: -1px;
+  color: var(--accent);
+}
+
+.note-more,
+.note-reply {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--text-dim);
+}
+
+.note-reply {
+  color: var(--accent);
+}
+
+.note-pre {
+  white-space: pre-line;
 }

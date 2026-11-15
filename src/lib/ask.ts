@@ -62,9 +62,40 @@ export function whereText(from: AskFrom, lookup: Lookup): string {
     .join('\n');
 }
 
-export function askPrompt(question: string, from: AskFrom, lookup: Lookup): string {
+/** One question and what came of it, for the chat so far. */
+export interface AskTurn {
+  q: string;
+  result?: AskResult;
+}
+
+/** The chat so far, short: his questions, and your kind, reason, words and plan (ids only). */
+export function chatText(turns: AskTurn[]): string {
+  return turns
+    .filter((t) => t.result)
+    .slice(-6)
+    .map((t) => {
+      const r = t.result!;
+      const plan = r.blocks
+        .filter((b) => !b.rehabDose)
+        .map((b) => b.items.map((i) => i.exerciseId).join(' + '))
+        .join(', ');
+      const you = [
+        `kind ${r.kind}${r.routine ? ` of ${r.routine.id}` : ''}`,
+        r.reason,
+        r.answer,
+        plan ? `plan "${r.name}": ${plan}` : '',
+      ].filter(Boolean);
+      return `Stefan: """${t.q.trim()}"""\nYou: ${you.join(' · ')}`;
+    })
+    .join('\n');
+}
+
+export function askPrompt(question: string, from: AskFrom, lookup: Lookup, earlier: AskTurn[] = []): string {
+  const chat = chatText(earlier);
   return [
+    ...(chat ? [`This is a follow-up. The chat so far (oldest first):\n${chat}`, ''] : []),
     `Stefan asks: """${question.trim()}"""`,
+    ...(chat ? ['"It", "that" and "this" may mean your last answer: build on it rather than starting over.'] : []),
     '',
     whereText(from, lookup),
     '',

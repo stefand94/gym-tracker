@@ -85,8 +85,9 @@ exercises) and `npm run build`. Push to `main` to deploy.
 
 `gh api repos/stefand94/gym-tracker-data/contents/workouts/<year>` lists workout files; each is a `Workout`
 (`src/types.ts`). Only sets with `done: true` count; items with `status: "skipped"` count for nothing.
-Notes: `WorkoutItem.note` (with `noteSuggestions`, the chips Claude read out of it; `[]` = read, nothing to do)
-and `Workout.note` for the whole session. Read them; they're often why a number looks odd.
+Notes are chats: `WorkoutItem.noteThread` / `Workout.noteThread` (`{ from: 'me' | 'claude', text, at }`, Claude's empty
+text = read, nothing to say); `note` always holds just Stefan's messages, one per line — read that. `noteSuggestions`
+are the chips Claude read out of the note, waiting for a tap. Read them; they're often why a number looks odd.
 
 ## Claude in the app
 
