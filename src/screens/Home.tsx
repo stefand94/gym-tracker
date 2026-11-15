@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BodyMap } from '../components/BodyMap';
 import { AskSheet } from '../components/AskSheet';
+import { CheckInCard } from '../components/CheckInCard';
 import { IconMore, IconPlus, IconSettings, IconSpark } from '../components/Icons';
 import { PainStrip } from '../components/PainStrip';
 import { ConfirmSheet, Sheet } from '../components/Sheet';
@@ -199,6 +200,8 @@ export function Home() {
       </div>
 
       <div className="section-title">Last 7 days</div>
+      {!active && <CheckInCard />}
+
       <Link to="/body" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
         <BodyMap load={week} size="small" />
         <div className="legend">

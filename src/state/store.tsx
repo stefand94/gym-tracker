@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useReducer, type ReactNode } from 'react';
+import type { CheckIn } from '../lib/helpers';
 import { ROUTINES, setCustomExercises } from '../data/library';
 import { mergeKeyed, mergeVersioned } from '../lib/merge';
 import { costUsd, type ModelKey, type TokenUsage } from '../lib/claude';
@@ -49,6 +50,8 @@ export interface AiSettings {
   askModel: ModelKey;
   /** Running total since `since`. */
   spent: { calls: number; usd: number; input: number; output: number; since: string };
+  /** This week's check-in on Home, kept so it isn't asked for again on every visit. */
+  checkIn?: CheckIn;
 }
 
 export interface RestState {
@@ -116,6 +119,7 @@ type Action =
   | { type: 'aiSettings'; ai: Partial<Pick<AiSettings, 'key' | 'askModel'>> }
   | { type: 'aiUsage'; model: ModelKey; usage: TokenUsage }
   | { type: 'aiUsageReset'; now: string }
+  | { type: 'aiCheckIn'; checkIn: CheckIn }
   | { type: 'historyUpdate'; workout: Workout };
 
 const KEY = 'gym-tracker:v1';
@@ -350,6 +354,8 @@ export function reducer(state: State, action: Action): State {
       };
       return { ...state, ai: { ...state.ai, spent } };
     }
+    case 'aiCheckIn':
+      return { ...state, ai: { ...state.ai, checkIn: action.checkIn } };
     case 'aiUsageReset':
       return { ...state, ai: { ...state.ai, spent: emptySpent(action.now) } };
     case 'videoPin':

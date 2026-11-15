@@ -1,7 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../state/store';
 import { performedExerciseIds } from '../lib/progress';
-import { allExercises } from '../data/library';
+import { allExercises, getExercise } from '../data/library';
+import { FIND_SCHEMA, findPrompt, readFind, type RawFind } from '../lib/helpers';
+import { aiMessage, useClaude } from '../state/useClaude';
 import { searchExercises } from '../lib/search';
 import { MUSCLE_IDS, MUSCLE_LABELS, type MuscleId } from '../data/muscles';
 import { exerciseGroup, GROUP_LABELS, GROUPS, type Group } from '../lib/groups';
@@ -10,7 +12,7 @@ import { rankReplacements } from '../lib/similar';
 import type { Exercise } from '../types';
 import { BodyMap } from './BodyMap';
 import { HowToSheet } from './HowToSheet';
-import { IconInfo } from './Icons';
+import { IconInfo, IconSpark } from './Icons';
 import { Sheet } from './Sheet';
 
 const RECENT_MAX = 8;
@@ -73,6 +75,23 @@ export function ExercisePicker({
   const [musclesOpen, setMusclesOpen] = useState(false);
   const [howTo, setHowTo] = useState<Exercise | null>(null);
   const custom = state.customExercises;
+  const { ask, ready } = useClaude();
+  type Found = { q: string; busy?: boolean; matches?: Exercise[]; note?: string; error?: string };
+  const [found, setFound] = useState<Found | null>(null);
+  const abort = useRef<AbortController | null>(null);
+  useEffect(() => () => abort.current?.abort(), []);
+  const askClaude = async () => {
+    const query = q.trim();
+    abort.current?.abort();
+    abort.current = new AbortController();
+    setFound({ q: query, busy: true });
+    try {
+      const { data } = await ask<RawFind>({ prompt: findPrompt(query), schema: FIND_SCHEMA, signal: abort.current.signal });
+      setFound({ q: query, ...readFind(data, getExercise) });
+    } catch (e) {
+      if (!abort.current.signal.aborted) setFound({ q: query, error: aiMessage(e) });
+    }
+  };
 
   const filtered = useMemo(
     () =>
@@ -180,7 +199,34 @@ export function ExercisePicker({
           <Section label={group || muscle ? 'Matching exercises' : 'All exercises'} list={az} onPick={onPick} onHowTo={setHowTo} />
         </>
       )}
-      {!count && <div className="empty">No exercises match.</div>}
+      {!count && !(found?.q === q.trim() && found.matches?.length) && <div className="empty">No exercises match.</div>}
+      {searching && !count && ready && (
+        <div className="picker-ask">
+          {found?.q !== q.trim() ? (
+            <button className="picker-create" onClick={() => void askClaude()}>
+              <span className="picker-create-plus">
+                <IconSpark />
+              </span>
+              Ask Claude what “{q.trim()}” is
+            </button>
+          ) : found.busy ? (
+            <div className="small dim picker-ask-line">
+              <IconSpark /> Looking for “{found.q}”…
+            </div>
+          ) : found.error ? (
+            <div className="error-text small picker-ask-line">{found.error}</div>
+          ) : (
+            <>
+              {found.note && (
+                <div className="small dim picker-ask-line">
+                  <IconSpark /> {found.note}
+                </div>
+              )}
+              <Section label="Claude’s matches" list={found.matches ?? []} onPick={onPick} onHowTo={setHowTo} />
+            </>
+          )}
+        </div>
+      )}
       {onCreate && (
         <button className="picker-create" onClick={() => onCreate(q.trim())}>
           <span className="picker-create-plus">+</span>

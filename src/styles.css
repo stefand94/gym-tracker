@@ -2872,3 +2872,83 @@ body.dragging .grip {
 .ask-actions {
   margin-top: 6px;
 }
+
+/* ---------- Claude helpers: auto-fill, picker fallback, weekly check-in ---------- */
+
+.fill-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.fill-row svg,
+.picker-ask svg,
+.checkin-card .today-label svg {
+  width: 15px;
+  height: 15px;
+  vertical-align: -2px;
+  color: var(--accent);
+}
+
+.fill-row .btn {
+  align-self: flex-start;
+}
+
+.fill-done {
+  color: var(--text-dim);
+}
+
+.picker-create-plus svg {
+  width: 20px;
+  height: 20px;
+}
+
+.picker-ask-line {
+  padding: 12px 4px 4px;
+}
+
+.checkin-card {
+  margin-bottom: 12px;
+}
+
+.checkin-head {
+  margin-top: 4px;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.checkin-behind {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.chip-static {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.checkin-next {
+  margin-top: 8px;
+  font-size: 15px;
+}
+
+.checkin-more {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--text-dim);
+}
+
+.checkin-more li + li {
+  margin-top: 4px;
+}
+
+.checkin-card .link-btn.small {
+  margin-top: 6px;
+  padding: 0;
+}

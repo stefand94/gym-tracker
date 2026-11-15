@@ -1,12 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { allExercises } from '../data/library';
 import { MUSCLE_IDS, MUSCLE_LABELS, type MuscleId } from '../data/muscles';
 import { guessFromName } from '../lib/guessMuscles';
+import { FILL_SCHEMA, fillPrompt, readFill, type RawFill } from '../lib/helpers';
 import { exerciseMap } from '../lib/muscleLoad';
 import { useStore } from '../state/store';
-import type { Exercise, ExerciseType } from '../types';
+import { aiMessage, useClaude } from '../state/useClaude';
+import type { Exercise, ExerciseType, HowTo } from '../types';
 import { BodyMap } from './BodyMap';
 import { ExercisePicker } from './ExercisePicker';
+import { IconSpark } from './Icons';
 import { Sheet } from './Sheet';
 
 const TYPES: [ExerciseType, string][] = [
@@ -68,6 +71,52 @@ export function ExerciseEditor({
   // Until you touch a field yourself, it follows the guess from the name.
   const [touched, setTouched] = useState({ type: !!first, equipment: !!first, muscles: !!first });
   const [copying, setCopying] = useState(false);
+  const [cue, setCue] = useState(first?.cue);
+  const [howto, setHowto] = useState<HowTo | undefined>(first?.howto);
+
+  // Claude fills in type, equipment, muscles, cue and a how-to (still marked for review).
+  const { ask, ready } = useClaude();
+  const [filling, setFilling] = useState(false);
+  const [filled, setFilled] = useState(false);
+  const [fillError, setFillError] = useState<string | null>(null);
+  const abort = useRef<AbortController | null>(null);
+  useEffect(() => () => abort.current?.abort(), []);
+  const fill = async (forName = name) => {
+    if (!forName.trim() || filling) return;
+    setFilling(true);
+    setFillError(null);
+    abort.current = new AbortController();
+    try {
+      const { data } = await ask<RawFill>({
+        prompt: fillPrompt(forName, { type, equipment }),
+        schema: FILL_SCHEMA,
+        signal: abort.current.signal,
+      });
+      const f = readFill(data);
+      setType(f.type);
+      setEquipment(f.equipment);
+      setPrimary(f.primary);
+      setSecondary(f.secondary);
+      setDefaults(f.defaults);
+      setWeightNote(f.weightNote);
+      setCue(f.cue);
+      setHowto(f.howto);
+      setTouched({ type: true, equipment: true, muscles: true });
+      setFilled(true);
+    } catch (e) {
+      if (!abort.current?.signal.aborted) setFillError(aiMessage(e));
+    } finally {
+      setFilling(false);
+    }
+  };
+  // Opened from a search ("Create 'hack squat'"): fill straight away.
+  const autoFilled = useRef(false);
+  useEffect(() => {
+    if (autoFilled.current || existing || !initialName.trim() || !ready || navigator.onLine === false) return;
+    autoFilled.current = true;
+    void fill(initialName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onName = (v: string) => {
     setName(v);
@@ -100,6 +149,7 @@ export function ExerciseEditor({
     setSecondary([...e.secondary]);
     setDefaults(e.defaults);
     setWeightNote(e.weightNote);
+    setCue(e.cue);
     setTouched({ type: true, equipment: true, muscles: true });
   };
 
@@ -130,6 +180,8 @@ export function ExerciseEditor({
       secondary,
       defaults: { ...d },
       ...(weightNote ? { weightNote } : {}),
+      ...(cue ? { cue } : {}),
+      ...(howto ? { howto } : {}),
       custom: true,
       reviewed: false,
     };
@@ -150,6 +202,24 @@ export function ExerciseEditor({
           autoFocus={!initialName && !existing}
           onChange={(e) => onName(e.target.value)}
         />
+        {ready && (
+          <div className="fill-row">
+            {filling ? (
+              <span className="small dim">
+                <IconSpark /> Claude is filling in the details…
+              </span>
+            ) : filled ? (
+              <span className="small fill-done">
+                <IconSpark /> Filled in by Claude{cue ? ` · “${cue}”` : ''}. Check the muscles; it’s still marked for review.
+              </span>
+            ) : (
+              <button className="btn btn-ghost btn-sm" disabled={!ok} onClick={() => void fill()}>
+                <IconSpark /> Fill in with Claude
+              </button>
+            )}
+            {fillError && <div className="error-text small">{fillError}</div>}
+          </div>
+        )}
 
         <div className="field-label">Type</div>
         <div className="seg" role="radiogroup">
