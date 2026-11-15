@@ -88,8 +88,18 @@ exercise was done, then routine values, then exercise defaults.
 
 ## Checks
 
-`npm test` (includes a check that every exercise uses valid muscle ids and every routine references real
-exercises) and `npm run build`. Push to `main` to deploy.
+`npm run check` runs everything CI runs: types, ESLint, Prettier and the tests (which include a check that every
+exercise uses valid muscle ids and every routine references real exercises); then `npm run build`. `npm run format`
+fixes formatting (Prettier skips `Icons.tsx`, the data JSON and this file). Push to `main` to deploy.
+
+## Where things live
+
+- `src/lib/workout/`: the workout in progress, one concern per file: `plan` (starting sets, go-up, warm-ups),
+  `sets` and `items` (edits), `layout` (blocks, supersets, drag-and-drop, the rehab dose's edge), `intervals`,
+  `status`. Import from `lib/workout`.
+- `src/components/workout/`: the workout card (`WorkoutBlockView` → single, superset or collapsed block).
+- `src/styles/`: one stylesheet per area, imported in cascade order by `index.css`.
+- `src/lib/merge.ts`: every merge — versioned lists, keyed maps, and `merge3` for workouts edited on both sides.
 
 ## Reading Stefan's history
 

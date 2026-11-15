@@ -21,7 +21,7 @@ function useTicker(on: boolean) {
 }
 
 /** Where a hold is: getting set (counting down to go) or holding (counting down to the end). */
-export function holdPhase(hold: HoldState, now: number) {
+function holdPhase(hold: HoldState, now: number) {
   if (now < hold.goAt) return { phase: 'ready' as const, left: Math.ceil((hold.goAt - now) / 1000) };
   return {
     phase: 'hold' as const,

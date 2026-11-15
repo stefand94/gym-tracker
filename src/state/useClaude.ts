@@ -27,6 +27,8 @@ const devMock = (): Mock | undefined => (import.meta.env.DEV ? (window as unknow
 export function useClaude() {
   const { state, dispatch } = useStore();
   const { key, askModel } = state.ai;
+  // allExercises() reads the library, which takes in the custom exercises: rebuild when they change
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const stable = useMemo(() => stableContext(allExercises()), [state.customExercises]);
 
   const ask = useCallback(

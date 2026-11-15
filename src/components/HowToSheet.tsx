@@ -8,7 +8,7 @@ import { BodyMap } from './BodyMap';
 import { Sheet } from './Sheet';
 
 /** The video to open for an exercise: a pin from the app, else one set in the exercise data. */
-export function pinnedVideo(ex: Exercise, videos: Record<string, { url: string }>): string | undefined {
+function pinnedVideo(ex: Exercise, videos: Record<string, { url: string }>): string | undefined {
   const pin = videos[ex.id];
   return pin ? pin.url || undefined : ex.video;
 }

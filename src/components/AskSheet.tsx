@@ -35,7 +35,7 @@ function itemLine(i: RoutineItem): string {
 }
 
 /** The plan as a short list: supersets grouped, the rehab dose as one line. */
-export function PlanPreview({ blocks }: { blocks: RoutineBlock[] }) {
+function PlanPreview({ blocks }: { blocks: RoutineBlock[] }) {
   return (
     <ol className="plan">
       {blocks.map((b, n) =>

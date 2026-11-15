@@ -7,9 +7,7 @@ export const EXERCISES = exercisesJson as Exercise[];
 /** Starter routines: only a seed — the user's routines live in the store and sync to the data repo. */
 export const ROUTINES = routinesJson as Routine[];
 
-export const EXERCISE_BY_ID: Record<string, Exercise> = Object.fromEntries(
-  EXERCISES.map((e) => [e.id, e]),
-);
+const EXERCISE_BY_ID: Record<string, Exercise> = Object.fromEntries(EXERCISES.map((e) => [e.id, e]));
 
 // Exercises created in the app. The store keeps this registry current so every
 // getExercise() caller sees them without threading a lookup through.

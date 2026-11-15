@@ -1,0 +1,187 @@
+/* Routine editor */
+
+.re-top {
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+
+.re-name {
+  display: block;
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid var(--border);
+  background: transparent;
+  padding: 4px 0 6px;
+  outline: none;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--text);
+}
+
+.re-name:focus {
+  border-bottom-color: var(--rest);
+}
+
+.re-desc {
+  margin: 12px 0 4px;
+}
+
+.re-error {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--danger);
+}
+
+.re-list {
+  margin-top: 16px;
+}
+
+.re-list > * + * {
+  margin-top: 10px;
+}
+
+.re-block {
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.re-block.re-ss {
+  box-shadow: inset 3px 0 0 var(--rest);
+}
+
+.re-ss-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 0 4px;
+}
+
+.re-ss-head .link-btn {
+  margin-left: auto;
+}
+
+.re-item + .re-item {
+  border-top: 0.5px solid var(--hairline);
+}
+
+.re-item {
+  padding-bottom: 12px;
+}
+
+.re-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px 2px;
+}
+
+.re-dose .re-row {
+  padding: 10px 4px;
+}
+
+.re-dose {
+  border: 1px dashed var(--border);
+}
+
+.re-mark {
+  min-width: 26px;
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--text-dim);
+}
+
+.re-ss .re-mark {
+  color: var(--rest);
+}
+
+.re-ex-wrap {
+  min-width: 0;
+}
+
+.re-ex {
+  font-weight: 750;
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.re-item .station-chip {
+  margin: 6px 0 0 50px;
+}
+
+.re-nums {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px 12px 0;
+}
+
+.re-num {
+  min-width: 0;
+}
+
+.re-num > span {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 4px 2px;
+}
+
+.re-num .stepper {
+  height: 42px;
+}
+
+.re-num .stepper button {
+  width: 30px;
+  font-size: 21px;
+}
+
+.re-num .stepper input {
+  font-size: 18px;
+}
+
+.re-num.auto .stepper input {
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.re-add-kg {
+  align-self: end;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  border: 1.5px dashed var(--border);
+  background: transparent;
+  font-weight: 650;
+  color: var(--text-dim);
+}
+
+.re-hint {
+  text-align: center;
+  margin: 8px 0 0;
+}
+
+.re-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.update-card {
+  margin-bottom: 12px;
+  border: 1.5px solid var(--rest);
+}
+
+.update-card .small.dim {
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.update-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}

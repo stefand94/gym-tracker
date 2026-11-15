@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Workout } from '../types';
-import { merge3 } from './merge3';
+import { merge3 } from './merge';
 import { runSync, workoutPath } from './sync';
 
 describe('merge3', () => {

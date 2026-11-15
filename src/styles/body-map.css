@@ -1,0 +1,97 @@
+/* Body map */
+
+.bm {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.bm figure {
+  margin: 0;
+  text-align: center;
+}
+
+.bm figcaption {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.bm-figure {
+  display: block;
+}
+
+.bm-mini .bm-figure {
+  height: 56px;
+  width: auto;
+}
+
+.bm-mini {
+  gap: 0;
+}
+
+.bm-small .bm-figure {
+  height: 180px;
+  width: auto;
+}
+
+.bm-compact .bm-figure {
+  height: 130px;
+}
+
+.bm-large figure {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.bm-large .bm-figure {
+  height: min(62vh, 440px);
+  width: auto;
+  max-width: 100%;
+}
+
+.bm-body {
+  fill: var(--body-base);
+  stroke: var(--body-stroke);
+  stroke-width: 1;
+}
+
+.bm-mini .bm-body {
+  stroke-width: 2;
+}
+
+.bm-muscle {
+  stroke: var(--surface);
+  stroke-width: 1.2;
+  transition: fill 0.25s;
+}
+
+.bm-mini .bm-muscle {
+  stroke-width: 2;
+}
+
+.bm-clickable {
+  cursor: pointer;
+}
+
+.bm-selected {
+  stroke: var(--text);
+  stroke-width: 2.5;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+.legend-bar {
+  width: 120px;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, var(--muscle-idle), color-mix(in oklab, var(--heat) 25%, var(--muscle-idle)), var(--heat));
+}

@@ -101,8 +101,8 @@ export function Body() {
         })}
       </div>
       <p className="small dim">
-        Sets are weighted: a set counts 1 for the main muscles worked and ½ for secondary muscles. Muscles not trained in{' '}
-        {COLD_DAYS}+ days are flagged.
+        Sets are weighted: a set counts 1 for the main muscles worked and ½ for secondary muscles. Muscles not trained in {COLD_DAYS}+ days
+        are flagged.
       </p>
     </div>
   );

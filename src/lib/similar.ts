@@ -24,7 +24,7 @@ export function similarity(a: Exercise, b: Exercise): number {
 }
 
 /** True when `b` has one of `a`'s main muscles as its own main muscle. */
-export function sharesPrimary(a: Exercise, b: Exercise): boolean {
+function sharesPrimary(a: Exercise, b: Exercise): boolean {
   return b.primary.some((m) => a.primary.includes(m));
 }
 

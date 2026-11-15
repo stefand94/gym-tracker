@@ -1,0 +1,129 @@
+/* Ask Claude */
+
+.ask-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  margin: 0 0 12px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  color: var(--text-dim);
+}
+
+.ask-bar svg,
+.ask-busy svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--accent);
+}
+
+.ask-btn svg {
+  color: var(--accent);
+}
+
+.ask-examples {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.ask-examples .chip {
+  min-height: 40px;
+  text-align: left;
+  line-height: 1.25;
+}
+
+.ask-busy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ask-error {
+  margin-top: 12px;
+}
+
+.ask-result {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ask-reason {
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--accent-soft);
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.ask-answer {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.ask-plan-head {
+  margin-top: 4px;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.plan {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: plan;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.plan > li {
+  counter-increment: plan;
+  position: relative;
+  padding: 8px 10px 8px 36px;
+  border-radius: var(--radius-sm);
+  background: var(--well);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.plan > li::before {
+  content: counter(plan);
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  font-weight: 750;
+  color: var(--text-dim);
+}
+
+.plan-ss .badge {
+  display: inline-block;
+  margin-bottom: 2px;
+}
+
+.plan-dose {
+  color: var(--text);
+}
+
+.ask-dropped {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ask-actions {
+  margin-top: 6px;
+}

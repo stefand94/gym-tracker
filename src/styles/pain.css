@@ -1,0 +1,109 @@
+/* Pain */
+
+.pain {
+  margin-top: 12px;
+}
+
+.pain-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.pain-scale {
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.pain-row {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  gap: 3px;
+}
+
+.pain-btn {
+  min-height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+}
+
+.pain-btn.on {
+  color: #fff;
+}
+
+.pain-btn.on.low {
+  background: var(--done);
+  color: var(--done-ink);
+}
+
+.pain-btn.on.mid {
+  background: #d98a0b;
+}
+
+.pain-btn.on.high {
+  background: var(--danger);
+}
+
+.rehab-card .rehab-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.rehab-phase {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.rehab-dots {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0 4px;
+}
+
+.rehab-dots span {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+}
+
+.rehab-dots span.on {
+  background: var(--done);
+}
+
+.rehab-status {
+  font-weight: 650;
+  margin: 6px 0 12px;
+  line-height: 1.35;
+}
+
+.rehab-status.warn {
+  color: var(--danger);
+}
+
+.morning-card .pain {
+  margin-top: 4px;
+}
+
+.ex-card .pain {
+  padding: 0 14px;
+}
+
+.morning-card,
+.rehab-card {
+  margin-bottom: 12px;
+}

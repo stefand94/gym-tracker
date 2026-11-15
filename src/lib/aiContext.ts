@@ -1,11 +1,9 @@
 import { MUSCLE_IDS, MUSCLE_LABELS, type MuscleId } from '../data/muscles';
-import type { Exercise, Routine, RoutineBlock, Workout } from '../types';
+import type { Exercise, Lookup, Routine, RoutineBlock, Workout } from '../types';
 import { exerciseGroup } from './groups';
 import { loadSince } from './muscleLoad';
 import { finishedNewestFirst } from './prefill';
 import type { RehabState } from './rehab';
-
-type Lookup = (id: string) => Exercise | undefined;
 
 /** Weighted sets per 7 days a muscle wants (same as suggest.ts). */
 export const WEEK_TARGET = 10;
@@ -121,7 +119,7 @@ export function historyText(history: Workout[], lookup: Lookup, now = new Date()
 }
 
 /** Weighted sets per muscle over 7 days vs the target, and over 48 h (fatigue). Lowest first. */
-export function loadText(history: Workout[], lookup: Lookup, now = new Date()): string {
+function loadText(history: Workout[], lookup: Lookup, now = new Date()): string {
   const week = loadSince(history, 7, lookup, now);
   const recent = loadSince(history, 2, lookup, now);
   const rows = (MUSCLE_IDS.filter((m) => m !== 'neck') as MuscleId[])
@@ -130,7 +128,7 @@ export function loadText(history: Workout[], lookup: Lookup, now = new Date()): 
   return rows.join('\n');
 }
 
-export function rehabText(r: RehabState | null): string {
+function rehabText(r: RehabState | null): string {
   if (!r) return 'No rehab going on.';
   if (r.done) return `${r.area} rehab finished: leg work is allowed again; keep the small Nordic dose.`;
   return `${r.area} rehab in progress: phase ${r.phase} of ${r.maxPhase}, ${r.streak} good session(s) in a row${

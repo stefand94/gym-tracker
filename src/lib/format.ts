@@ -64,7 +64,9 @@ export function itemSummary(ex: Exercise | undefined, item: WorkoutItem): string
   const same = (k: 'weight' | 'reps' | 'seconds') => sets.every((s) => s[k] === sets[0][k]);
   const top = Math.max(0, ...sets.map((s) => s.weight ?? 0));
   if (ex?.type === 'timed') {
-    const t = same('seconds') ? `${n} × ${fmtNum(sets[0].seconds)} s` : `${n} sets · best ${fmtNum(Math.max(...sets.map((s) => s.seconds ?? 0)))} s`;
+    const t = same('seconds')
+      ? `${n} × ${fmtNum(sets[0].seconds)} s`
+      : `${n} sets · best ${fmtNum(Math.max(...sets.map((s) => s.seconds ?? 0)))} s`;
     return top ? `${t} · +${fmtNum(top)} kg` : t;
   }
   const reps = same('reps') ? `${n} × ${fmtNum(sets[0].reps)}` : `${n} sets`;

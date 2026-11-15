@@ -1,7 +1,5 @@
-import type { Exercise, Routine, RoutineBlock, RoutineItem, Workout, WorkoutItem } from '../types';
+import type { Lookup, Routine, RoutineBlock, RoutineItem, Workout, WorkoutItem } from '../types';
 import { lastPerformance, lastStation } from './prefill';
-
-type Lookup = (id: string) => Exercise | undefined;
 
 /** A url- and file-safe id from a name that no other routine (or bundled seed) uses. */
 export function newRoutineId(name: string, taken: Iterable<string>): string {

@@ -1,7 +1,6 @@
 import type { Exercise, Routine, Workout } from '../types';
 import type { QueueOp, RemoteData, SyncSettings, VideoPin } from '../state/store';
-import { mergeForPush, mergeKeyed } from './merge';
-import { merge3 } from './merge3';
+import { merge3, mergeForPush, mergeKeyed } from './merge';
 
 const API = 'https://api.github.com';
 
@@ -14,14 +13,14 @@ export function workoutPath(w: Pick<Workout, 'id' | 'startedAt'>): string {
 }
 
 /** Workout id from a path like workouts/2026/2026-11-07-abc123.json */
-export function idFromPath(path: string): string | null {
+function idFromPath(path: string): string | null {
   const m = /^workouts\/\d{4}\/\d{4}-\d{2}-\d{2}-(.+)\.json$/.exec(path);
   return m ? m[1] : null;
 }
 
-export const routinePath = (id: string) => `routines/${id}.json`;
-export const CUSTOM_PATH = 'exercises/custom.json';
-export const VIDEOS_PATH = 'exercises/videos.json';
+const routinePath = (id: string) => `routines/${id}.json`;
+const CUSTOM_PATH = 'exercises/custom.json';
+const VIDEOS_PATH = 'exercises/videos.json';
 
 /** Routine id from routines/<id>.json */
 export function routineIdFromPath(path: string): string | null {
@@ -110,7 +109,7 @@ const isConflict = (e: unknown) => e instanceof GitHubError && (e.status === 409
  * Claude fixed a label), the push is refused, so we merge — the repo's changes and ours both kept, ours winning
  * where both touched the same field — and push that. Returns the new sha and what was saved.
  */
-export async function putWorkout(s: SyncSettings, w: Workout, lastSha?: string): Promise<{ sha?: string; saved: Workout }> {
+async function putWorkout(s: SyncSettings, w: Workout, lastSha?: string): Promise<{ sha?: string; saved: Workout }> {
   const path = workoutPath(w);
   const message = `Workout ${w.startedAt.slice(0, 10)}: ${w.name}`;
   if (!lastSha) return { sha: await putJson(s, path, w, message, await existingSha(s, path)), saved: w };
@@ -132,7 +131,7 @@ export async function putWorkout(s: SyncSettings, w: Workout, lastSha?: string):
   return { sha: await putJson(s, path, saved, message, remote.sha), saved };
 }
 
-export async function putRoutine(s: SyncSettings, r: Routine): Promise<string | undefined> {
+async function putRoutine(s: SyncSettings, r: Routine): Promise<string | undefined> {
   const path = routinePath(r.id);
   return putJson(s, path, r, `${r.archived ? 'Archive' : 'Save'} routine: ${r.name}`, await existingSha(s, path));
 }
@@ -161,13 +160,13 @@ async function mergePut<T>(s: SyncSettings, path: string, empty: T, merge: (remo
   }
 }
 
-export const putCustomExercises = (s: SyncSettings, local: Exercise[]) =>
+const putCustomExercises = (s: SyncSettings, local: Exercise[]) =>
   mergePut<Exercise[]>(s, CUSTOM_PATH, [], (remote) => mergeForPush(remote, local), 'Save custom exercises');
 
-export const putVideos = (s: SyncSettings, local: Record<string, VideoPin>) =>
+const putVideos = (s: SyncSettings, local: Record<string, VideoPin>) =>
   mergePut<Record<string, VideoPin>>(s, VIDEOS_PATH, {}, (remote) => mergeKeyed(remote, local), 'Save pinned videos');
 
-export async function deleteWorkout(s: SyncSettings, path: string): Promise<void> {
+async function deleteWorkout(s: SyncSettings, path: string): Promise<void> {
   const sha = await existingSha(s, path);
   if (!sha) return;
   await gh(s, `/contents/${path}`, {
@@ -190,7 +189,7 @@ export interface PullResult {
  * Download every workout whose id isn't in `known` or whose file changed in the repo since we last pulled it
  * (e.g. Claude fixed a label), plus each routine file and custom.json whose sha differs from the one we last pulled.
  */
-export async function pullAll(s: SyncSettings, known: Set<string>, shas: Record<string, string>): Promise<PullResult> {
+async function pullAll(s: SyncSettings, known: Set<string>, shas: Record<string, string>): Promise<PullResult> {
   const empty: PullResult = { workouts: [], remote: { routines: [], shas: {} } };
   let tree: { path: string; type: string; sha: string }[];
   try {

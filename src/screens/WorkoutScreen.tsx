@@ -8,7 +8,7 @@ import { HoldWatcher } from '../components/HoldTimer';
 import { IconPlus, IconSpark } from '../components/Icons';
 import { RestBar, TimerButton } from '../components/RestBar';
 import { ConfirmSheet } from '../components/Sheet';
-import { WorkoutBlockView } from '../components/WorkoutBlockView';
+import { WorkoutBlockView } from '../components/workout/WorkoutBlockView';
 import { getExercise } from '../data/library';
 import { workoutLoad } from '../lib/muscleLoad';
 import { routineFromWorkout } from '../lib/routineEdit';
@@ -179,15 +179,7 @@ export function WorkoutScreen() {
             return (
               <div key={b.id} id={`blk-${b.id}`} className="wo-block">
                 {label && <div className="list-label">Up next</div>}
-                <WorkoutBlockView
-                  block={b}
-                  index={i}
-                  count={w.blocks.length}
-                  update={update}
-                  open={open}
-                  current={i === cur}
-                  onToggle={() => toggle(b.id, open)}
-                />
+                <WorkoutBlockView block={b} index={i} update={update} open={open} current={i === cur} onToggle={() => toggle(b.id, open)} />
               </div>
             );
           })}

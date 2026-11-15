@@ -1,0 +1,278 @@
+/* Sets: hold timer, set rows, steppers and ticks */
+
+.hold-btn {
+  height: 50px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--well);
+  color: var(--text-dim);
+  display: grid;
+  place-items: center;
+}
+
+.hold-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.hold-btn.play {
+  color: var(--accent);
+}
+
+.hold-btn:active {
+  transform: scale(0.94);
+}
+
+.hold {
+  position: relative;
+  overflow: hidden;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--accent) 12%, var(--well));
+}
+
+.hold > * {
+  position: relative;
+}
+
+.hold-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: color-mix(in oklab, var(--accent) 28%, transparent);
+  transition: width 0.25s linear;
+}
+
+.hold-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.hold-time {
+  margin-left: auto;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.hold.ready .hold-time {
+  animation: hold-pulse 1s ease-out infinite;
+}
+
+@keyframes hold-pulse {
+  from {
+    transform: scale(1.18);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.set-row.holding .tick {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.set-row + .set-row {
+  margin-top: 2px;
+}
+
+.set-row.now {
+  background: color-mix(in oklab, var(--accent) 9%, transparent);
+  box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--accent) 60%, transparent);
+}
+
+.set-head {
+  padding: 6px 6px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.set-idx {
+  font-weight: 750;
+  color: var(--text-dim);
+  font-size: 15px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.set-row.done .set-idx {
+  color: var(--done);
+}
+
+.set-row.done .stepper input,
+.set-row.done .numin input {
+  color: var(--text-dim);
+}
+
+.round-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+  padding: 10px 6px 4px;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  border-radius: var(--radius-sm);
+  background: var(--well);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.stepper button {
+  width: 46px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.stepper button:active {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.stepper label,
+.numin {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  min-width: 0;
+}
+
+.stepper input,
+.numin input {
+  width: 100%;
+  max-width: 5ch;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-weight: 750;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  padding: 0;
+  outline: none;
+}
+
+.numin {
+  height: 50px;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  border: 1.5px dashed var(--border);
+}
+
+.numin:focus-within {
+  border-style: solid;
+  border-color: var(--rest);
+}
+
+.unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  padding-left: 2px;
+  flex: 0 0 auto;
+}
+
+.unit:empty {
+  display: none;
+}
+
+.stepper label:has(.unit:not(:empty)) input {
+  text-align: right;
+}
+
+.tick {
+  position: relative;
+  width: 60px;
+  height: 50px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.1s;
+}
+
+.tick:active {
+  transform: scale(0.94);
+}
+
+.tick svg {
+  width: 26px;
+  height: 26px;
+}
+
+.set-row.now .tick {
+  border-color: var(--accent);
+  color: color-mix(in oklab, var(--accent) 45%, transparent);
+}
+
+.tick.on {
+  background: var(--done);
+  border-color: var(--done);
+  color: var(--done-ink);
+}
+
+.ex-actions {
+  display: flex;
+  gap: 6px;
+  padding: 8px 14px 14px;
+}
+
+.ex-actions .btn {
+  flex: 1;
+  padding: 0 10px;
+}
+
+.ex-actions .btn-all {
+  flex: 1.5;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.ex-actions .btn-all.on {
+  background: var(--surface-2);
+  color: var(--text-dim);
+}
+
+.all-done {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--done) 16%, var(--surface));
+  display: grid;
+  gap: 12px;
+  text-align: center;
+  font-size: 17px;
+}
+
+.map-toggle {
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 0;
+  min-height: 32px;
+}

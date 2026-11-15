@@ -1,8 +1,6 @@
-import type { Exercise, Routine, RoutineBlock, RoutineItem } from '../types';
+import type { Exercise, Lookup, Routine, RoutineBlock, RoutineItem } from '../types';
 import { heldBack } from './aiContext';
 import type { RehabState } from './rehab';
-
-type Lookup = (id: string) => Exercise | undefined;
 
 /** A workout plan as Claude writes it (structured output: every field present, null when unused). */
 export interface AiItem {

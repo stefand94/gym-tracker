@@ -1,6 +1,6 @@
 const LEVELS = Array.from({ length: 11 }, (_, i) => i);
 
-export function painTone(n: number): 'low' | 'mid' | 'high' {
+function painTone(n: number): 'low' | 'mid' | 'high' {
   return n <= 2 ? 'low' : n <= 3 ? 'mid' : 'high';
 }
 

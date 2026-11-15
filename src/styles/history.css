@@ -1,0 +1,90 @@
+/* History */
+
+.hist-sets {
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.hist-set {
+  display: inline-block;
+  margin-right: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hist-set.missed {
+  color: var(--text-dim);
+  text-decoration: line-through;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.stat {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.stat-v {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-l {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.chart-box {
+  height: 240px;
+  position: relative;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-pill::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--skip);
+}
+
+.status-pill.ok::before {
+  background: var(--done);
+}
+
+.status-pill.warn::before {
+  background: var(--heat);
+}
+
+.error-text {
+  color: var(--danger);
+  font-size: 13px;
+  word-break: break-word;
+}
+
+ol.steps {
+  padding-left: 20px;
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+ol.steps code {
+  font-size: 13px;
+  background: var(--surface-2);
+  padding: 1px 5px;
+  border-radius: 5px;
+}

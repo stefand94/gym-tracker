@@ -20,7 +20,7 @@ export type QueueOp =
   { op: 'put'; kind?: SyncKind; id: string; t?: number } | { op: 'delete'; kind?: SyncKind; id: string; path: string; t?: number };
 
 export const CUSTOM_ID = 'custom';
-export const VIDEOS_ID = 'videos';
+const VIDEOS_ID = 'videos';
 
 /** A video pinned to an exercise; an empty url is a removed pin (kept so the removal syncs). */
 export interface VideoPin {
@@ -67,7 +67,7 @@ export interface HoldState {
   endsAt: number;
 }
 
-export const HOLD_LEAD_IN = 5;
+const HOLD_LEAD_IN = 5;
 
 export interface State {
   history: Workout[];
@@ -149,7 +149,7 @@ const DEFAULT_SETTINGS: SyncSettings = {
 const SEED_TIME = '2000-01-01T00:00:00.000Z';
 
 /** Add any bundled routine the user doesn't have yet (archived ones keep their id, so they stay gone). */
-export function withSeedRoutines(routines: Routine[]): Routine[] {
+function withSeedRoutines(routines: Routine[]): Routine[] {
   const have = new Set(routines.map((r) => r.id));
   const missing = ROUTINES.filter((r) => !have.has(r.id)).map((r) => ({ ...r, updatedAt: r.updatedAt ?? SEED_TIME }));
   return missing.length ? [...routines, ...missing] : routines;
@@ -196,12 +196,12 @@ export function load(): State {
 const kindOf = (op: QueueOp): SyncKind => op.kind ?? 'workout';
 const sameTarget = (a: QueueOp, b: { kind?: SyncKind; id: string }) => kindOf(a) === (b.kind ?? 'workout') && a.id === b.id;
 
-export function sameOp(a: QueueOp, b: QueueOp) {
+function sameOp(a: QueueOp, b: QueueOp) {
   return a.op === b.op && sameTarget(a, b) && a.t === b.t;
 }
 
 let seq = 0;
-export function enqueue(queue: QueueOp[], op: QueueOp): QueueOp[] {
+function enqueue(queue: QueueOp[], op: QueueOp): QueueOp[] {
   const stamped = { ...op, t: Date.now() * 1000 + (seq++ % 1000) };
   return [...queue.filter((q) => !sameTarget(q, op)), stamped];
 }

@@ -78,7 +78,11 @@ export function series(exercise: Exercise, metric: Metric, history: Workout[], s
 export function stationsIn(exercise: Exercise, history: Workout[]): (string | null)[] {
   const named = stationsFor(exercise.id, history);
   const unnamed = history.some(
-    (w) => w.finishedAt && w.blocks.some((b) => b.items.some((i) => i.exerciseId === exercise.id && !i.station && i.status !== 'skipped' && i.sets.some((s) => s.done))),
+    (w) =>
+      w.finishedAt &&
+      w.blocks.some((b) =>
+        b.items.some((i) => i.exerciseId === exercise.id && !i.station && i.status !== 'skipped' && i.sets.some((s) => s.done)),
+      ),
   );
   return unnamed ? [...named, null] : named;
 }

@@ -1,8 +1,6 @@
 import { isMuscleId, MUSCLE_IDS, type MuscleId } from '../data/muscles';
-import type { Exercise, ExerciseDefaults, ExerciseType, HowTo, Workout } from '../types';
+import type { Exercise, ExerciseDefaults, ExerciseType, HowTo, Lookup, Workout } from '../types';
 import { finishedNewestFirst } from './prefill';
-
-type Lookup = (id: string) => Exercise | undefined;
 
 const str = (x: unknown, max: number) => (typeof x === 'string' ? x.trim().slice(0, max) : '');
 const TYPES: ExerciseType[] = ['weight', 'machine', 'bodyweight', 'timed'];

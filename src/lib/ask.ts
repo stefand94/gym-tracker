@@ -1,9 +1,7 @@
-import type { Exercise, Routine, RoutineBlock, Workout } from '../types';
+import type { Lookup, Routine, RoutineBlock, Workout } from '../types';
 import { routinesText } from './aiContext';
 import { checkPlan, PLAN_SCHEMA, type AiPlan } from './aiValidate';
 import type { RehabState } from './rehab';
-
-type Lookup = (id: string) => Exercise | undefined;
 
 export type AskKind = 'change' | 'today' | 'new' | 'answer';
 
@@ -33,7 +31,7 @@ export interface RawAnswer {
 }
 
 /** What Stefan has open right now, in words. */
-export function whereText(from: AskFrom, lookup: Lookup): string {
+function whereText(from: AskFrom, lookup: Lookup): string {
   if (from.kind === 'home') return 'He asked from the home screen.';
   if (from.kind === 'routine') {
     const r = { id: from.routine.id ?? 'new-routine', ...from.routine } as Routine;
@@ -69,7 +67,7 @@ export interface AskTurn {
 }
 
 /** The chat so far, short: his questions, and your kind, reason, words and plan (ids only). */
-export function chatText(turns: AskTurn[]): string {
+function chatText(turns: AskTurn[]): string {
   return turns
     .filter((t) => t.result)
     .slice(-6)

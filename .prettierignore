@@ -1,0 +1,9 @@
+dist
+dev-dist
+node_modules
+package-lock.json
+# hand-laid-out SVG paths and hand-edited data: keep their own formatting
+src/components/Icons.tsx
+src/data/*.json
+# hand-aligned examples
+CLAUDE.md

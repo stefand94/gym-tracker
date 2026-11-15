@@ -1,0 +1,14 @@
+/* Claude settings */
+
+.seg-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.ai-spent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}

@@ -1,0 +1,106 @@
+/* How-to */
+
+.picker-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 0.5px solid var(--hairline);
+}
+
+.picker-row .picker-item {
+  flex: 1;
+  min-width: 0;
+  border-bottom: none;
+}
+
+.picker-howto {
+  margin-right: -10px;
+}
+
+.howto-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -4px 0 12px;
+}
+
+.howto-head .bm-mini .bm-figure {
+  height: 48px;
+}
+
+.howto-meta {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.howto-steps {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.howto-steps li {
+  counter-increment: step;
+  position: relative;
+  padding: 8px 0 8px 40px;
+  line-height: 1.4;
+  border-bottom: 0.5px solid var(--hairline);
+}
+
+.howto-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  font-weight: 800;
+  font-size: 14px;
+  display: grid;
+  place-items: center;
+}
+
+.howto-mistake {
+  background: var(--accent-soft);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.howto-mistake-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+
+.howto-cue {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.howto-none {
+  margin: 0 0 12px;
+}
+
+.howto-actions {
+  margin-top: 16px;
+}
+
+.howto-actions a.btn {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.howto-pin .row {
+  margin-top: 8px;
+}

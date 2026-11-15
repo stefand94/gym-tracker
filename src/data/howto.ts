@@ -8,8 +8,6 @@ export function howToFor(ex: Exercise): HowTo | undefined {
   return ex.howto ?? BUNDLED[ex.id];
 }
 
-export const hasBundledHowTo = (id: string) => id in BUNDLED;
-
 /** YouTube search for the exercise's form videos. */
 export function youtubeSearchUrl(name: string): string {
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${name} form`)}`;

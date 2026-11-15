@@ -1,21 +1,21 @@
 import type { Exercise, RehabArea, Routine, RoutineBlock, RoutineItem, Workout } from '../types';
 
 /** Pain during a session at or below this counts as a good session. */
-export const GOOD_MAX = 2;
+const GOOD_MAX = 2;
 /** Pain above this (during, or the next morning) means go back a phase. */
-export const BAD_ABOVE = 3;
+const BAD_ABOVE = 3;
 /** Good sessions in a row needed to move up. */
 export const STREAK = 2;
 
 export const AREA_LABELS: Record<RehabArea, string> = { hamstring: 'Hamstring' };
 
 /** Highest pain logged in a workout, or undefined if none was logged. */
-export function sessionPain(w: Workout): number | undefined {
+function sessionPain(w: Workout): number | undefined {
   const p = w.blocks.flatMap((b) => b.items).flatMap((i) => (i.status !== 'skipped' && i.pain !== undefined ? [i.pain] : []));
   return p.length ? Math.max(...p) : undefined;
 }
 
-export function tracksPain(w: Workout): boolean {
+function tracksPain(w: Workout): boolean {
   return w.blocks.some((b) => b.items.some((i) => i.trackPain || i.pain !== undefined));
 }
 

@@ -2,9 +2,7 @@ import type { SetEntry, Workout, WorkoutItem } from '../types';
 
 /** Finished workouts, newest first. */
 export function finishedNewestFirst(history: Workout[]): Workout[] {
-  return history
-    .filter((w) => w.finishedAt)
-    .sort((a, b) => (b.startedAt < a.startedAt ? -1 : b.startedAt > a.startedAt ? 1 : 0));
+  return history.filter((w) => w.finishedAt).sort((a, b) => (b.startedAt < a.startedAt ? -1 : b.startedAt > a.startedAt ? 1 : 0));
 }
 
 /** Performed items (done sets, not skipped) of one exercise, newest workout first. */
@@ -48,9 +46,7 @@ export function stationsFor(exerciseId: string, history: Workout[]): string[] {
 
 /** Every station used, most recent first. */
 export function allStations(history: Workout[]): string[] {
-  return uniqueStations(
-    finishedNewestFirst(history).flatMap((w) => w.blocks.flatMap((b) => b.items.map((i) => i.station))),
-  );
+  return uniqueStations(finishedNewestFirst(history).flatMap((w) => w.blocks.flatMap((b) => b.items.map((i) => i.station))));
 }
 
 function uniqueStations(list: (string | undefined)[]): string[] {

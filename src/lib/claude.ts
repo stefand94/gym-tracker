@@ -1,7 +1,7 @@
 import type Anthropic from '@anthropic-ai/sdk';
 
 /** Haiku does everything by default; Ask can be moved to Sonnet in Settings. */
-export const MODELS = { haiku: 'claude-haiku-5-5', sonnet: 'claude-sonnet-5-5' } as const;
+const MODELS = { haiku: 'claude-haiku-5-5', sonnet: 'claude-sonnet-5-5' } as const;
 export type ModelKey = keyof typeof MODELS;
 export const MODEL_LABELS: Record<ModelKey, string> = { haiku: 'Haiku 5.5', sonnet: 'Sonnet 5.5' };
 

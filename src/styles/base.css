@@ -1,0 +1,124 @@
+/*
+ * "Iron": steel greys with competition-plate colours. Red (25 kg) is the main action,
+ * green (10 kg) means done, blue (20 kg) means rest. Bricolage Grotesque throughout,
+ * with an iOS feel: large titles, grouped rounded lists, frosted bars, sentence case.
+ */
+:root {
+  --bg: #f2f3f5;
+  --surface: #ffffff;
+  --surface-2: #e9ebef;
+  --well: #f2f3f5;
+  --border: #d5d9df;
+  --hairline: rgb(60 66 76 / 0.16);
+  --text: #121519;
+  --text-dim: #5d6672;
+  --accent: #d62b21;
+  --accent-ink: #ffffff;
+  --accent-soft: #fbe4e2;
+  --done: #23893f;
+  --done-ink: #ffffff;
+  --rest: #1f6fd1;
+  --heat: #e5480f;
+  --danger: #d62b21;
+  --muscle-idle: #d9dce1;
+  --body-base: #e8eaee;
+  --body-stroke: #c8ccd3;
+  --skip: #98a0ab;
+  --bar: rgb(242 243 245 / 0.82);
+  --radius: 14px;
+  --radius-sm: 11px;
+  --nav-h: 60px;
+  --font: 'Bricolage Grotesque Variable', -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0f1215;
+    --surface: #1b1f25;
+    --surface-2: #262b33;
+    --well: #13161a;
+    --border: #353c47;
+    --hairline: rgb(160 172 188 / 0.14);
+    --text: #f1f3f6;
+    --text-dim: #8f99a6;
+    --accent: #f0423a;
+    --accent-ink: #ffffff;
+    --accent-soft: #3a1b1a;
+    --done: #34b45a;
+    --done-ink: #07170c;
+    --rest: #4a95ff;
+    --heat: #ff6a2b;
+    --danger: #ff5a52;
+    --muscle-idle: #323944;
+    --body-base: #232830;
+    --body-stroke: #3a414d;
+    --skip: #67707c;
+    --bar: rgb(15 18 21 / 0.8);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0f1215;
+  --surface: #1b1f25;
+  --surface-2: #262b33;
+  --well: #13161a;
+  --border: #353c47;
+  --hairline: rgb(160 172 188 / 0.14);
+  --text: #f1f3f6;
+  --text-dim: #8f99a6;
+  --accent: #f0423a;
+  --accent-ink: #ffffff;
+  --accent-soft: #3a1b1a;
+  --done: #34b45a;
+  --done-ink: #07170c;
+  --rest: #4a95ff;
+  --heat: #ff6a2b;
+  --danger: #ff5a52;
+  --muscle-idle: #323944;
+  --body-base: #232830;
+  --body-stroke: #3a414d;
+  --skip: #67707c;
+  --bar: rgb(15 18 21 / 0.8);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  letter-spacing: -0.005em;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 2px solid var(--rest);
+  outline-offset: 2px;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}

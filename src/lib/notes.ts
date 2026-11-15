@@ -1,7 +1,5 @@
-import type { Exercise, NoteMessage, NoteSuggestion, Routine, Workout, WorkoutItem } from '../types';
+import type { Exercise, Lookup, NoteMessage, NoteSuggestion, Routine, Workout, WorkoutItem } from '../types';
 import { deriveStatus, setPain, setStation } from './workout';
-
-type Lookup = (id: string) => Exercise | undefined;
 
 const mapItem = (w: Workout, itemId: string, fn: (i: WorkoutItem) => WorkoutItem): Workout => ({
   ...w,

@@ -147,3 +147,6 @@ export interface Workout {
   /** The session note's messages, oldest first. */
   noteThread?: NoteMessage[];
 }
+
+/** Finds an exercise by id (bundled or custom). */
+export type Lookup = (id: string) => Exercise | undefined;

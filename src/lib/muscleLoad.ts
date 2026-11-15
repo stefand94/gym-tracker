@@ -1,8 +1,7 @@
 import { MUSCLE_IDS, type MuscleId } from '../data/muscles';
-import type { Exercise, Workout, WorkoutItem } from '../types';
+import type { Exercise, Lookup, Workout, WorkoutItem } from '../types';
 
 export type MuscleLoad = Record<MuscleId, number>;
-type Lookup = (id: string) => Exercise | undefined;
 
 export const PRIMARY_CREDIT = 1;
 export const SECONDARY_CREDIT = 0.5;
@@ -19,7 +18,7 @@ export function exerciseMap(ex: Exercise): MuscleLoad {
   return load;
 }
 
-export function addItemLoad(load: MuscleLoad, item: WorkoutItem, lookup: Lookup): void {
+function addItemLoad(load: MuscleLoad, item: WorkoutItem, lookup: Lookup): void {
   if (item.status === 'skipped') return;
   const ex = lookup(item.exerciseId);
   if (!ex) return;
@@ -57,8 +56,4 @@ export function lastTrained(history: Workout[], lookup: Lookup): Partial<Record<
     }
   }
   return out;
-}
-
-export function maxLoad(load: MuscleLoad): number {
-  return Math.max(0, ...Object.values(load));
 }

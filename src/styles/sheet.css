@@ -1,0 +1,93 @@
+/* Sheet */
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgb(0 0 0 / 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fade 0.15s;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 560px;
+  max-height: 88dvh;
+  overflow: auto;
+  background: var(--surface);
+  border-radius: 22px 22px 0 0;
+  padding: 8px 16px calc(env(safe-area-inset-bottom) + 16px);
+  overscroll-behavior: contain;
+  will-change: transform;
+  animation: rise 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.sheet-tall {
+  height: 88dvh;
+}
+
+.sheet-grip {
+  width: 36px;
+  height: 5px;
+  flex: none;
+  border-radius: 3px;
+  background: var(--border);
+  margin: 4px auto 12px;
+}
+
+.sheet-title {
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 4px;
+  border: none;
+  background: transparent;
+  font-size: 17px;
+  font-weight: 550;
+  text-align: left;
+  border-bottom: 0.5px solid var(--hairline);
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:disabled {
+  opacity: 0.35;
+}
+
+.menu-item.danger {
+  color: var(--danger);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(60px);
+    opacity: 0.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

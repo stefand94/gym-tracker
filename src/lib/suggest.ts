@@ -1,10 +1,8 @@
 import { MUSCLE_LABELS, type MuscleId } from '../data/muscles';
-import type { Exercise, Routine, Workout } from '../types';
+import type { Lookup, Routine, Workout } from '../types';
 import { exerciseGroup } from './groups';
 import { emptyLoad, loadSince, PRIMARY_CREDIT, SECONDARY_CREDIT, type MuscleLoad } from './muscleLoad';
 import type { RehabState } from './rehab';
-
-type Lookup = (id: string) => Exercise | undefined;
 
 /** Small muscles that get worked by nearly everything; they shouldn't steer the pick. */
 const IGNORE: MuscleId[] = ['neck', 'forearms'];
@@ -15,7 +13,7 @@ const FATIGUE_FULL = 6;
 const FATIGUE_WEIGHT = 0.7;
 
 /** What a routine plans to train: planned sets × credit per muscle (the rehab dose block isn't counted). */
-export function routineCoverage(r: Routine, lookup: Lookup): MuscleLoad {
+function routineCoverage(r: Routine, lookup: Lookup): MuscleLoad {
   const load = emptyLoad();
   for (const b of r.blocks) {
     if (b.rehabDose) continue;

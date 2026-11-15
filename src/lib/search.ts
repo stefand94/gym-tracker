@@ -37,7 +37,7 @@ const covers = (hay: string[], needles: string[]) => needles.every((n) => hay.so
  * How well `e` matches the query, lower is better; null when it doesn't match.
  * 0 name starts with the query · 1 every word is in the name · 2 via an alias · 3 via equipment/muscles.
  */
-export function matchTier(e: Exercise, query: string): number | null {
+function matchTier(e: Exercise, query: string): number | null {
   const q = tokens(query);
   if (!q.length) return 0;
   const name = tokens(e.name);

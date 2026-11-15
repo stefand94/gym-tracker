@@ -1,0 +1,76 @@
+/* Stations */
+
+.station-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  margin: 2px 0 6px 14px;
+  padding: 0 12px;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text-dim);
+}
+
+.station-chip.set {
+  border-style: solid;
+  border-color: transparent;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.station-chips {
+  margin-bottom: 4px;
+}
+
+.station-chips .chip {
+  min-height: 44px;
+}
+
+.station-new {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.station-new .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.station-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text-dim);
+}
+
+.chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
