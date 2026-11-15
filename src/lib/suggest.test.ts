@@ -64,7 +64,7 @@ describe('routine edits', () => {
 
   it('takes the new order, supersets and set counts, keeping the rehab dose a dose block', () => {
     let w = workoutFromRoutine(upperA, [], getExercise, now);
-    // dead hang to the front, an extra set of bench, plank added, face pull + lateral raise superset dropped
+    // dead hang to the front, an extra set of bench, plank added, lateral raise + face pull superset dropped
     const hang = w.blocks.flatMap((b) => b.items).find((i) => i.exerciseId === 'dead-hang')!;
     const bench = w.blocks[0].items[0];
     const ss = w.blocks[2];
@@ -84,7 +84,7 @@ describe('routine edits', () => {
     expect(dose).toHaveLength(1);
     expect(dose[0]).toEqual(upperA.blocks.find((b) => b.rehabDose));
     expect(next.blocks[next.blocks.length - 1].items[0].exerciseId).toBe('plank');
-    expect(describeChanges(upperA, next, getExercise)).toBe('Adds Plank · drops Face pull, Lateral raise');
+    expect(describeChanges(upperA, next, getExercise)).toBe('Adds Plank · drops Lateral raise, Face pull');
   });
 
   it('saves a workout as a routine without its skipped exercises', () => {
@@ -97,7 +97,7 @@ describe('routine edits', () => {
     expect(r.blocks.flatMap((b) => b.items).some((i) => i.exerciseId === 'dead-hang')).toBe(false);
     expect(r.blocks[0]).toMatchObject({
       superset: true,
-      items: [{ exerciseId: 'barbell-bench-press' }, { exerciseId: 'assisted-pull-up' }],
+      items: [{ exerciseId: 'barbell-bench-press' }, { exerciseId: 'lat-pulldown' }],
     });
     expect(r.blocks.filter((b) => b.rehabDose)).toHaveLength(1);
   });

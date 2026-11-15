@@ -992,7 +992,7 @@
     "name": "Goblet squat",
     "type": "weight",
     "equipment": "Dumbbells",
-    "weightNote": "one dumbbell",
+    "weightNote": "one dumbbell or kettlebell",
     "primary": [
       "quads",
       "glutes"
@@ -1005,7 +1005,10 @@
       "sets": 3,
       "reps": 10,
       "weight": 16
-    }
+    },
+    "aliases": [
+      "kettlebell goblet squat"
+    ]
   },
   {
     "id": "front-squat",
@@ -1253,7 +1256,9 @@
       "sets": 3,
       "reps": 15,
       "weight": 16
-    }
+    },
+    "cue": "snap the hips, arms just guide the bell",
+    "weightNote": "bells start at 8 kg"
   },
   {
     "id": "glute-bridge",
@@ -1694,7 +1699,8 @@
       "weight": 20
     },
     "aliases": [
-      "farmers walk"
+      "farmers walk",
+      "kettlebell carry"
     ]
   },
   {
@@ -2545,6 +2551,127 @@
     "defaults": {
       "sets": 3,
       "reps": 10
+    }
+  },
+  {
+    "id": "sled-push",
+    "name": "Sled push",
+    "type": "weight",
+    "equipment": "Sled",
+    "weightNote": "plates on the sled · reps = metres",
+    "cue": "hips low, arms locked, short fast steps",
+    "aliases": [
+      "prowler push"
+    ],
+    "primary": [
+      "quads",
+      "glutes"
+    ],
+    "secondary": [
+      "calves",
+      "abs"
+    ],
+    "defaults": {
+      "sets": 4,
+      "reps": 20,
+      "weight": 40
+    }
+  },
+  {
+    "id": "backward-sled-drag",
+    "name": "Backward sled drag",
+    "type": "weight",
+    "equipment": "Sled",
+    "weightNote": "plates on the sled · reps = metres",
+    "cue": "sit back, walk backwards on the balls of your feet",
+    "aliases": [
+      "sled pull",
+      "reverse sled drag"
+    ],
+    "primary": [
+      "quads"
+    ],
+    "secondary": [
+      "calves",
+      "glutes"
+    ],
+    "defaults": {
+      "sets": 4,
+      "reps": 20,
+      "weight": 30
+    }
+  },
+  {
+    "id": "box-jump",
+    "name": "Box jump",
+    "type": "bodyweight",
+    "equipment": "Box",
+    "cue": "land soft and quiet, step down",
+    "aliases": [
+      "plyo box jump"
+    ],
+    "primary": [
+      "quads",
+      "glutes"
+    ],
+    "secondary": [
+      "calves",
+      "hamstrings"
+    ],
+    "defaults": {
+      "sets": 4,
+      "reps": 5
+    }
+  },
+  {
+    "id": "wall-ball",
+    "name": "Wall ball",
+    "type": "weight",
+    "equipment": "Medicine ball",
+    "weightNote": "ball weight",
+    "cue": "squat deep, drive up and throw in one move",
+    "aliases": [
+      "wall ball shot",
+      "war ball",
+      "medicine ball throw"
+    ],
+    "primary": [
+      "quads",
+      "glutes"
+    ],
+    "secondary": [
+      "frontDelts",
+      "triceps"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 6
+    }
+  },
+  {
+    "id": "suitcase-carry",
+    "name": "Suitcase carry",
+    "type": "weight",
+    "equipment": "Kettlebell",
+    "weightNote": "one kettlebell · reps = metres per side",
+    "cue": "stand tall, don't lean toward the weight",
+    "aliases": [
+      "one arm farmer carry",
+      "single kettlebell carry"
+    ],
+    "primary": [
+      "obliques",
+      "forearms"
+    ],
+    "secondary": [
+      "traps",
+      "abs"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 30,
+      "weight": 16
     }
   }
 ]

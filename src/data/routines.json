@@ -2,10 +2,7 @@
   {
     "id": "upper-a",
     "name": "Upper A",
-    "description": "Bench focus",
-    "days": [
-      "mon"
-    ],
+    "description": "Bench & shoulders · free weights and cables",
     "blocks": [
       {
         "superset": true,
@@ -14,13 +11,13 @@
             "exerciseId": "barbell-bench-press",
             "sets": 4,
             "reps": 6,
-            "weight": 45
+            "weight": 50
           },
           {
-            "exerciseId": "assisted-pull-up",
+            "exerciseId": "lat-pulldown",
             "sets": 4,
-            "reps": 5,
-            "weight": 32
+            "reps": 8,
+            "weight": 39
           }
         ]
       },
@@ -34,10 +31,10 @@
             "weight": 20
           },
           {
-            "exerciseId": "machine-row",
+            "exerciseId": "single-arm-cable-row",
             "sets": 3,
             "reps": 10,
-            "weight": 32
+            "weight": 25
           }
         ]
       },
@@ -45,24 +42,31 @@
         "superset": true,
         "items": [
           {
-            "exerciseId": "face-pull",
-            "sets": 3,
-            "reps": 15,
-            "weight": 15
-          },
-          {
             "exerciseId": "lateral-raise",
             "sets": 3,
             "reps": 12,
             "weight": 6
+          },
+          {
+            "exerciseId": "face-pull",
+            "sets": 3,
+            "reps": 15,
+            "weight": 15
           }
         ]
       },
       {
+        "superset": true,
         "items": [
           {
+            "exerciseId": "cable-external-rotation",
+            "sets": 2,
+            "reps": 12,
+            "weight": 2.5
+          },
+          {
             "exerciseId": "dead-hang",
-            "sets": 3,
+            "sets": 2,
             "seconds": 30
           }
         ]
@@ -89,10 +93,7 @@
   {
     "id": "upper-b",
     "name": "Upper B",
-    "description": "Pull focus",
-    "days": [
-      "wed"
-    ],
+    "description": "Pull & arms · free weights and cables",
     "blocks": [
       {
         "superset": true,
@@ -106,7 +107,7 @@
             "exerciseId": "dumbbell-bench-press",
             "sets": 4,
             "reps": 8,
-            "weight": 14
+            "weight": 18
           }
         ]
       },
@@ -114,16 +115,33 @@
         "superset": true,
         "items": [
           {
-            "exerciseId": "lat-pulldown",
+            "exerciseId": "one-arm-dumbbell-row",
             "sets": 3,
-            "reps": 8,
-            "weight": 40
+            "reps": 10,
+            "weight": 16
           },
           {
-            "exerciseId": "assisted-dip",
+            "exerciseId": "landmine-press",
             "sets": 3,
-            "reps": 8,
-            "weight": 20
+            "reps": 10,
+            "weight": 10
+          }
+        ]
+      },
+      {
+        "superset": true,
+        "items": [
+          {
+            "exerciseId": "rear-delt-fly",
+            "sets": 3,
+            "reps": 12,
+            "weight": 6
+          },
+          {
+            "exerciseId": "cable-lateral-raise",
+            "sets": 3,
+            "reps": 12,
+            "weight": 5
           }
         ]
       },
@@ -140,16 +158,7 @@
             "exerciseId": "triceps-rope-pushdown",
             "sets": 3,
             "reps": 10,
-            "weight": 22.5
-          }
-        ]
-      },
-      {
-        "items": [
-          {
-            "exerciseId": "plank",
-            "sets": 2,
-            "seconds": 45
+            "weight": 17.5
           }
         ]
       },
@@ -175,10 +184,7 @@
   {
     "id": "legs",
     "name": "Legs",
-    "description": "Squat & hamstrings",
-    "days": [
-      "thu"
-    ],
+    "description": "Squat, hinge, then the three machines worth it",
     "blocks": [
       {
         "superset": true,
@@ -200,7 +206,7 @@
         "items": [
           {
             "exerciseId": "romanian-deadlift",
-            "sets": 4,
+            "sets": 3,
             "reps": 8,
             "weight": 40
           }
@@ -210,10 +216,10 @@
         "superset": true,
         "items": [
           {
-            "exerciseId": "bulgarian-split-squat",
+            "exerciseId": "leg-press",
             "sets": 3,
-            "reps": 8,
-            "weight": 0
+            "reps": 10,
+            "weight": 80
           },
           {
             "exerciseId": "leg-curl",
@@ -223,12 +229,28 @@
         ]
       },
       {
+        "superset": true,
         "items": [
           {
-            "exerciseId": "farmer-carry",
+            "exerciseId": "leg-extension",
             "sets": 3,
-            "reps": 30,
-            "weight": 20
+            "reps": 12,
+            "weight": 32
+          },
+          {
+            "exerciseId": "hanging-knee-raise",
+            "sets": 3,
+            "reps": 10
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "sled-push",
+            "sets": 4,
+            "reps": 20,
+            "weight": 40
           }
         ]
       }

@@ -17,6 +17,8 @@ export const RULES = [
   'Go easy on the rotator cuff: no upright rows, no behind-the-neck pressing, keep dips shallow; external rotations are good.',
   'While the hamstring rehab is unfinished: no leg exercises at all outside the rehab dose block (the app also removes them).',
   'Shoulders are a focus Stefan wants more of.',
+  'Equipment he likes: barbells, dumbbells, cable stations (leverage differs between stations, so keep the station tag), and the functional area: kettlebells from 8 kg up (none lighter), a sled, plyo boxes and wall balls.',
+  'Prefers free weights and cables over machines. The only machines worth programming: leg press (tolerated), leg curl and leg extension (wanted).',
 ];
 
 const n = (x: number) => (Math.round(x * 10) / 10).toString();

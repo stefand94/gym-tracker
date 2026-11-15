@@ -502,5 +502,25 @@
   "single-arm-cable-rear-delt-fly": {
     "steps": ["Set a single handle at shoulder height and stand side-on to the stack", "Take the handle in the far hand so your arm starts across your chest", "Keep the arm straight and sweep it out and back until it's in line with your shoulder", "Pause, then let it return across your body under control"],
     "mistake": "Twisting the torso or bending the elbow to move more weight — the rear delt should do the work"
+  },
+  "sled-push": {
+    "steps": ["Load the sled and grip the high or low handles with arms straight", "Lean in so your body makes a line from hands to back foot", "Drive with short, quick steps, pushing the floor away behind you", "Keep pushing through the finish line before you stand up"],
+    "mistake": "Standing too upright and pushing with the arms — lean in and let the legs drive"
+  },
+  "backward-sled-drag": {
+    "steps": ["Clip a strap or handles to the sled and face it, arms straight", "Sit your hips back slightly so your knees are bent", "Walk backwards with small steps, pushing through the front of each foot", "Keep tension on the strap the whole way, no jerking"],
+    "mistake": "Leaning back and pulling with the arms — the quads should do the work"
+  },
+  "box-jump": {
+    "steps": ["Stand a foot from the box, feet hip-width", "Swing your arms back and dip into a quarter squat", "Jump up and land softly with your whole foot on the box, knees over toes", "Stand tall, then step down one foot at a time"],
+    "mistake": "Jumping down off the box — step down to spare the tendons"
+  },
+  "wall-ball": {
+    "steps": ["Hold the ball at your chest, facing the wall about an arm's length away", "Squat until your hips are below your knees, chest up", "Drive up and throw the ball to the target in one movement", "Catch it high and sink straight into the next squat"],
+    "mistake": "Throwing with the arms only — the throw should come from the legs"
+  },
+  "suitcase-carry": {
+    "steps": ["Pick up one kettlebell at your side like a suitcase", "Brace your core and stand tall with shoulders level", "Walk with steady, normal steps for the distance", "Switch hands and walk back"],
+    "mistake": "Leaning away from or toward the bell — the point is to stay upright"
   }
 }
