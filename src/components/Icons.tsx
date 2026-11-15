@@ -48,3 +48,9 @@ export const IconGrip = () => (
 export const IconInfo = () => (
   <svg viewBox="0 0 24 24" {...p}><circle cx="12" cy="12" r="9" /><path d="M12 11v5" /><circle cx="12" cy="7.8" r="0.6" fill="currentColor" /></svg>
 );
+export const IconNote = () => (
+  <svg viewBox="0 0 24 24" {...p}><path d="M5 4h10l4 4v12H5z" /><path d="M15 4v4h4M8 12h8M8 16h5" /></svg>
+);
+export const IconSpark = () => (
+  <svg viewBox="0 0 24 24" {...p}><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" /><path d="M18.5 15.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z" /></svg>
+);

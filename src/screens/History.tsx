@@ -11,6 +11,8 @@ import { finishedNewestFirst } from '../lib/prefill';
 import { describeChanges, routineFromWorkout, routineWithWorkout, sameRoutineLayout } from '../lib/routineEdit';
 import { workoutPath } from '../lib/sync';
 import { useStore } from '../state/store';
+import { NoteSheet, WorkoutNoteCard } from '../components/NoteSheet';
+import { setWorkoutNote } from '../lib/notes';
 import type { Workout } from '../types';
 
 export function HistoryList() {
@@ -57,6 +59,7 @@ export function HistoryDetail() {
   const { state, dispatch } = useStore();
   const nav = useNavigate();
   const [ask, setAsk] = useState(false);
+  const [noting, setNoting] = useState(false);
   const [routineAnswer, setRoutineAnswer] = useState<'updated' | 'kept' | null>(null);
   const w = state.history.find((x) => x.id === id);
   if (!w) return <div className="empty">Workout not found.</div>;
@@ -83,6 +86,17 @@ export function HistoryDetail() {
       <div className="dim small" style={{ marginTop: -10, marginBottom: 16 }}>
         {fmtDate(w.startedAt, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} · {duration(w)}
       </div>
+
+      <WorkoutNoteCard note={w.note} onEdit={() => setNoting(true)} />
+      {noting && (
+        <NoteSheet
+          title="Session note"
+          initial={w.note}
+          placeholder="How did it go? Energy, sleep, anything that hurt…"
+          onSave={(t) => dispatch({ type: 'historyUpdate', workout: setWorkoutNote(w, t) })}
+          onClose={() => setNoting(false)}
+        />
+      )}
 
       {differs && !routineAnswer && (
         <div className="card update-card">
@@ -146,6 +160,7 @@ export function HistoryDetail() {
                     {i.status === 'skipped' && <span className="badge badge-skip">Skipped</span>}
                     {i.pain !== undefined && <span className="station-tag">pain {i.pain}/10</span>}
                   </div>
+                  {i.note && <div className="hist-note">“{i.note}”</div>}
                   {i.status !== 'skipped' && (
                     <div className="hist-sets">
                       {i.sets.map((s, k) => (

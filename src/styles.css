@@ -2617,3 +2617,123 @@ body.dragging .grip {
   border-radius: var(--radius-sm);
   background: var(--surface-2);
 }
+
+/* ---- Notes ---- */
+.note-input {
+  min-height: 110px;
+  padding: 12px;
+  font: inherit;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.note-hint {
+  margin: 6px 2px 12px;
+}
+
+.note-box {
+  margin: 0 0 8px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.note-text,
+.note-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+}
+
+.note-text {
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--well);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.note-text svg,
+.note-card svg,
+.note-add svg,
+.note-status svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  color: var(--text-dim);
+}
+
+.note-card {
+  margin-bottom: 12px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.note-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: -6px 0 10px -8px;
+}
+
+.note-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.note-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.note-chip {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  overflow: hidden;
+}
+
+.note-chip button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 40px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.note-chip .note-chip-yes {
+  padding: 0 6px 0 12px;
+}
+
+.note-chip .note-chip-no {
+  padding: 0 12px 0 8px;
+  color: var(--text-dim);
+  border-left: 1px solid var(--hairline);
+}
+
+.note-chip svg {
+  width: 15px;
+  height: 15px;
+}
+
+.hist-note {
+  margin: 2px 0 4px;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--text-dim);
+}

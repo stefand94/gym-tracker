@@ -15,6 +15,8 @@ import { routineFromWorkout } from '../lib/routineEdit';
 import { useWakeLock } from '../lib/useWakeLock';
 import { addExercise, blockComplete, currentBlockIndex, moveInWorkout, sameLayout, workoutProgress } from '../lib/workout';
 import { useStore } from '../state/store';
+import { NoteSheet, WorkoutNoteCard } from '../components/NoteSheet';
+import { setWorkoutNote } from '../lib/notes';
 import type { Workout, WorkoutBlock } from '../types';
 
 function Elapsed({ startedAt }: { startedAt: string }) {
@@ -36,6 +38,7 @@ export function WorkoutScreen() {
   const [creating, setCreating] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(true);
   const [ask, setAsk] = useState<Ask>(null);
+  const [noting, setNoting] = useState(false);
   /** Blocks opened or closed by hand; everything else follows "only the current block is open". */
   const [override, setOverride] = useState<Record<string, boolean>>({});
   const headRef = useRef<HTMLDivElement>(null);
@@ -160,6 +163,8 @@ export function WorkoutScreen() {
       </div>
       <HoldWatcher />
 
+      {w.note && <WorkoutNoteCard note={w.note} onEdit={() => setNoting(true)} />}
+
       <BlockDnd blocks={dndBlocks} onMove={onMove} onUndo={onUndo}>
         <div className="wo-list">
           {w.blocks.map((b, i) => {
@@ -219,6 +224,11 @@ export function WorkoutScreen() {
             Finish workout
           </button>
         )}
+        {!w.note && (
+          <button className="btn btn-ghost btn-block" onClick={() => setNoting(true)}>
+            Add a session note
+          </button>
+        )}
         <button
           className="btn btn-ghost btn-block"
           onClick={() => nav('/routines/new', { state: { draft: routineFromWorkout(w, getExercise) } })}
@@ -254,6 +264,16 @@ export function WorkoutScreen() {
             setCreating(null);
             setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 50);
           }}
+        />
+      )}
+
+      {noting && (
+        <NoteSheet
+          title="Session note"
+          initial={w.note}
+          placeholder="How's it going? Energy, sleep, anything that hurt…"
+          onSave={(t) => update((x) => setWorkoutNote(x, t))}
+          onClose={() => setNoting(false)}
         />
       )}
 

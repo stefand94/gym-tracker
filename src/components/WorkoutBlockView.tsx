@@ -33,6 +33,8 @@ import { ExercisePicker } from './ExercisePicker';
 import { HoldDisplay } from './HoldTimer';
 import { IconCheck, IconClose, IconMore, IconPlay } from './Icons';
 import { Sheet } from './Sheet';
+import { ItemNote, NoteSheet } from './NoteSheet';
+import { setItemNote } from '../lib/notes';
 import { PainStrip } from './PainStrip';
 import { StationSheet, usesStations } from './StationSheet';
 import { DragHandle, type DragSpec } from './BlockDnd';
@@ -263,6 +265,7 @@ function ItemHead({
           {item.station ? <>📍 {item.station}</> : '+ Station'}
         </button>
       )}
+      <ItemNote ex={ex} item={item} update={update} />
       {picking && (
         <StationSheet
           ex={ex}
@@ -297,6 +300,7 @@ function ItemMenu({
   const [armed, setArmed] = useState(false);
   const [replacing, setReplacing] = useState(false);
   const [howTo, setHowTo] = useState(false);
+  const [noting, setNoting] = useState(false);
   const act = (fn: (w: Workout) => Workout) => {
     update(fn);
     onClose();
@@ -311,8 +315,21 @@ function ItemMenu({
       />
     );
   if (howTo) return <HowToSheet ex={ex} onClose={onClose} />;
+  if (noting)
+    return (
+      <NoteSheet
+        title={`Note · ${ex.name}`}
+        initial={item.note}
+        placeholder="e.g. left shoulder twinged on set 3, used Upstairs 2"
+        onSave={(t) => update((w) => setItemNote(w, item.id, t))}
+        onClose={onClose}
+      />
+    );
   return (
     <Sheet title={ex.name} onClose={onClose}>
+      <button className="menu-item" onClick={() => setNoting(true)}>
+        {item.note ? 'Edit note' : 'Add a note'}
+      </button>
       <button className="menu-item" onClick={() => setHowTo(true)}>
         How to do it
       </button>

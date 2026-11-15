@@ -106,8 +106,7 @@ export type NoteSuggestion =
   | { kind: 'pain'; pain: number; label: string }
   | { kind: 'station'; station: string; label: string }
   | { kind: 'sets'; sets: { weight?: number; reps?: number; seconds?: number }[]; label: string }
-  | { kind: 'swap'; exerciseId: string; label: string }
-  | { kind: 'remember'; text: string; label: string };
+  | { kind: 'swap'; exerciseId: string; label: string };
 
 export interface WorkoutBlock {
   id: string;
