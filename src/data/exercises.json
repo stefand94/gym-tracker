@@ -16,7 +16,8 @@
       "sets": 3,
       "reps": 8,
       "weight": 40
-    }
+    },
+    "warmup": true
   },
   {
     "id": "dumbbell-bench-press",
@@ -77,7 +78,8 @@
       "sets": 3,
       "reps": 8,
       "weight": 35
-    }
+    },
+    "warmup": true
   },
   {
     "id": "dumbbell-fly",
@@ -223,7 +225,8 @@
       "ohp",
       "military press",
       "standing press"
-    ]
+    ],
+    "warmup": true
   },
   {
     "id": "dumbbell-shoulder-press",
@@ -455,7 +458,8 @@
       "sets": 3,
       "reps": 5,
       "weight": 60
-    }
+    },
+    "warmup": true
   },
   {
     "id": "barbell-row",
@@ -985,7 +989,8 @@
       "sets": 3,
       "reps": 8,
       "weight": 50
-    }
+    },
+    "warmup": true
   },
   {
     "id": "goblet-squat",
@@ -1028,7 +1033,8 @@
       "sets": 3,
       "reps": 6,
       "weight": 40
-    }
+    },
+    "warmup": true
   },
   {
     "id": "hack-squat",
@@ -1089,7 +1095,8 @@
     "cue": "double-overhand grip; straps last set only",
     "aliases": [
       "stiff leg deadlift"
-    ]
+    ],
+    "warmup": true
   },
   {
     "id": "walking-lunge",
@@ -2672,6 +2679,77 @@
       "sets": 3,
       "reps": 30,
       "weight": 16
+    }
+  },
+  {
+    "id": "jog-interval",
+    "name": "Jog interval",
+    "type": "timed",
+    "equipment": "Treadmill or track",
+    "intervals": true,
+    "cue": "easy pace you could talk at; stop if the hamstring tightens",
+    "aliases": [
+      "walk jog",
+      "run interval",
+      "jogging"
+    ],
+    "primary": [
+      "hamstrings",
+      "calves"
+    ],
+    "secondary": [
+      "quads",
+      "glutes"
+    ],
+    "defaults": {
+      "sets": 6,
+      "seconds": 60
+    }
+  },
+  {
+    "id": "walk-interval",
+    "name": "Walk interval",
+    "type": "timed",
+    "equipment": "Treadmill or track",
+    "intervals": true,
+    "cue": "brisk walk between jogs",
+    "aliases": [
+      "brisk walk",
+      "walking"
+    ],
+    "primary": [
+      "calves"
+    ],
+    "secondary": [
+      "glutes"
+    ],
+    "defaults": {
+      "sets": 6,
+      "seconds": 90
+    }
+  },
+  {
+    "id": "medicine-ball-rotational-throw",
+    "name": "Medicine ball rotational throw",
+    "type": "weight",
+    "equipment": "Medicine ball",
+    "weightNote": "ball weight · reps per side",
+    "cue": "turn from the hips, arms just follow",
+    "aliases": [
+      "med ball side throw",
+      "rotational wall throw"
+    ],
+    "primary": [
+      "obliques"
+    ],
+    "secondary": [
+      "abs",
+      "glutes"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 8,
+      "weight": 4
     }
   }
 ]

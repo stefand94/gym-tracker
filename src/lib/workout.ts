@@ -4,15 +4,49 @@ import { cleanStation, lastPerformance, lastStation } from './prefill';
 
 type Lookup = (id: string) => Exercise | undefined;
 
-/** Build the starting sets for an exercise: last time's actual sets → routine defaults → exercise defaults. */
-export function buildSets(exercise: Exercise, history: Workout[], routineItem?: RoutineItem, station?: string): SetEntry[] {
+const round2 = (x: number) => Math.round(x * 100) / 100;
+
+/** One step up: a dumbbell or kettlebell size, 5 kg on machines, 2.5 kg on bars and cables; assisted machines take 5 kg of help off. */
+export function goUpStep(ex: Exercise): number {
+  if (/assist/i.test(ex.weightNote ?? '')) return -5;
+  if (ex.type === 'machine') return 5;
+  if (/dumbbell/i.test(ex.equipment)) return 2;
+  if (/kettlebell/i.test(ex.equipment)) return 4;
+  return 2.5;
+}
+
+/**
+ * Whether last time earns a step up: a weight or machine exercise where every planned set was done at one
+ * weight, each at or above the target reps. Returns the change in kg, or 0 to stay where you were.
+ */
+export function goUpFrom(ex: Exercise, last: SetEntry[], target: number | undefined, planned: number): number {
+  if ((ex.type !== 'weight' && ex.type !== 'machine') || !target || !last.length || last.length < planned) return 0;
+  const w = last[0].weight ?? 0;
+  if (w <= 0 || last.some((s) => (s.weight ?? 0) !== w || (s.reps ?? 0) < target)) return 0;
+  const step = goUpStep(ex);
+  return w + step < 0 ? -w : step;
+}
+
+/**
+ * The starting sets for an exercise: last time's actual sets (one step heavier when every set hit the target
+ * reps) → routine values → exercise defaults.
+ */
+export function planSets(
+  exercise: Exercise,
+  history: Workout[],
+  routineItem?: RoutineItem,
+  station?: string,
+): { sets: SetEntry[]; goUp?: number } {
   const last = lastPerformance(exercise.id, history, station);
   if (last && last.length > 0) {
     const count = routineItem?.sets ?? last.length;
-    return Array.from({ length: count }, (_, i) => {
-      const src = last[Math.min(i, last.length - 1)];
-      return pickFields(exercise, { ...src, done: false });
-    });
+    const target = routineItem?.reps ?? exercise.defaults.reps;
+    const step = routineItem?.trackPain ? 0 : goUpFrom(exercise, last, target, count);
+    if (step) {
+      const set = pickFields(exercise, { weight: round2((last[0].weight ?? 0) + step), reps: target, done: false });
+      return { sets: Array.from({ length: count }, () => ({ ...set })), goUp: step };
+    }
+    return { sets: fromLast(exercise, last, count) };
   }
   const d = exercise.defaults;
   const count = routineItem?.sets ?? d.sets;
@@ -22,7 +56,37 @@ export function buildSets(exercise: Exercise, history: Workout[], routineItem?: 
     seconds: routineItem?.seconds ?? d.seconds,
     done: false,
   };
-  return Array.from({ length: count }, () => pickFields(exercise, base));
+  return { sets: Array.from({ length: count }, () => pickFields(exercise, base)) };
+}
+
+export const buildSets = (exercise: Exercise, history: Workout[], routineItem?: RoutineItem, station?: string): SetEntry[] =>
+  planSets(exercise, history, routineItem, station).sets;
+
+const fromLast = (exercise: Exercise, last: SetEntry[], count: number) =>
+  Array.from({ length: count }, (_, i) => pickFields(exercise, { ...last[Math.min(i, last.length - 1)], done: false }));
+
+const BAR = 20;
+
+/**
+ * Ramp-up sets before the working sets: for a heavy barbell lift the empty bar, then about 50% and 75% of the
+ * working weight, skipping any too close to the one before. `force` makes them for any weight or machine exercise.
+ */
+export function warmupSets(ex: Exercise, sets: SetEntry[], force = false): SetEntry[] {
+  if ((!ex.warmup && !force) || (ex.type !== 'weight' && ex.type !== 'machine') || /assist/i.test(ex.weightNote ?? '')) return [];
+  const top = Math.max(0, ...sets.map((s) => s.weight ?? 0));
+  if (top < (force ? 5 : 40)) return [];
+  const bar = /barbell/i.test(ex.equipment);
+  const unit = bar ? 2.5 : Math.abs(goUpStep(ex));
+  const gap = bar ? 10 : unit;
+  const out: SetEntry[] = bar && top > BAR ? [{ weight: BAR, reps: 10, done: false }] : [];
+  for (const [pct, reps] of [
+    [0.5, 8],
+    [0.75, 5],
+  ]) {
+    const weight = round2(Math.round((top * pct) / unit) * unit);
+    if (weight > 0 && weight < top && weight - (out.at(-1)?.weight ?? 0) >= gap) out.push({ weight, reps, done: false });
+  }
+  return out;
 }
 
 function pickFields(exercise: Exercise, s: SetEntry): SetEntry {
@@ -43,11 +107,15 @@ function pickFields(exercise: Exercise, s: SetEntry): SetEntry {
 
 export function makeItem(exercise: Exercise, history: Workout[], routineItem?: RoutineItem): WorkoutItem {
   const station = routineItem?.station ?? lastStation(exercise.id, history);
+  const { sets, goUp } = planSets(exercise, history, routineItem, station);
+  const warmups = warmupSets(exercise, sets);
   return {
     id: uid(),
     exerciseId: exercise.id,
     status: 'pending',
-    sets: buildSets(exercise, history, routineItem, station),
+    sets,
+    ...(warmups.length ? { warmups } : {}),
+    ...(goUp ? { goUp } : {}),
     ...(routineItem?.trackPain ? { trackPain: true } : {}),
     ...(station ? { station } : {}),
   };
@@ -153,11 +221,84 @@ export function updateSet(w: Workout, itemId: string, setIndex: number, patch: S
 }
 
 /** Change one set and carry the change forward to the later sets that haven't been ticked yet. */
-export function updateSetForward(w: Workout, itemId: string, setIndex: number, patch: SetPatch): Workout {
-  return mapItem(w, itemId, (i) => ({
-    ...i,
-    sets: i.sets.map((s, idx) => (idx === setIndex || (idx > setIndex && !s.done) ? { ...s, ...patch } : s)),
-  }));
+export function updateSetForward(w: Workout, itemId: string, setIndex: number, patch: SetPatch, lookup?: Lookup): Workout {
+  return mapItem(w, itemId, (i) =>
+    withFreshWarmups(
+      {
+        ...i,
+        sets: i.sets.map((s, idx) => (idx === setIndex || (idx > setIndex && !s.done) ? { ...s, ...patch } : s)),
+      },
+      patch.weight !== undefined ? lookup : undefined,
+    ),
+  );
+}
+
+/** Warm-ups follow the working weight until one of them is ticked. */
+function withFreshWarmups(i: WorkoutItem, lookup?: Lookup): WorkoutItem {
+  const ex = lookup?.(i.exerciseId);
+  if (!ex || !i.warmups?.length || i.warmups.some((s) => s.done)) return i;
+  const warmups = warmupSets(ex, i.sets, true);
+  if (warmups.length) return { ...i, warmups };
+  const { warmups: _w, ...rest } = i;
+  return rest;
+}
+
+// ---------- warm-ups ----------
+
+export function toggleWarmup(w: Workout, itemId: string, k: number): Workout {
+  return mapItem(w, itemId, (i) => ({ ...i, warmups: i.warmups?.map((s, n) => (n === k ? { ...s, done: !s.done } : s)) }));
+}
+
+export function updateWarmup(w: Workout, itemId: string, k: number, patch: SetPatch): Workout {
+  return mapItem(w, itemId, (i) => ({ ...i, warmups: i.warmups?.map((s, n) => (n === k ? { ...s, ...patch } : s)) }));
+}
+
+/** Add warm-ups worked out from the working weight, or take them away. */
+export function toggleWarmups(w: Workout, itemId: string, lookup: Lookup): Workout {
+  return mapItem(w, itemId, (i) => {
+    const { warmups: had, ...rest } = i;
+    if (had?.length) return rest;
+    const ex = lookup(i.exerciseId);
+    const warmups = ex ? warmupSets(ex, i.sets, true) : [];
+    return warmups.length ? { ...rest, warmups } : rest;
+  });
+}
+
+/** Undo a go-up: the sets still to do go back to last time's (on the same station, when it has one). */
+export function keepLastWeight(w: Workout, itemId: string, history: Workout[], lookup: Lookup): Workout {
+  return mapItem(w, itemId, (i) => {
+    const { goUp: _g, ...rest } = i;
+    const ex = lookup(i.exerciseId);
+    const last = ex && lastPerformance(i.exerciseId, history, i.station);
+    if (!ex || !last?.length) return rest;
+    const fresh = fromLast(ex, last, i.sets.length);
+    return withFreshWarmups({ ...rest, sets: i.sets.map((s, n) => (s.done ? s : fresh[n])) }, lookup);
+  });
+}
+
+// ---------- interval timers ----------
+
+/**
+ * After an interval's timer ends: the next set in round order in the same superset, when it's an unticked
+ * interval too (walk → jog → walk …), so its timer can start straight away.
+ */
+export function nextInterval(
+  w: Workout,
+  itemId: string,
+  set: number,
+  lookup: Lookup,
+): { itemId: string; set: number; seconds: number } | null {
+  const block = w.blocks.find((b) => b.items.some((i) => i.id === itemId));
+  if (!block?.superset || !lookup(block.items.find((i) => i.id === itemId)!.exerciseId)?.intervals) return null;
+  const order = block.items.filter((i) => i.status !== 'skipped');
+  const rounds = Math.max(0, ...order.map((i) => i.sets.length));
+  const seq = Array.from({ length: rounds }, (_, r) => order.filter((i) => r < i.sets.length).map((i) => ({ i, r }))).flat();
+  const at = seq.findIndex((x) => x.i.id === itemId && x.r === set);
+  const next = at >= 0 ? seq[at + 1] : undefined;
+  if (!next) return null;
+  const s = next.i.sets[next.r];
+  if (s.done || !s.seconds || !lookup(next.i.exerciseId)?.intervals) return null;
+  return { itemId: next.i.id, set: next.r, seconds: s.seconds };
 }
 
 /** Apply a value to every set that hasn't been ticked yet. */
@@ -316,7 +457,9 @@ export function setStation(w: Workout, itemId: string, station: string | undefin
     const last = ex ? lastPerformance(i.exerciseId, history, name, true) : null;
     const sets =
       ex && last ? i.sets.map((s, idx) => (s.done ? s : pickFields(ex, { ...last[Math.min(idx, last.length - 1)], done: false }))) : i.sets;
-    return { ...rest, station: name, sets };
+    if (!last) return { ...rest, station: name, sets };
+    const { goUp: _g, ...plain } = rest;
+    return withFreshWarmups({ ...plain, station: name, sets }, lookup);
   });
 }
 

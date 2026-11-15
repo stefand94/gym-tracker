@@ -8,6 +8,7 @@ import { MUSCLE_LABELS, MUSCLE_IDS } from '../data/muscles';
 import { doneSetCount, duration, exerciseCount, fmtDate, fmtSet } from '../lib/format';
 import { workoutLoad } from '../lib/muscleLoad';
 import { finishedNewestFirst } from '../lib/prefill';
+import { recordsIn } from '../lib/records';
 import { describeChanges, routineFromWorkout, routineWithWorkout, sameRoutineLayout } from '../lib/routineEdit';
 import { workoutPath } from '../lib/sync';
 import { useStore } from '../state/store';
@@ -71,6 +72,14 @@ export function HistoryDetail() {
   const load = workoutLoad(w, getExercise);
   const hit = MUSCLE_IDS.filter((m) => load[m] > 0).sort((a, b) => load[b] - load[a]);
   const justFinished = params.get('done') === '1';
+  const records = recordsIn(w, state.history, getExercise);
+  const recordList = w.blocks.flatMap((b) =>
+    b.items.flatMap((i) => {
+      const ex = getExercise(i.exerciseId);
+      const k = records.get(i.id);
+      return ex && k ? [{ id: i.id, ex, set: i.sets[k[k.length - 1]] }] : [];
+    }),
+  );
 
   return (
     <div>
@@ -125,6 +134,21 @@ export function HistoryDetail() {
         </div>
       )}
 
+      {justFinished && recordList.length > 0 && (
+        <div className="card records-card" role="status">
+          <div className="records-head">
+            <span className="pr-badge">PR</span>{' '}
+            {recordList.length === 1 ? 'New personal record' : `${recordList.length} new personal records`}
+          </div>
+          {recordList.map((r) => (
+            <div key={r.id} className="records-row">
+              <span className="grow">{r.ex.name}</span>
+              <span className="records-set">{fmtSet(r.ex, r.set)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="stat-grid">
         <div className="stat">
           <div className="stat-v">{exerciseCount(w)}</div>
@@ -164,11 +188,22 @@ export function HistoryDetail() {
                   {i.note && <div className="hist-note note-pre">“{i.note}”</div>}
                   {i.status !== 'skipped' && (
                     <div className="hist-sets">
-                      {i.sets.map((s, k) => (
-                        <span key={k} className={'hist-set' + (s.done ? '' : ' missed')}>
-                          {fmtSet(ex, s)}
-                        </span>
-                      ))}
+                      {i.warmups
+                        ?.filter((s) => s.done)
+                        .map((s, k) => (
+                          <span key={`w${k}`} className="hist-set warmup" title="Warm-up">
+                            W {fmtSet(ex, s)}
+                          </span>
+                        ))}
+                      {i.sets.map((s, k) => {
+                        const pr = s.done && !!records.get(i.id)?.includes(k);
+                        return (
+                          <span key={k} className={'hist-set' + (s.done ? '' : ' missed') + (pr ? ' pr' : '')}>
+                            {fmtSet(ex, s)}
+                            {pr && <span className="pr-badge">PR</span>}
+                          </span>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

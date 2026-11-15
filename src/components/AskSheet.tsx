@@ -133,7 +133,7 @@ export function AskSheet({
   const now = () => new Date().toISOString();
   const asWorkout = (r: AskResult) => {
     const temp: Routine = { id: '', name: r.name, blocks: r.blocks };
-    const w = workoutFromRoutine(temp, state.history, getExercise, new Date(), (rb) => doseItems(rb, rehab, state.routines));
+    const w = workoutFromRoutine(temp, state.history, getExercise, new Date(), (rb) => doseItems(rb, rehab, state.routines, getExercise));
     delete w.routineId;
     return w;
   };

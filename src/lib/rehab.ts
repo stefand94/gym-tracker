@@ -1,4 +1,4 @@
-import type { RehabArea, Routine, RoutineBlock, RoutineItem, Workout } from '../types';
+import type { Exercise, RehabArea, Routine, RoutineBlock, RoutineItem, Workout } from '../types';
 
 /** Pain during a session at or below this counts as a good session. */
 export const GOOD_MAX = 2;
@@ -91,7 +91,13 @@ const MAINTENANCE: Record<RehabArea, RoutineItem[]> = {
  * Items for a `rehabDose` block: as written while on phase 1; later the first two exercises of the
  * phase you're on (one back if dropping back) at 2 sets; the maintenance dose once done.
  */
-export function doseItems(block: RoutineBlock, state: RehabState | null, routines: Routine[]): RoutineItem[] {
+export function doseItems(
+  block: RoutineBlock,
+  state: RehabState | null,
+  routines: Routine[],
+  /** Lets the dose skip interval work (walk–jog stays in the phase session). */
+  lookup?: (id: string) => Exercise | undefined,
+): RoutineItem[] {
   if (!block.rehabDose || !state || state.area !== block.rehabDose) return block.items;
   if (state.done) return MAINTENANCE[block.rehabDose];
   const phase = state.dropBack ? state.phase - 1 : state.phase;
@@ -99,6 +105,7 @@ export function doseItems(block: RoutineBlock, state: RehabState | null, routine
   if (phase <= 1 || !source) return block.items;
   return source.blocks
     .flatMap((b) => b.items)
+    .filter((i) => !lookup?.(i.exerciseId)?.intervals)
     .slice(0, 2)
     .map((i) => ({ ...i, sets: Math.min(i.sets ?? 2, 2), trackPain: true }));
 }
@@ -110,9 +117,7 @@ const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
  * earlier day (up to 2 days back) that hasn't been answered or dismissed yet.
  */
 export function morningCheck(history: Workout[], now = new Date()): Workout | undefined {
-  const latest = history
-    .filter((w) => w.finishedAt && tracksPain(w))
-    .sort((a, b) => (a.startedAt < b.startedAt ? 1 : -1))[0];
+  const latest = history.filter((w) => w.finishedAt && tracksPain(w)).sort((a, b) => (a.startedAt < b.startedAt ? 1 : -1))[0];
   if (!latest || latest.nextDayPain !== undefined) return undefined;
   const started = new Date(latest.startedAt);
   if (dayKey(started) === dayKey(now)) return undefined;

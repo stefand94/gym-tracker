@@ -2,14 +2,16 @@ import { useState } from 'react';
 import { getExercise } from '../data/library';
 import { MUSCLE_LABELS } from '../data/muscles';
 import { primeAudio, tickFeedback } from '../lib/alert';
-import { itemSummary, weightStep } from '../lib/format';
+import { fmtNum, itemSummary, weightStep } from '../lib/format';
 import { exerciseMap } from '../lib/muscleLoad';
 import { stationsFor } from '../lib/prefill';
+import { recordsIn } from '../lib/records';
 import {
   addRound,
   addSet,
   blockComplete,
   completeHold,
+  keepLastWeight,
   removeItem,
   removeSet,
   replaceItem,
@@ -22,7 +24,10 @@ import {
   setPain,
   setStation,
   toggleTrackPain,
+  toggleWarmup,
+  toggleWarmups,
   updateSetForward,
+  updateWarmup,
   type SetPatch,
 } from '../lib/workout';
 import { useStore } from '../state/store';
@@ -109,6 +114,7 @@ function SetRow({
   update,
   units = false,
   now = false,
+  pr = false,
   onTicked,
 }: {
   ex: Exercise;
@@ -119,6 +125,8 @@ function SetRow({
   units?: boolean;
   /** The next set to do: highlighted. */
   now?: boolean;
+  /** This set beats your best for the exercise. */
+  pr?: boolean;
   onTicked: () => void;
 }) {
   const { state, dispatch } = useStore();
@@ -150,7 +158,7 @@ function SetRow({
       {hold ? (
         <HoldDisplay hold={hold} />
       ) : (
-        <SetFields ex={ex} set={set} units={units} onChange={(p) => update((w) => updateSetForward(w, item.id, index, p))} />
+        <SetFields ex={ex} set={set} units={units} onChange={(p) => update((w) => updateSetForward(w, item.id, index, p, getExercise))} />
       )}
       {timed &&
         (hold ? (
@@ -180,9 +188,11 @@ function SetRow({
         ))}
       <button
         type="button"
-        className={'tick' + (set.done ? ' on' : '')}
+        className={'tick' + (set.done ? ' on' : '') + (pr && set.done ? ' pr' : '')}
         aria-label={
-          hold ? `Stop timer and log set ${index + 1} of ${ex.name}` : `${set.done ? 'Untick' : 'Tick'} set ${index + 1} of ${ex.name}`
+          hold
+            ? `Stop timer and log set ${index + 1} of ${ex.name}`
+            : `${set.done ? 'Untick' : 'Tick'} set ${index + 1} of ${ex.name}${pr && set.done ? ' (personal record)' : ''}`
         }
         aria-pressed={set.done}
         onClick={tap}
@@ -191,6 +201,41 @@ function SetRow({
       </button>
     </div>
   );
+}
+
+/** An exercise's ramp-up sets, above the working sets: marked W, no rest after, and not counted anywhere. */
+function WarmupRows({ ex, item, update, units = false }: { ex: Exercise; item: WorkoutItem; update: Update; units?: boolean }) {
+  if (!item.warmups?.length || item.status === 'skipped') return null;
+  return (
+    <>
+      {item.warmups.map((set, k) => (
+        <div key={`w${k}`} className={'set-row warmup' + (set.done ? ' done' : '')}>
+          <div className="set-idx" aria-label="Warm-up">
+            W
+          </div>
+          <SetFields ex={ex} set={set} units={units} onChange={(p) => update((w) => updateWarmup(w, item.id, k, p))} />
+          <button
+            type="button"
+            className={'tick' + (set.done ? ' on' : '')}
+            aria-label={`${set.done ? 'Untick' : 'Tick'} warm-up ${k + 1} of ${ex.name}`}
+            aria-pressed={set.done}
+            onClick={() => {
+              if (!set.done) tickFeedback();
+              update((w) => toggleWarmup(w, item.id, k));
+            }}
+          >
+            <IconCheck />
+          </button>
+        </div>
+      ))}
+    </>
+  );
+}
+
+/** The record sets of the workout in progress, by item id. */
+function useRecords(): Map<string, number[]> {
+  const { state } = useStore();
+  return state.active ? recordsIn(state.active, state.history, getExercise) : new Map();
 }
 
 function StatusBadge({ item }: { item: WorkoutItem }) {
@@ -267,6 +312,22 @@ function ItemHead({
         >
           {item.station ? <>📍 {item.station}</> : '+ Station'}
         </button>
+      )}
+      {!!item.goUp && item.status !== 'skipped' && (
+        <div className="goup">
+          <span className="goup-tag">
+            ↑ {item.goUp > 0 ? `${fmtNum(item.goUp)} kg up` : `${fmtNum(-item.goUp)} kg less help`} · every rep last time
+          </span>
+          {!item.sets.some((s) => s.done) && (
+            <button
+              type="button"
+              className="link-btn small"
+              onClick={() => update((w) => keepLastWeight(w, item.id, state.history, getExercise))}
+            >
+              Keep last weight
+            </button>
+          )}
+        </div>
       )}
       <ItemNote ex={ex} item={item} update={update} open={noteOpen} onOpen={onNote} />
       {picking && (
@@ -351,6 +412,11 @@ function ItemMenu({
       <button className="menu-item" disabled={item.sets.length <= 1} onClick={() => act((w) => removeSet(w, item.id))}>
         Remove last set
       </button>
+      {(ex.type === 'weight' || ex.type === 'machine') && !/assist/i.test(ex.weightNote ?? '') && (
+        <button className="menu-item" onClick={() => act((w) => toggleWarmups(w, item.id, getExercise))}>
+          {item.warmups?.length ? 'Remove warm-up sets' : 'Add warm-up sets'}
+        </button>
+      )}
       <button className="menu-item" disabled={index >= count - 1} onClick={() => act((w) => supersetWithNext(w, block.id))}>
         Superset with next exercise
       </button>
@@ -372,6 +438,7 @@ function SingleBlock({ block, index, count, update, current, onToggle }: BlockPr
   const [menu, setMenu] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const startRest = useStartRest();
+  const prs = useRecords().get(item.id);
   if (!ex) return <div className="card dim">Unknown exercise: {item.exerciseId}</div>;
   const cls = item.status === 'done' ? ' is-done' : item.status === 'skipped' ? ' is-skipped' : '';
   const nextSet = item.status === 'pending' ? item.sets.findIndex((s) => !s.done) : -1;
@@ -390,8 +457,19 @@ function SingleBlock({ block, index, count, update, current, onToggle }: BlockPr
       {item.status !== 'skipped' && (
         <div className="sets">
           <SetHeader labels={fieldLabels(ex)} />
+          <WarmupRows ex={ex} item={item} update={update} />
           {item.sets.map((_, i) => (
-            <SetRow key={i} ex={ex} item={item} index={i} label={String(i + 1)} update={update} now={i === nextSet} onTicked={startRest} />
+            <SetRow
+              key={i}
+              ex={ex}
+              item={item}
+              index={i}
+              label={String(i + 1)}
+              update={update}
+              now={i === nextSet}
+              pr={!!prs?.includes(i)}
+              onTicked={startRest}
+            />
           ))}
         </div>
       )}
@@ -433,6 +511,7 @@ function SupersetBlock({ block, index, count, update, current, onToggle }: Block
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const [noteFor, setNoteFor] = useState<string | null>(null);
   const startRest = useStartRest();
+  const records = useRecords();
   const letter = LETTERS[index % 26];
   const entries = block.items.map((item, n) => ({
     item,
@@ -493,6 +572,14 @@ function SupersetBlock({ block, index, count, update, current, onToggle }: Block
       )}
       <div className="sets">
         {shared && <SetHeader labels={shared} />}
+        {active.some((e) => e.item.warmups?.length) && (
+          <div>
+            <div className="round-label">Warm-up</div>
+            {active.map((e) => (
+              <WarmupRows key={e.item.id} ex={e.ex!} item={e.item} update={update} units={!shared} />
+            ))}
+          </div>
+        )}
         {Array.from({ length: rounds }, (_, r) => (
           <div key={r}>
             <div className="round-label">Round {r + 1}</div>
@@ -508,6 +595,7 @@ function SupersetBlock({ block, index, count, update, current, onToggle }: Block
                   update={update}
                   units={!shared}
                   now={next?.item === e.item.id && next.round === r}
+                  pr={!!records.get(e.item.id)?.includes(r)}
                   onTicked={tickedIn(e.item.id, r)}
                 />
               ))}

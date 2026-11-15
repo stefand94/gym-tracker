@@ -33,6 +33,10 @@ export interface Exercise {
   video?: string;
   /** Other names people search for, e.g. "lying triceps extension". */
   aliases?: string[];
+  /** Heavy barbell lift: a workout adds ramp-up sets (bar, ~50%, ~75%) before the working sets. */
+  warmup?: boolean;
+  /** Timed intervals (walk–jog): in a superset, each one's timer starts the moment the one before ends. */
+  intervals?: boolean;
   /** Created in the app (lives in the data repo's exercises/custom.json). */
   custom?: boolean;
   /** A custom exercise whose muscles/type Claude has checked. */
@@ -95,6 +99,10 @@ export interface WorkoutItem {
   pain?: number;
   /** Machine / cable station it was done on, e.g. "Upstairs 1" (weights differ between stations). */
   station?: string;
+  /** Ramp-up sets before the working sets. They don't count anywhere: not in muscle load, progress, records or pre-fill. */
+  warmups?: SetEntry[];
+  /** kg added to last time's weight because every set hit the target reps (negative on assisted machines: less help). */
+  goUp?: number;
   /** Free-text note (typed or dictated), e.g. "left shoulder clicked on the last set": all of Stefan's messages, one per line. */
   note?: string;
   /** The note as a chat, oldest first: Stefan's messages and Claude's replies (`note` is kept in step with it). */

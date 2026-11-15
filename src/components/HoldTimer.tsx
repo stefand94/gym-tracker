@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { countBeep, restOverAlert } from '../lib/alert';
-import { completeHold, restsAfter } from '../lib/workout';
+import { getExercise } from '../data/library';
+import { completeHold, nextInterval, restsAfter } from '../lib/workout';
 import { useStore, type HoldState } from '../state/store';
 
 function clock(s: number) {
@@ -53,7 +54,11 @@ export function HoldWatcher() {
       dispatch({ type: 'holdStop' });
       if (!w) return;
       dispatch({ type: 'updateActive', fn: (x) => completeHold(x, hold.itemId, hold.set, seconds) });
-      if (state.prefs.rest && restsAfter(completeHold(w, hold.itemId, hold.set, seconds), hold.itemId, hold.set)) dispatch({ type: 'restStart', now: Date.now() });
+      const after = completeHold(w, hold.itemId, hold.set, seconds);
+      // walk → jog → walk: the next interval starts straight away, no rest in between
+      const next = nextInterval(after, hold.itemId, hold.set, getExercise);
+      if (next) dispatch({ type: 'holdStart', ...next, now: Date.now(), lead: 0 });
+      else if (state.prefs.rest && restsAfter(after, hold.itemId, hold.set)) dispatch({ type: 'restStart', now: Date.now() });
     }
   }, [hold, now, state.active, state.prefs.rest, dispatch]);
 

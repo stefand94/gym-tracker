@@ -9,6 +9,7 @@ import { MUSCLE_LABELS } from '../data/muscles';
 import { fmtDate, fmtNum, fmtSet } from '../lib/format';
 import { exerciseMap } from '../lib/muscleLoad';
 import { metricsFor, performedExerciseIds, series, stationsIn } from '../lib/progress';
+import { recentRecords } from '../lib/records';
 import { useStore } from '../state/store';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Filler);
@@ -43,6 +44,7 @@ export function Progress() {
   const nav = useNavigate();
   const { state } = useStore();
   const performed = useMemo(() => performedExerciseIds(state.history), [state.history]);
+  const records = useMemo(() => recentRecords(state.history, getExercise), [state.history]);
   const exId = id ?? performed[0];
   const ex = exId ? getExercise(exId) : undefined;
   const [metricKey, setMetricKey] = useState('top');
@@ -276,6 +278,37 @@ export function Progress() {
       )}
 
       {!ex && <div className="card empty">Finish a workout to start tracking progress, or pick any exercise above.</div>}
+
+      {records.length > 0 && (
+        <>
+          <div className="section-title">Recent records</div>
+          <div className="card list-card">
+            {records.map((r) => {
+              const rx = getExercise(r.exerciseId);
+              return (
+                <button
+                  key={`${r.workoutId}-${r.exerciseId}-${r.station ?? ''}`}
+                  type="button"
+                  className="list-row records-link"
+                  onClick={() => nav(`/progress/${r.exerciseId}`, { replace: true })}
+                >
+                  <div className="small dim" style={{ width: 64, flexShrink: 0 }}>
+                    {fmtDate(r.date, { day: 'numeric', month: 'short' })}
+                  </div>
+                  <div className="grow">
+                    <div style={{ fontWeight: 700 }}>{rx?.name ?? r.exerciseId}</div>
+                    {r.station && <div className="small dim">📍 {r.station}</div>}
+                  </div>
+                  <span className="hist-set pr">
+                    {fmtSet(rx, r.set)}
+                    <span className="pr-badge">PR</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {picking && (
         <ExercisePicker

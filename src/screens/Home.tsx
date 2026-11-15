@@ -77,7 +77,7 @@ export function Home() {
     nav(`/routines/${id}`);
   };
   const startRoutine = (r: Routine) =>
-    start(workoutFromRoutine(r, state.history, getExercise, new Date(), (rb) => doseItems(rb, rehab, state.routines)));
+    start(workoutFromRoutine(r, state.history, getExercise, new Date(), (rb) => doseItems(rb, rehab, state.routines, getExercise)));
   const morning = morningCheck(state.history);
   const answerMorning = (v: number | null) => morning && dispatch({ type: 'historyUpdate', workout: { ...morning, nextDayPain: v } });
 

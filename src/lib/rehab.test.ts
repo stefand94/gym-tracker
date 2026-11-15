@@ -56,17 +56,23 @@ describe('rehab', () => {
   });
 
   it('is done after passing the last phase', () => {
-    const s = rehabState(hist(session(3, 0), session(3, 1)), routines)!;
-    expect(s).toMatchObject({ done: true, phase: 4 });
+    expect(rehabState(hist(session(3, 0), session(3, 1)), routines)!).toMatchObject({ ready: true, done: false, phase: 3 });
+    const s = rehabState(hist(session(3, 0), session(3, 1), session(4, 1), session(4, 0)), routines)!;
+    expect(s).toMatchObject({ done: true, phase: 5, maxPhase: 4 });
   });
 
   it('dose blocks follow the current phase', () => {
     const block = upper.blocks.find((b) => b.rehabDose)!;
     expect(doseItems(block, rehabState([], routines), routines)).toBe(block.items);
     const p2 = doseItems(block, rehabState(hist(session(2, 1)), routines), routines);
-    expect(p2.map((i) => i.exerciseId)).toEqual(phase(2).blocks.flatMap((b) => b.items).slice(0, 2).map((i) => i.exerciseId));
+    expect(p2.map((i) => i.exerciseId)).toEqual(
+      phase(2)
+        .blocks.flatMap((b) => b.items)
+        .slice(0, 2)
+        .map((i) => i.exerciseId),
+    );
     expect(p2.every((i) => i.trackPain && (i.sets ?? 0) <= 2)).toBe(true);
-    const done = doseItems(block, rehabState(hist(session(3, 0), session(3, 1)), routines), routines);
+    const done = doseItems(block, rehabState(hist(session(4, 0), session(4, 1)), routines), routines);
     expect(done.map((i) => i.exerciseId)).toEqual(['nordic-curl']);
   });
 
@@ -76,7 +82,12 @@ describe('rehab', () => {
     // the dose's two exercises come one after the other, each its own block
     const last = w.blocks.slice(-2);
     expect(last.map((b) => b.items.length)).toEqual([1, 1]);
-    expect(last.map((b) => b.items[0].exerciseId)).toEqual(phase(2).blocks.flatMap((b) => b.items).slice(0, 2).map((i) => i.exerciseId));
+    expect(last.map((b) => b.items[0].exerciseId)).toEqual(
+      phase(2)
+        .blocks.flatMap((b) => b.items)
+        .slice(0, 2)
+        .map((i) => i.exerciseId),
+    );
     expect(last.every((b) => b.items[0].trackPain)).toBe(true);
   });
 

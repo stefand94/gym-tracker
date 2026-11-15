@@ -28,6 +28,11 @@ Stefan adds exercises and routines by asking Claude, not in the app. Weights are
 - Dumbbell exercises are entered **per dumbbell**; barbell as total bar weight. Say so in `weightNote`.
 - Assisted machines (pull-up, dip): `weight` type, `equipment: "Machine"`, weight = kg of assistance
   (`weightNote: "assistance (less = harder)"`). Carries: `weight` type with reps = metres.
+- `"warmup": true` (heavy barbell lifts) gives an exercise ramp-up sets when a workout starts: bar, ~50%, ~75%.
+  They live in `WorkoutItem.warmups`, apart from `sets`, so nothing counts them (load, progress, PRs, pre-fill).
+  Any weight/machine exercise can add them from its menu.
+- `"intervals": true` (timed, e.g. `jog-interval` / `walk-interval`): in a superset the next interval's timer starts
+  as soon as one ends, no rest between. The rehab dose skips them.
 - Never change an existing `id` — logged workouts reference it.
 - Also add a how-to to `src/data/howto.json` under the same id: `{ "steps": [3–4 short steps], "mistake": "…" }`, in
   your own words (a test checks every bundled exercise has one). The app's How-to sheet shows it with a YouTube
@@ -73,6 +78,11 @@ No weekdays (`days` is no longer used): Home suggests the routine that best hits
 last 7 days and rested over 48 h (`src/lib/suggest.ts`); routines with leg work outside the `rehabDose` block are held
 back while a rehab is unfinished. Stefan can also build and edit routines in the app (`src/screens/RoutineEditor.tsx`)
 and update one from the finish screen, so read the repo copy before changing a routine.
+Go-up: when every set last time hit the target reps (routine reps, else the exercise default) at one weight, the
+sets pre-fill one step up (+2.5 kg barbell, +2 dumbbells, +4 kettlebell, +5 machine, 5 kg less assistance) and the
+item carries `goUp` (kg); not on pain-tracked items. Personal records aren't stored: `src/lib/records.ts` works them
+out from history (est. 1RM; reps for bodyweight, seconds for holds; per station; none for carries, sleds or assisted).
+Hamstring rehab has 4 phases; phase 4 is back to running (walk–jog intervals), and legs stay held back until it's passed.
 Per-item `sets/reps/seconds/weight/station` are optional (`station` is a free-text machine/cable tag like "Upstairs 1"; weights pre-fill from the last time on the same station); when a workout starts, sets pre-fill from the last time the
 exercise was done, then routine values, then exercise defaults.
 

@@ -109,7 +109,14 @@ type Action =
   | { type: 'restStart'; now: number }
   | { type: 'restAdjust'; seconds: number; now: number }
   | { type: 'restStop' }
-  | { type: 'holdStart'; itemId: string; set: number; seconds: number; now: number }
+  | {
+      type: 'holdStart';
+      itemId: string;
+      set: number;
+      seconds: number;
+      now: number;
+      /** get-ready seconds (default HOLD_LEAD_IN) */ lead?: number;
+    }
   | { type: 'holdStop' }
   | { type: 'routineSave'; routine: Routine; now: string }
   | { type: 'routineArchive'; id: string; now: string }
@@ -289,7 +296,7 @@ export function reducer(state: State, action: Action): State {
       return state.rest ? { ...state, rest: null } : state;
     case 'holdStart': {
       // Starting a hold ends any rest that's still counting.
-      const goAt = action.now + HOLD_LEAD_IN * 1000;
+      const goAt = action.now + (action.lead ?? HOLD_LEAD_IN) * 1000;
       return { ...state, rest: null, hold: { itemId: action.itemId, set: action.set, goAt, endsAt: goAt + action.seconds * 1000 } };
     }
     case 'holdStop':

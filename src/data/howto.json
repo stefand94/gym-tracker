@@ -522,5 +522,17 @@
   "suitcase-carry": {
     "steps": ["Pick up one kettlebell at your side like a suitcase", "Brace your core and stand tall with shoulders level", "Walk with steady, normal steps for the distance", "Switch hands and walk back"],
     "mistake": "Leaning away from or toward the bell — the point is to stay upright"
+  },
+  "jog-interval": {
+    "steps": ["Start the timer and pick up to an easy jog, short relaxed strides", "Land under your hips rather than reaching out in front", "Keep it easy enough to talk; no sprinting", "When the timer ends, drop straight into the walk"],
+    "mistake": "Speeding up as it feels good — rehab running stays easy until the jogs are long"
+  },
+  "walk-interval": {
+    "steps": ["Walk briskly the moment the jog ends", "Swing your arms and keep your steps quick", "Breathe out the jog and check the hamstring feels normal", "The next jog starts on its own when the timer ends"],
+    "mistake": "Stopping still between jogs — keep moving so the legs stay warm"
+  },
+  "medicine-ball-rotational-throw": {
+    "steps": ["Stand side-on to a solid wall, about a metre away, ball at your hip", "Load by turning away from the wall, weight on the back leg", "Turn your hips hard toward the wall and let the arms sling the ball", "Catch it on the bounce, reset, and do all reps before switching sides"],
+    "mistake": "Throwing with the arms while the hips stay still — the turn should do the work"
   }
 }

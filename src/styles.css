@@ -3141,3 +3141,128 @@ body.dragging .grip {
 .note-pre {
   white-space: pre-line;
 }
+
+/* ---- warm-ups, go-up nudges, personal records ---- */
+.set-row.warmup {
+  opacity: 0.78;
+}
+
+.set-row.warmup .set-idx {
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.set-row.warmup.done {
+  opacity: 0.55;
+}
+
+.goup {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 6px 0 2px;
+}
+
+.goup-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--done);
+  background: color-mix(in oklab, var(--done) 13%, transparent);
+}
+
+.goup .link-btn {
+  font-size: 13px;
+}
+
+.pr-badge {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--heat);
+  vertical-align: 2px;
+}
+
+.tick {
+  position: relative;
+}
+
+.tick.pr::after {
+  content: 'PR';
+  position: absolute;
+  top: -7px;
+  right: -6px;
+  padding: 1px 5px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--heat);
+  box-shadow: 0 0 0 2px var(--surface);
+  animation: pr-pop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+@keyframes pr-pop {
+  from {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+}
+
+.hist-set.pr {
+  font-weight: 750;
+}
+
+.hist-set .pr-badge {
+  margin-left: 4px;
+}
+
+.hist-set.warmup {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.records-card {
+  border: 1.5px solid color-mix(in oklab, var(--heat) 55%, transparent);
+  margin-bottom: 12px;
+}
+
+.records-head {
+  font-weight: 750;
+  margin-bottom: 6px;
+}
+
+.records-row {
+  display: flex;
+  gap: 10px;
+  padding: 3px 0;
+}
+
+.records-set {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.records-link {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+}
+
+.records-link .hist-set {
+  margin-right: 0;
+  white-space: nowrap;
+}

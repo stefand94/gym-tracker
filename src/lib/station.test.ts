@@ -20,7 +20,7 @@ function done(weight: number, station?: string, exerciseId = EX): Workout {
       {
         id: 'b',
         superset: false,
-        items: [{ id: 'i', exerciseId, status: 'done', ...(station ? { station } : {}), sets: [{ weight, reps: 10, done: true }] }],
+        items: [{ id: 'i', exerciseId, status: 'done', ...(station ? { station } : {}), sets: [{ weight, reps: 8, done: true }] }], // under the 10-rep target: no go-up
       },
     ],
   };

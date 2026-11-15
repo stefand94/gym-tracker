@@ -63,7 +63,10 @@ const lookup = (id: string) => lib[id];
 const routine: Routine = {
   id: 'arms',
   name: 'Arms',
-  blocks: [{ items: [{ exerciseId: 'hammer-curl' }] }, { superset: true, items: [{ exerciseId: 'push-up' }, { exerciseId: 'plank', sets: 2 }] }],
+  blocks: [
+    { items: [{ exerciseId: 'hammer-curl' }] },
+    { superset: true, items: [{ exerciseId: 'push-up' }, { exerciseId: 'plank', sets: 2 }] },
+  ],
 };
 
 function fresh(history: Workout[] = []) {
@@ -90,8 +93,8 @@ describe('building a workout', () => {
 
   it('pre-fills from the last finished workout', () => {
     let prev = fresh();
-    prev = updateSet(prev, itemId(prev, 0), 0, { weight: 12, reps: 10 });
-    prev = updateSet(prev, itemId(prev, 0), 1, { weight: 12, reps: 9 });
+    prev = updateSet(prev, itemId(prev, 0), 0, { weight: 12, reps: 8 });
+    prev = updateSet(prev, itemId(prev, 0), 1, { weight: 12, reps: 7 }); // missed the top reps: no go-up
     prev = toggleSet(prev, itemId(prev, 0), 0);
     prev = toggleSet(prev, itemId(prev, 0), 1);
     prev.finishedAt = '2026-11-01T11:00:00Z';
@@ -99,8 +102,8 @@ describe('building a workout', () => {
     const next = fresh([prev]);
     // routine doesn't fix set count → uses last time's count (2 done sets)
     expect(next.blocks[0].items[0].sets).toEqual([
-      { weight: 12, reps: 10, done: false },
-      { weight: 12, reps: 9, done: false },
+      { weight: 12, reps: 8, done: false },
+      { weight: 12, reps: 7, done: false },
     ]);
   });
 });
@@ -302,23 +305,39 @@ describe('seed data', async () => {
     }
   });
   it('routines reference real exercises', () => {
-    for (const r of ROUTINES) for (const b of r.blocks) for (const i of b.items) expect(ids(EXERCISES).has(i.exerciseId), i.exerciseId).toBe(true);
+    for (const r of ROUTINES)
+      for (const b of r.blocks) for (const i of b.items) expect(ids(EXERCISES).has(i.exerciseId), i.exerciseId).toBe(true);
   });
   const ids = (xs: { id: string }[]) => new Set(xs.map((x) => x.id));
 });
 
 describe('replacing an exercise', () => {
   const pulldown: Exercise = {
-    id: 'lat-pulldown', name: 'Lat pulldown', type: 'machine', equipment: 'Cable',
-    primary: ['lats'], secondary: ['biceps', 'upperBack'], defaults: { sets: 3, reps: 10, weight: 40 },
+    id: 'lat-pulldown',
+    name: 'Lat pulldown',
+    type: 'machine',
+    equipment: 'Cable',
+    primary: ['lats'],
+    secondary: ['biceps', 'upperBack'],
+    defaults: { sets: 3, reps: 10, weight: 40 },
   };
   const pullup: Exercise = {
-    id: 'pull-up', name: 'Pull-up', type: 'bodyweight', equipment: 'Bodyweight',
-    primary: ['lats'], secondary: ['biceps', 'upperBack', 'forearms'], defaults: { sets: 3, reps: 8 },
+    id: 'pull-up',
+    name: 'Pull-up',
+    type: 'bodyweight',
+    equipment: 'Bodyweight',
+    primary: ['lats'],
+    secondary: ['biceps', 'upperBack', 'forearms'],
+    defaults: { sets: 3, reps: 8 },
   };
   const row: Exercise = {
-    id: 'seated-cable-row', name: 'Seated cable row', type: 'machine', equipment: 'Cable',
-    primary: ['upperBack', 'lats'], secondary: ['biceps', 'rearDelts'], defaults: { sets: 3, reps: 10, weight: 40 },
+    id: 'seated-cable-row',
+    name: 'Seated cable row',
+    type: 'machine',
+    equipment: 'Cable',
+    primary: ['upperBack', 'lats'],
+    secondary: ['biceps', 'rearDelts'],
+    defaults: { sets: 3, reps: 10, weight: 40 },
   };
 
   it('ranks exercises with the same main muscles first, closest overlap first', () => {

@@ -343,7 +343,7 @@
   {
     "id": "hamstring-rehab-3",
     "name": "Hamstring rehab 3",
-    "description": "Lengthened · ~2 weeks · then back to Legs",
+    "description": "Lengthened · ~2 weeks · then phase 4: back to running",
     "rehab": {
       "area": "hamstring",
       "phase": 3
@@ -388,6 +388,65 @@
             "sets": 3,
             "reps": 8,
             "weight": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hamstring-rehab-4",
+    "name": "Hamstring rehab 4",
+    "description": "Back to running · walk–jog intervals run on a timer · add 15–30 s to the jogs when a session feels easy",
+    "rehab": {
+      "area": "hamstring",
+      "phase": 4
+    },
+    "blocks": [
+      {
+        "superset": true,
+        "items": [
+          {
+            "exerciseId": "jog-interval",
+            "trackPain": true,
+            "sets": 6,
+            "seconds": 60
+          },
+          {
+            "exerciseId": "walk-interval",
+            "sets": 6,
+            "seconds": 90
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "nordic-curl",
+            "trackPain": true,
+            "sets": 3,
+            "reps": 4
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "single-leg-rdl",
+            "trackPain": true,
+            "sets": 3,
+            "reps": 8,
+            "weight": 8
+          }
+        ]
+      },
+      {
+        "items": [
+          {
+            "exerciseId": "goblet-squat",
+            "trackPain": true,
+            "sets": 3,
+            "reps": 8,
+            "weight": 12
           }
         ]
       }
