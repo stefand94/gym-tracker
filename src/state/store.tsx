@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useReducer, type ReactNode } from 'react';
 import { ROUTINES, setCustomExercises } from '../data/library';
 import { mergeKeyed, mergeVersioned } from '../lib/merge';
+import { costUsd, type ModelKey, type TokenUsage } from '../lib/claude';
 import type { Exercise, Routine, Workout } from '../types';
 
 export interface SyncSettings {
@@ -41,6 +42,15 @@ export interface Prefs {
   restMini: boolean;
 }
 
+/** Claude in the app. Lives only on this device: never synced, never in the repo. */
+export interface AiSettings {
+  key: string;
+  /** Model for Ask (notes and helpers always use Haiku). */
+  askModel: ModelKey;
+  /** Running total since `since`. */
+  spent: { calls: number; usd: number; input: number; output: number; since: string };
+}
+
 export interface RestState {
   endsAt: number;
   total: number;
@@ -70,6 +80,7 @@ export interface State {
   remoteShas: Record<string, string>;
   /** Pinned how-to videos by exercise id (synced as exercises/videos.json). */
   videos: Record<string, VideoPin>;
+  ai: AiSettings;
 }
 
 export interface RemoteData {
@@ -102,9 +113,15 @@ type Action =
   | { type: 'exerciseSave'; exercise: Exercise; now: string }
   | { type: 'remoteMerge'; remote: RemoteData }
   | { type: 'videoPin'; exerciseId: string; url: string; now: string }
+  | { type: 'aiSettings'; ai: Partial<Pick<AiSettings, 'key' | 'askModel'>> }
+  | { type: 'aiUsage'; model: ModelKey; usage: TokenUsage }
+  | { type: 'aiUsageReset'; now: string }
   | { type: 'historyUpdate'; workout: Workout };
 
 const KEY = 'gym-tracker:v1';
+
+const emptySpent = (since = new Date().toISOString()) => ({ calls: 0, usd: 0, input: 0, output: 0, since });
+const DEFAULT_AI = (): AiSettings => ({ key: '', askModel: 'haiku', spent: emptySpent() });
 
 const DEFAULT_PREFS: Prefs = { rest: false, restSeconds: 90, restMini: false };
 const REST_MIN = 15;
@@ -140,6 +157,7 @@ export function load(): State {
     customExercises: [],
     remoteShas: {},
     videos: {},
+    ai: DEFAULT_AI(),
   };
   try {
     const raw = localStorage.getItem(KEY);
@@ -157,6 +175,7 @@ export function load(): State {
       customExercises: saved.customExercises ?? [],
       remoteShas: saved.remoteShas ?? {},
       videos: saved.videos ?? {},
+      ai: { ...DEFAULT_AI(), ...saved.ai },
     };
   } catch {
     return base;
@@ -317,6 +336,22 @@ export function reducer(state: State, action: Action): State {
       const videos = remote.videos ? mergeKeyed(state.videos, remote.videos) : state.videos;
       return { ...state, routines, customExercises, videos, remoteShas: { ...state.remoteShas, ...remote.shas } };
     }
+    case 'aiSettings':
+      return { ...state, ai: { ...state.ai, ...action.ai } };
+    case 'aiUsage': {
+      const s = state.ai.spent;
+      const u = action.usage;
+      const spent = {
+        ...s,
+        calls: s.calls + 1,
+        usd: s.usd + costUsd(action.model, u),
+        input: s.input + u.input + u.cacheRead + u.cacheWrite,
+        output: s.output + u.output,
+      };
+      return { ...state, ai: { ...state.ai, spent } };
+    }
+    case 'aiUsageReset':
+      return { ...state, ai: { ...state.ai, spent: emptySpent(action.now) } };
     case 'videoPin':
       return {
         ...state,
@@ -339,7 +374,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   setCustomExercises(state.customExercises);
   useEffect(() => {
     try {
-      const { history, active, settings, sync, prefs, rest, hold, routines, customExercises, remoteShas, videos } = state;
+      const { history, active, settings, sync, prefs, rest, hold, routines, customExercises, remoteShas, videos, ai } = state;
       localStorage.setItem(
         KEY,
         JSON.stringify({
@@ -353,6 +388,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           customExercises,
           remoteShas,
           videos,
+          ai,
           sync: { queue: sync.queue, lastSync: sync.lastSync },
         }),
       );

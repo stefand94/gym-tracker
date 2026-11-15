@@ -95,7 +95,19 @@ export interface WorkoutItem {
   pain?: number;
   /** Machine / cable station it was done on, e.g. "Upstairs 1" (weights differ between stations). */
   station?: string;
+  /** Free-text note (typed or dictated), e.g. "left shoulder clicked on the last set". */
+  note?: string;
+  /** Changes Claude read out of the note, waiting for a tap (accepted ones are applied and removed). */
+  noteSuggestions?: NoteSuggestion[];
 }
+
+/** One change Claude read out of a note. */
+export type NoteSuggestion =
+  | { kind: 'pain'; pain: number; label: string }
+  | { kind: 'station'; station: string; label: string }
+  | { kind: 'sets'; sets: { weight?: number; reps?: number; seconds?: number }[]; label: string }
+  | { kind: 'swap'; exerciseId: string; label: string }
+  | { kind: 'remember'; text: string; label: string };
 
 export interface WorkoutBlock {
   id: string;
@@ -114,4 +126,6 @@ export interface Workout {
   blocks: WorkoutBlock[];
   /** 0–10 pain the morning after (rehab check-in); null = dismissed without answering. */
   nextDayPain?: number | null;
+  /** Free-text note about the whole session. */
+  note?: string;
 }
