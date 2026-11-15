@@ -85,3 +85,19 @@ exercises) and `npm run build`. Push to `main` to deploy.
 
 `gh api repos/stefand94/gym-tracker-data/contents/workouts/<year>` lists workout files; each is a `Workout`
 (`src/types.ts`). Only sets with `done: true` count; items with `status: "skipped"` count for nothing.
+Notes: `WorkoutItem.note` (with `noteSuggestions`, the chips Claude read out of it; `[]` = read, nothing to do)
+and `Workout.note` for the whole session. Read them; they're often why a number looks odd.
+
+## Claude in the app
+
+Stefan's own Anthropic API key lives only in that device's localStorage (`state.ai.key`), like the GitHub token —
+never in the repo or the data repo (the site is public). Never enter either key yourself.
+- `src/lib/claude.ts`: lazy-loaded SDK, `callJson` with structured output (schemas need `additionalProperties:false`,
+  no min/max), cost tally. Ask uses the model picked in Settings; notes and helpers always use Haiku.
+- `src/lib/aiContext.ts`: what Claude sees (catalogue, routines, 4 weeks of history with notes, muscle load, rehab).
+  Stefan's standing rules are `RULES` there — add new preferences to that list.
+- `src/lib/aiValidate.ts` (`checkPlan`): every plan is checked in code — unknown ids dropped, leg work held back
+  during rehab, sets/reps clamped, the rehab dose appended. `src/lib/ask.ts` (Ask), `notes.ts`, `helpers.ts`
+  (exercise auto-fill, picker fallback, weekly check-in cached in `state.ai.checkIn`) read Claude's answers.
+- Nothing Claude proposes is saved without a tap. Custom exercises it fills in stay `reviewed: false`.
+- Dev only: `window.__claudeMock = ({ prompt, today, model }) => data` answers instead of the API (no key needed).
