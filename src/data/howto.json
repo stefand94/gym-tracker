@@ -498,5 +498,9 @@
   "inverted-row": {
     "steps": ["Lie under a bar (Smith or rack) set at waist height", "Grip just wider than shoulders, body straight, heels on the floor", "Pull your chest to the bar", "Lower to straight arms"],
     "mistake": "Hips sagging — keep the plank"
+  },
+  "single-arm-cable-rear-delt-fly": {
+    "steps": ["Set a single handle at shoulder height and stand side-on to the stack", "Take the handle in the far hand so your arm starts across your chest", "Keep the arm straight and sweep it out and back until it's in line with your shoulder", "Pause, then let it return across your body under control"],
+    "mistake": "Twisting the torso or bending the elbow to move more weight — the rear delt should do the work"
   }
 }

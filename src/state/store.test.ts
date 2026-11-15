@@ -34,7 +34,12 @@ describe('initial state', () => {
 describe('mergeVersioned', () => {
   it('takes remote copies unless a pending local one is at least as new', () => {
     const local = [routine('a', '2026-11-10'), routine('b', '2026-11-12', 'local b'), routine('c', '2026-11-12', 'local c')];
-    const remote = [routine('a', '2026-11-01', 'remote a'), routine('b', '2026-11-11', 'remote b'), routine('c', '2026-11-13', 'remote c'), routine('d')];
+    const remote = [
+      routine('a', '2026-11-01', 'remote a'),
+      routine('b', '2026-11-11', 'remote b'),
+      routine('c', '2026-11-13', 'remote c'),
+      routine('d'),
+    ];
     const pending = (id: string) => id === 'b' || id === 'c';
     const out = Object.fromEntries(mergeVersioned(local, remote, pending).map((r) => [r.id, r.name]));
     // a: not pending → remote even though older (Claude may have forgotten to bump updatedAt)
@@ -115,5 +120,26 @@ describe('exercise lookup', () => {
   it('parses routine paths', () => {
     expect(routineIdFromPath('routines/upper-a.json')).toBe('upper-a');
     expect(routineIdFromPath('workouts/2026/2026-11-14-x.json')).toBeNull();
+  });
+});
+
+describe('pulled workouts', () => {
+  const w = (id: string, exerciseId: string) => ({
+    id,
+    name: 'Upper A',
+    startedAt: '2026-11-14T08:00:00Z',
+    finishedAt: '2026-11-14T09:00:00Z',
+    blocks: [{ id: 'b', superset: false, items: [{ id: 'i', exerciseId, status: 'done' as const, sets: [{ done: true, reps: 10 }] }] }],
+  });
+
+  it('adds new ones and takes repo fixes to ones we have, unless we have an unsynced edit', () => {
+    let s: State = { ...fresh(), history: [w('a', 'one-arm-dumbbell-row'), w('b', 'one-arm-dumbbell-row')] };
+    s = { ...s, sync: { ...s.sync, queue: [{ op: 'put', kind: 'workout', id: 'b', t: 1 }] } };
+    s = reducer(s, { type: 'merge', workouts: [w('a', 'single-arm-cable-row'), w('b', 'single-arm-cable-row'), w('c', 'face-pull')] });
+    expect(s.history.map((x) => `${x.id}:${x.blocks[0].items[0].exerciseId}`)).toEqual([
+      'a:single-arm-cable-row',
+      'b:one-arm-dumbbell-row',
+      'c:face-pull',
+    ]);
   });
 });

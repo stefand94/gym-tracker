@@ -156,8 +156,8 @@ export interface PullResult {
 }
 
 /**
- * Download every workout whose id isn't in `known`, plus each routine file and custom.json
- * whose sha differs from the one we last pulled.
+ * Download every workout whose id isn't in `known` or whose file changed in the repo since we last pulled it
+ * (e.g. Claude fixed a label), plus each routine file and custom.json whose sha differs from the one we last pulled.
  */
 export async function pullAll(s: SyncSettings, known: Set<string>, shas: Record<string, string>): Promise<PullResult> {
   const empty: PullResult = { workouts: [], remote: { routines: [], shas: {} } };
@@ -174,7 +174,9 @@ export async function pullAll(s: SyncSettings, known: Set<string>, shas: Record<
   const out = empty;
   for (const t of blobs) {
     const id = idFromPath(t.path);
-    if (id && !known.has(id)) out.workouts.push(await raw<Workout>(s, t.path));
+    if (!id || (known.has(id) && shas[t.path] === t.sha)) continue;
+    out.workouts.push(await raw<Workout>(s, t.path));
+    out.remote.shas[t.path] = t.sha;
   }
   for (const t of blobs) {
     if (shas[t.path] === t.sha) continue;

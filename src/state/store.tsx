@@ -235,10 +235,15 @@ export function reducer(state: State, action: Action): State {
       };
     }
     case 'merge': {
+      // New workouts are added; ones changed in the repo replace ours unless we have an unsynced edit of our own.
+      const q = state.sync.queue;
       const known = new Set(state.history.map((w) => w.id));
-      const deleting = new Set(state.sync.queue.filter((q) => q.op === 'delete' && kindOf(q) === 'workout').map((q) => q.id));
-      const fresh = action.workouts.filter((w) => !known.has(w.id) && !deleting.has(w.id));
-      return fresh.length ? { ...state, history: [...state.history, ...fresh] } : state;
+      const deleting = new Set(q.filter((x) => x.op === 'delete' && kindOf(x) === 'workout').map((x) => x.id));
+      const pulled = new Map(action.workouts.filter((w) => !deleting.has(w.id)).map((w) => [w.id, w]));
+      if (!pulled.size) return state;
+      const history = state.history.map((w) => (pulled.has(w.id) && !isPending(q, 'workout', w.id) ? pulled.get(w.id)! : w));
+      const fresh = [...pulled.values()].filter((w) => !known.has(w.id));
+      return { ...state, history: [...history, ...fresh] };
     }
     case 'settings':
       return { ...state, settings: { ...state.settings, ...action.settings } };

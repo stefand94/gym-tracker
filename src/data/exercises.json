@@ -35,7 +35,11 @@
       "sets": 3,
       "reps": 10,
       "weight": 16
-    }
+    },
+    "aliases": [
+      "dumbbell chest press",
+      "flat dumbbell press"
+    ]
   },
   {
     "id": "incline-dumbbell-press",
@@ -1997,8 +2001,34 @@
     "aliases": [
       "reverse cable fly",
       "cable reverse fly",
-      "back fly"
+      "back fly",
+      "full back fly",
+      "shoulder height cable fly"
     ]
+  },
+  {
+    "id": "single-arm-cable-rear-delt-fly",
+    "name": "Single-arm cable rear delt fly",
+    "type": "weight",
+    "equipment": "Cable",
+    "cue": "straight arm, sweep across at shoulder height",
+    "aliases": [
+      "shoulder height cable extension",
+      "cross-body cable fly",
+      "one arm reverse cable fly"
+    ],
+    "primary": [
+      "rearDelts"
+    ],
+    "secondary": [
+      "upperBack",
+      "sideDelts"
+    ],
+    "defaults": {
+      "sets": 3,
+      "reps": 12,
+      "weight": 5
+    }
   },
   {
     "id": "cable-y-raise",
