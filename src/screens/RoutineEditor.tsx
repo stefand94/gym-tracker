@@ -4,7 +4,8 @@ import { BlockDnd, DragHandle, type DndBlock } from '../components/BlockDnd';
 import { ExerciseEditor } from '../components/ExerciseEditor';
 import { ExercisePicker } from '../components/ExercisePicker';
 import { HowToSheet } from '../components/HowToSheet';
-import { IconBack, IconClose, IconInfo, IconPlus } from '../components/Icons';
+import { AskSheet } from '../components/AskSheet';
+import { IconBack, IconClose, IconInfo, IconPlus, IconSpark } from '../components/Icons';
 import { ConfirmSheet } from '../components/Sheet';
 import { StationSheet, usesStations } from '../components/StationSheet';
 import { Stepper } from '../components/Stepper';
@@ -15,6 +16,7 @@ import { AREA_LABELS } from '../lib/rehab';
 import { newRoutineId } from '../lib/routineEdit';
 import { moveItems, sameLayout, type DropTarget } from '../lib/workout';
 import { useStore } from '../state/store';
+import { useClaude } from '../state/useClaude';
 import type { Exercise, Routine, RoutineBlock, RoutineItem } from '../types';
 
 type EItem = RoutineItem & { id: string };
@@ -49,20 +51,27 @@ export function RoutineEditor() {
   const location = useLocation();
   const existing = id && id !== 'new' ? state.routines.find((r) => r.id === id && !r.archived) : undefined;
   const draft = (location.state as { draft?: Omit<Routine, 'id'> } | null)?.draft;
-  const start = existing ?? draft;
+  // a draft over an existing routine (Claude's "Edit first") starts from the draft but counts as an unsaved change
+  const start = draft ? { ...existing, ...draft } : existing;
 
   const [name, setName] = useState(start?.name ?? '');
   const [description, setDescription] = useState(start?.description ?? '');
   const [blocks, setBlocks] = useState<EBlock[]>(() => toEditor(start?.blocks ?? []));
   const snapshot = (n: string, d: string, bs: EBlock[]) => JSON.stringify({ n: n.trim(), d: d.trim(), b: fromEditor(bs) });
   const initial = useRef<string | null>(null);
-  if (initial.current === null) initial.current = snapshot(name, description, blocks);
+  if (initial.current === null)
+    initial.current =
+      existing && draft
+        ? snapshot(existing.name, existing.description ?? '', toEditor(existing.blocks))
+        : snapshot(name, description, blocks);
   const undo = useRef<EBlock[] | null>(null);
   const [picking, setPicking] = useState(false);
   const [creating, setCreating] = useState<string | null>(null);
   const [station, setStation] = useState<EItem | null>(null);
   const [ask, setAsk] = useState<'leave' | 'delete' | null>(null);
   const [tried, setTried] = useState(false);
+  const [asking, setAsking] = useState(false);
+  const { ready: aiReady } = useClaude();
 
   const itemCount = blocks.reduce((n, b) => n + b.items.length, 0);
   const valid = name.trim().length > 0 && itemCount > 0;
@@ -231,6 +240,21 @@ export function RoutineEditor() {
       <button className="btn btn-block btn-lg btn-dashed" style={{ marginTop: 12 }} onClick={() => setPicking(true)}>
         <IconPlus /> Add exercise
       </button>
+      {aiReady && (
+        <button className="btn btn-block btn-ghost ask-btn" style={{ marginTop: 8 }} onClick={() => setAsking(true)}>
+          <IconSpark /> Ask Claude to build or change this
+        </button>
+      )}
+      {asking && (
+        <AskSheet
+          from={{ kind: 'routine', routine: { ...routine(), id: existing?.id } }}
+          onClose={() => setAsking(false)}
+          onUseInEditor={(n, bs) => {
+            if (!name.trim()) setName(n);
+            setBlocks(toEditor(bs));
+          }}
+        />
+      )}
       {blocks.length > 1 && <p className="small dim re-hint">Hold ⋮⋮ to reorder · drop on another exercise to superset</p>}
 
       <div className="stack" style={{ marginTop: 20 }}>

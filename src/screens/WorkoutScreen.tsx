@@ -5,7 +5,7 @@ import { BodyMap } from '../components/BodyMap';
 import { ExerciseEditor } from '../components/ExerciseEditor';
 import { ExercisePicker } from '../components/ExercisePicker';
 import { HoldWatcher } from '../components/HoldTimer';
-import { IconPlus } from '../components/Icons';
+import { IconPlus, IconSpark } from '../components/Icons';
 import { RestBar, TimerButton } from '../components/RestBar';
 import { ConfirmSheet } from '../components/Sheet';
 import { WorkoutBlockView } from '../components/WorkoutBlockView';
@@ -15,6 +15,8 @@ import { routineFromWorkout } from '../lib/routineEdit';
 import { useWakeLock } from '../lib/useWakeLock';
 import { addExercise, blockComplete, currentBlockIndex, moveInWorkout, sameLayout, workoutProgress } from '../lib/workout';
 import { useStore } from '../state/store';
+import { useClaude } from '../state/useClaude';
+import { AskSheet } from '../components/AskSheet';
 import { NoteSheet, WorkoutNoteCard } from '../components/NoteSheet';
 import { setWorkoutNote } from '../lib/notes';
 import type { Workout, WorkoutBlock } from '../types';
@@ -39,6 +41,8 @@ export function WorkoutScreen() {
   const [showMap, setShowMap] = useState(true);
   const [ask, setAsk] = useState<Ask>(null);
   const [noting, setNoting] = useState(false);
+  const [asking, setAsking] = useState(false);
+  const { ready: aiReady } = useClaude();
   /** Blocks opened or closed by hand; everything else follows "only the current block is open". */
   const [override, setOverride] = useState<Record<string, boolean>>({});
   const headRef = useRef<HTMLDivElement>(null);
@@ -224,6 +228,11 @@ export function WorkoutScreen() {
             Finish workout
           </button>
         )}
+        {aiReady && (
+          <button className="btn btn-block ask-btn" onClick={() => setAsking(true)}>
+            <IconSpark /> Ask Claude
+          </button>
+        )}
         {!w.note && (
           <button className="btn btn-ghost btn-block" onClick={() => setNoting(true)}>
             Add a session note
@@ -267,6 +276,7 @@ export function WorkoutScreen() {
         />
       )}
 
+      {asking && <AskSheet from={{ kind: 'workout', workout: w }} onClose={() => setAsking(false)} />}
       {noting && (
         <NoteSheet
           title="Session note"

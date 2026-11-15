@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BodyMap } from '../components/BodyMap';
-import { IconMore, IconPlus, IconSettings } from '../components/Icons';
+import { AskSheet } from '../components/AskSheet';
+import { IconMore, IconPlus, IconSettings, IconSpark } from '../components/Icons';
 import { PainStrip } from '../components/PainStrip';
 import { ConfirmSheet, Sheet } from '../components/Sheet';
 import { getExercise, ROUTINES } from '../data/library';
@@ -13,6 +14,7 @@ import { newRoutineId } from '../lib/routineEdit';
 import { suggest, type Suggestion } from '../lib/suggest';
 import { emptyWorkout, workoutFromRoutine, workoutProgress } from '../lib/workout';
 import { useStore } from '../state/store';
+import { useClaude } from '../state/useClaude';
 import type { Routine, Workout } from '../types';
 
 function routineSummary(r: Routine): string {
@@ -64,6 +66,8 @@ export function Home() {
     ...routines.filter((r) => r.rehab).map((routine) => ({ routine })),
   ];
   const [menu, setMenu] = useState<Routine | null>(null);
+  const [asking, setAsking] = useState(false);
+  const { ready: aiReady } = useClaude();
   const [deleting, setDeleting] = useState<Routine | null>(null);
   const duplicate = (r: Routine) => {
     const name = `${r.name} copy`;
@@ -84,6 +88,14 @@ export function Home() {
           <IconSettings />
         </Link>
       </div>
+
+      {aiReady && (
+        <button className="ask-bar" onClick={() => setAsking(true)}>
+          <IconSpark />
+          <span className="grow">Ask Claude: plan today, change a routine…</span>
+        </button>
+      )}
+      {asking && <AskSheet from={active ? { kind: 'workout', workout: active } : { kind: 'home' }} onClose={() => setAsking(false)} />}
 
       {active && prog && (
         <Link to="/workout" className="card resume">
