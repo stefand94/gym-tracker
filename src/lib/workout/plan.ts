@@ -1,13 +1,25 @@
 /** What an exercise starts a workout with: sets pre-filled from last time, go-up nudges and warm-ups. */
 
-import type { Exercise, Lookup, Routine, RoutineBlock, RoutineItem, SetEntry, Workout, WorkoutBlock, WorkoutItem } from '../../types';
+import type {
+  Exercise,
+  Lookup,
+  Routine,
+  RoutineBlock,
+  RoutineItem,
+  SetEntry,
+  Stall,
+  Workout,
+  WorkoutBlock,
+  WorkoutItem,
+} from '../../types';
 import { uid } from '../id';
 import { lastPerformance, lastStation } from '../prefill';
+import { stallFrom } from '../stall';
 
 const round2 = (x: number) => Math.round(x * 100) / 100;
 
 /** One step up: a dumbbell or kettlebell size, 5 kg on machines, 2.5 kg on bars and cables; assisted machines take 5 kg of help off. */
-function goUpStep(ex: Exercise): number {
+export function goUpStep(ex: Exercise): number {
   if (/assist/i.test(ex.weightNote ?? '')) return -5;
   if (ex.type === 'machine') return 5;
   if (/dumbbell/i.test(ex.equipment)) return 2;
@@ -29,14 +41,14 @@ export function goUpFrom(ex: Exercise, last: SetEntry[], target: number | undefi
 
 /**
  * The starting sets for an exercise: last time's actual sets (one step heavier when every set hit the target
- * reps) → routine values → exercise defaults.
+ * reps) → routine values → exercise defaults. Without a step up, it checks whether the exercise has stalled.
  */
 export function planSets(
   exercise: Exercise,
   history: Workout[],
   routineItem?: RoutineItem,
   station?: string,
-): { sets: SetEntry[]; goUp?: number } {
+): { sets: SetEntry[]; goUp?: number; stall?: Stall } {
   const last = lastPerformance(exercise.id, history, station);
   if (last && last.length > 0) {
     const count = routineItem?.sets ?? last.length;
@@ -46,7 +58,8 @@ export function planSets(
       const set = pickFields(exercise, { weight: round2((last[0].weight ?? 0) + step), reps: target, done: false });
       return { sets: Array.from({ length: count }, () => ({ ...set })), goUp: step };
     }
-    return { sets: fromLast(exercise, last, count) };
+    const stall = routineItem?.trackPain ? null : stallFrom(exercise, history, station, target);
+    return { sets: fromLast(exercise, last, count), ...(stall ? { stall } : {}) };
   }
   const d = exercise.defaults;
   const count = routineItem?.sets ?? d.sets;
@@ -114,7 +127,7 @@ export function pickFields(exercise: Exercise, s: SetEntry): SetEntry {
 
 export function makeItem(exercise: Exercise, history: Workout[], routineItem?: RoutineItem): WorkoutItem {
   const station = routineItem?.station ?? lastStation(exercise.id, history);
-  const { sets, goUp } = planSets(exercise, history, routineItem, station);
+  const { sets, goUp, stall } = planSets(exercise, history, routineItem, station);
   const warmups = warmupSets(exercise, sets);
   return {
     id: uid(),
@@ -123,6 +136,7 @@ export function makeItem(exercise: Exercise, history: Workout[], routineItem?: R
     sets,
     ...(warmups.length ? { warmups } : {}),
     ...(goUp ? { goUp } : {}),
+    ...(stall ? { stall } : {}),
     ...(routineItem?.trackPain ? { trackPain: true } : {}),
     ...(station ? { station } : {}),
   };

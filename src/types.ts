@@ -103,12 +103,27 @@ export interface WorkoutItem {
   warmups?: SetEntry[];
   /** kg added to last time's weight because every set hit the target reps (negative on assisted machines: less help). */
   goUp?: number;
+  /** No progress lately (see lib/stall.ts): a tag with fixes, until one is picked or it's dismissed. */
+  stall?: Stall;
+  /** A stall fix picked this session: 'reset' (weight down about 10%) or 'reps' (new sets × reps). Stall detection counts from here. */
+  stallFix?: 'reset' | 'reps';
   /** Free-text note (typed or dictated), e.g. "left shoulder clicked on the last set": all of Stefan's messages, one per line. */
   note?: string;
   /** The note as a chat, oldest first: Stefan's messages and Claude's replies (`note` is kept in step with it). */
   noteThread?: NoteMessage[];
   /** Changes Claude read out of the note, waiting for a tap (accepted ones are applied and removed). */
   noteSuggestions?: NoteSuggestion[];
+}
+
+/**
+ * Why an exercise looks stuck: 'flat' = the last `sessions` sessions didn't beat the best before them; 'missed' = reps
+ * below the target `sessions` sessions running at the same `weight`. `target` is the reps it was aiming for.
+ */
+export interface Stall {
+  kind: 'flat' | 'missed';
+  sessions: number;
+  weight?: number;
+  target?: number;
 }
 
 /** One message in a note thread. A Claude message with empty text means "read, nothing to say". */

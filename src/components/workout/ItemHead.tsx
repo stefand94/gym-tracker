@@ -4,6 +4,7 @@ import { MUSCLE_LABELS } from '../../data/muscles';
 import { fmtNum } from '../../lib/format';
 import { exerciseMap } from '../../lib/muscleLoad';
 import { stationsFor } from '../../lib/prefill';
+import { stallText } from '../../lib/stall';
 import { keepLastWeight, setStation } from '../../lib/workout';
 import { useStore } from '../../state/store';
 import type { Exercise, WorkoutItem } from '../../types';
@@ -13,6 +14,7 @@ import { IconMore } from '../Icons';
 import { ItemNote } from '../NoteSheet';
 import { StationSheet, usesStations } from '../StationSheet';
 import type { Update } from './shared';
+import { StallSheet } from './StallSheet';
 
 function StatusBadge({ item }: { item: WorkoutItem }) {
   if (item.status === 'done') return <span className="badge badge-done">Done</span>;
@@ -20,7 +22,7 @@ function StatusBadge({ item }: { item: WorkoutItem }) {
   return null;
 }
 
-/** An exercise's name, muscles and cue, with its station, go-up nudge and note underneath. */
+/** An exercise's name, muscles and cue, with its station, go-up or stuck tag, and note underneath. */
 export function ItemHead({
   ex,
   item,
@@ -44,6 +46,7 @@ export function ItemHead({
 }) {
   const { state } = useStore();
   const [picking, setPicking] = useState(false);
+  const [fixing, setFixing] = useState(false);
   const showStation = item.status !== 'skipped' && (!!item.station || usesStations(ex) || stationsFor(ex.id, state.history).length > 0);
   const muscles = ex.primary.map((m) => MUSCLE_LABELS[m]).join(', ');
   const text = (
@@ -106,7 +109,18 @@ export function ItemHead({
           )}
         </div>
       )}
+      {item.stall && item.status !== 'skipped' && !item.sets.some((s) => s.done) && (
+        <div className="goup">
+          <button type="button" className="goup-tag stall-tag" onClick={() => setFixing(true)}>
+            Stuck · {stallText(item.stall)}
+          </button>
+          <button type="button" className="link-btn small" onClick={() => setFixing(true)}>
+            Fix it
+          </button>
+        </div>
+      )}
       <ItemNote ex={ex} item={item} update={update} open={noteOpen} onOpen={onNote} />
+      {fixing && <StallSheet ex={ex} item={item} update={update} onClose={() => setFixing(false)} />}
       {picking && (
         <StationSheet
           ex={ex}

@@ -178,9 +178,10 @@ export const weekWorkouts = (history: Workout[], now = new Date()) =>
 
 export const checkInPrompt = () =>
   [
-    "Write Stefan's weekly check-in from the last 7 days of his data (MUSCLE LOAD, HISTORY with his notes, REHAB).",
+    "Write Stefan's weekly check-in from the last 7 days of his data (MUSCLE LOAD, HISTORY with his notes, REHAB, STUCK).",
     'Be specific and short: numbers from his log, no filler, no praise words like "great job". Lists may be empty.',
     `"behind" uses the weekly target of sets per muscle. "next" is one thing to do next session, following his rules.`,
+    'If STUCK lists an exercise, put it in "behind", with the reason from his notes on those sessions when they give one.',
   ].join('\n');
 
 export function readCheckIn(raw: RawCheckIn, meta: Pick<CheckIn, 'week' | 'at' | 'workouts'>): CheckIn {

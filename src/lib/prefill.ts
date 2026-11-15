@@ -5,15 +5,21 @@ export function finishedNewestFirst(history: Workout[]): Workout[] {
   return history.filter((w) => w.finishedAt).sort((a, b) => (b.startedAt < a.startedAt ? -1 : b.startedAt > a.startedAt ? 1 : 0));
 }
 
+export interface Performance {
+  workout: Workout;
+  item: WorkoutItem;
+  done: SetEntry[];
+}
+
 /** Performed items (done sets, not skipped) of one exercise, newest workout first. */
-function performances(exerciseId: string, history: Workout[]): { item: WorkoutItem; done: SetEntry[] }[] {
-  const out: { item: WorkoutItem; done: SetEntry[] }[] = [];
+export function performances(exerciseId: string, history: Workout[]): Performance[] {
+  const out: Performance[] = [];
   for (const w of finishedNewestFirst(history))
     for (const b of w.blocks)
       for (const i of b.items) {
         if (i.exerciseId !== exerciseId || i.status === 'skipped') continue;
         const done = i.sets.filter((s) => s.done);
-        if (done.length) out.push({ item: i, done });
+        if (done.length) out.push({ workout: w, item: i, done });
       }
   return out;
 }

@@ -85,7 +85,7 @@ export function setStation(w: Workout, itemId: string, station: string | undefin
     const sets =
       ex && last ? i.sets.map((s, idx) => (s.done ? s : pickFields(ex, { ...last[Math.min(idx, last.length - 1)], done: false }))) : i.sets;
     if (!last) return { ...rest, station: name, sets };
-    const { goUp: _g, ...plain } = rest;
+    const { goUp: _g, stall: _s, ...plain } = rest; // worked out for the old station
     return withFreshWarmups({ ...plain, station: name, sets }, lookup);
   });
 }

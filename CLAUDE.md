@@ -82,6 +82,12 @@ Go-up: when every set last time hit the target reps (routine reps, else the exer
 sets pre-fill one step up (+2.5 kg barbell, +2 dumbbells, +4 kettlebell, +5 machine, 5 kg less assistance) and the
 item carries `goUp` (kg); not on pain-tracked items. Personal records aren't stored: `src/lib/records.ts` works them
 out from history (est. 1RM; reps for bodyweight, seconds for holds; per station; none for carries, sleds or assisted).
+Stall detection (`src/lib/stall.ts`): an exercise is stuck when its last 4 sessions didn't beat the best before them
+(est. 1RM; reps or seconds, weight first, for bodyweight and holds; less help on assisted machines), or reps were missed 2
+sessions running at one weight. Needs 4 sessions since the last fix, counts stations apart, and skips pain-tracked work,
+carries, sleds, jumps, throws and intervals. The item carries `stall`; the card offers a ~10% reset, two other sets × reps
+(saved to the routine), a swap, or not now; the pick is stored as `stallFix` and detection counts from there. Go-up wins
+over it. Claude sees the list as STUCK in its context.
 Hamstring rehab has 4 phases; phase 4 is back to running (walk–jog intervals), and legs stay held back until it's passed.
 Per-item `sets/reps/seconds/weight/station` are optional (`station` is a free-text machine/cable tag like "Upstairs 1"; weights pre-fill from the last time on the same station); when a workout starts, sets pre-fill from the last time the
 exercise was done, then routine values, then exercise defaults.
@@ -95,7 +101,7 @@ fixes formatting (Prettier skips `Icons.tsx`, the data JSON and this file). Push
 ## Where things live
 
 - `src/lib/workout/`: the workout in progress, one concern per file: `plan` (starting sets, go-up, warm-ups),
-  `sets` and `items` (edits), `layout` (blocks, supersets, drag-and-drop, the rehab dose's edge), `intervals`,
+  `sets` and `items` (edits), `stall` (the fixes for a stuck exercise), `layout` (blocks, supersets, drag-and-drop, the rehab dose's edge), `intervals`,
   `status`. Import from `lib/workout`.
 - `src/components/workout/`: the workout card (`WorkoutBlockView` → single, superset or collapsed block).
 - `src/styles/`: one stylesheet per area, imported in cascade order by `index.css`.

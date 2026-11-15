@@ -10,6 +10,7 @@ import { fmtDate, fmtNum, fmtSet } from '../lib/format';
 import { exerciseMap } from '../lib/muscleLoad';
 import { metricsFor, performedExerciseIds, series, stationsIn } from '../lib/progress';
 import { recentRecords } from '../lib/records';
+import { stallNow, stallText } from '../lib/stall';
 import { useStore } from '../state/store';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Filler);
@@ -86,6 +87,10 @@ export function Progress() {
       .slice(0, 10);
   }, [ex, state.history]);
 
+  const stuck = useMemo(() => (ex ? stallNow(ex, state.history, state.routines) : null), [ex, state.history, state.routines]);
+  const stuckDates = new Set(stuck?.sessions.map((p) => p.workout.startedAt));
+  const pointColor = pts.map((p) => (stuckDates.has(p.date) ? colors.text : colors.accent));
+
   const best = pts.length ? Math.max(...pts.map((p) => p.value)) : null;
   const first = pts[0]?.value;
   const latest = pts[pts.length - 1]?.value;
@@ -156,6 +161,16 @@ export function Progress() {
             </div>
           </div>
 
+          {stuck && (
+            <div className="card stall-note">
+              <span className="goup-tag stall-tag">Stuck</span>
+              <div className="grow small">
+                {stallText(stuck.stall)[0].toUpperCase() + stallText(stuck.stall).slice(1)}
+                {!lines.length && ' (the grey points)'}. Next time you do it, the card offers a fix.
+              </div>
+            </div>
+          )}
+
           <div className="card">
             {pts.length ? (
               <>
@@ -186,7 +201,7 @@ export function Progress() {
                               data: pts.map((p) => p.value),
                               borderColor: colors.accent,
                               backgroundColor: `${colors.accent}2e`,
-                              pointBackgroundColor: colors.accent,
+                              pointBackgroundColor: pointColor,
                               pointBorderColor: colors.surface,
                               pointBorderWidth: 2,
                               pointRadius: 4,

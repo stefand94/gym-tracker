@@ -4,6 +4,7 @@ import { exerciseGroup } from './groups';
 import { loadSince } from './muscleLoad';
 import { finishedNewestFirst } from './prefill';
 import type { RehabState } from './rehab';
+import { stallText, stuckExercises } from './stall';
 
 /** Weighted sets per 7 days a muscle wants (same as suggest.ts). */
 export const WEEK_TARGET = 10;
@@ -136,6 +137,11 @@ function rehabText(r: RehabState | null): string {
   }${r.dropBack ? ', dropping back a phase' : ''}. No leg exercises outside the rehab dose block.`;
 }
 
+function stuckText(history: Workout[], routines: Routine[], lookup: Lookup, now: Date): string {
+  const list = stuckExercises(history, routines, lookup, now);
+  return list.length ? list.map(({ ex, stall }) => `${ex.id} "${ex.name}": ${stallText(stall)}`).join('\n') : 'Nothing stuck.';
+}
+
 export interface ContextInput {
   history: Workout[];
   routines: Routine[];
@@ -155,6 +161,9 @@ export function todayContext({ history, routines, rehab, lookup, now = new Date(
     '',
     `MUSCLE LOAD (weighted sets: primary 1, secondary 0.5; target ${WEEK_TARGET} a week)`,
     loadText(history, lookup, now),
+    '',
+    'STUCK (no progress lately; the workout card offers a lighter reset, other sets × reps, or a swap)',
+    stuckText(history, routines, lookup, now),
     '',
     'ROUTINES (id "name", blocks in order)',
     routinesText(routines, lookup),
