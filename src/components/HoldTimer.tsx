@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { countBeep, restOverAlert } from '../lib/alert';
 import { getExercise } from '../data/library';
-import { completeHold, nextInterval, restsAfter } from '../lib/workout';
+import { finishHolds, restsAfter } from '../lib/workout';
 import { useStore, type HoldState } from '../state/store';
 
 function clock(s: number) {
@@ -50,15 +50,22 @@ export function HoldWatcher() {
     if (p.phase === 'hold' && p.left <= 0) {
       if (now - hold.endsAt < 3000) restOverAlert();
       const w = state.active;
-      const seconds = Math.round((hold.endsAt - hold.goAt) / 1000);
       dispatch({ type: 'holdStop' });
       if (!w) return;
-      dispatch({ type: 'updateActive', fn: (x) => completeHold(x, hold.itemId, hold.set, seconds) });
-      const after = completeHold(w, hold.itemId, hold.set, seconds);
-      // walk → jog → walk: the next interval starts straight away, no rest in between
-      const next = nextInterval(after, hold.itemId, hold.set, getExercise);
-      if (next) dispatch({ type: 'holdStart', ...next, now: Date.now(), lead: 0 });
-      else if (state.prefs.rest && restsAfter(after, hold.itemId, hold.set)) dispatch({ type: 'restStart', now: Date.now() });
+      const at = Date.now();
+      dispatch({ type: 'updateActive', fn: (x) => finishHolds(x, hold, at, getExercise).workout });
+      // walk → jog → walk: the next interval starts the moment this one ended, no rest in between
+      const { workout: after, next, last } = finishHolds(w, hold, at, getExercise);
+      if (next)
+        dispatch({
+          type: 'holdStart',
+          itemId: next.itemId,
+          set: next.set,
+          seconds: (next.endsAt - next.goAt) / 1000,
+          now: next.goAt,
+          lead: 0,
+        });
+      else if (state.prefs.rest && restsAfter(after, last.itemId, last.set)) dispatch({ type: 'restStart', now: at });
     }
   }, [hold, now, state.active, state.prefs.rest, dispatch]);
 

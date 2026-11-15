@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { moveItems, sameLayout } from './workout';
+import type { Workout } from '../types';
+import { canSupersetWithNext, moveInWorkout, moveItems, sameLayout, splitBlock, supersetWithNext } from './workout';
 
 type B = { id: string; superset?: boolean; items: { id: string }[] };
 const blk = (id: string, ...items: string[]): B => ({ id, superset: items.length > 1, items: items.map((i) => ({ id: i })) });
@@ -55,5 +56,40 @@ describe('moveItems', () => {
     expect(moveItems(s, ['B', 'C'], { join: 'bc' }, newId)).toBe(s);
     expect(moveItems(s, ['B'], { join: 'bc' }, newId)).toBe(s);
     expect(moveItems(s, ['Z'], { gap: 0 }, newId)).toBe(s);
+  });
+});
+
+describe('the rehab dose stays its own block', () => {
+  const item = (id: string) => ({ id, exerciseId: 'nordic-curl', status: 'pending' as const, sets: [] });
+  const w = (): Workout => ({
+    id: 'w',
+    name: 'w',
+    startedAt: '',
+    blocks: [
+      { id: 'a', superset: false, items: [item('A')] },
+      { id: 'd1', superset: false, rehabDose: 'hamstring', items: [item('D1')] },
+      { id: 'd2', superset: false, rehabDose: 'hamstring', items: [item('D2')] },
+    ],
+  });
+
+  it('refuses joins across the edge, keeps the mark on joins inside it and on gap moves', () => {
+    expect(moveInWorkout(w(), ['A'], { join: 'd1' })).toEqual(w());
+    expect(moveInWorkout(w(), ['D1'], { join: 'a' })).toEqual(w());
+    const joined = moveInWorkout(w(), ['D2'], { join: 'd1' });
+    expect(joined.blocks.map((b) => b.rehabDose)).toEqual([undefined, 'hamstring']);
+    const out = moveInWorkout(joined, ['D2'], { gap: 0 });
+    expect(out.blocks.map((b) => [b.items.map((i) => i.id).join('+'), b.rehabDose])).toEqual([
+      ['D2', 'hamstring'],
+      ['A', undefined],
+      ['D1', 'hamstring'],
+    ]);
+  });
+
+  it('superset with next and split keep the mark, and never mix it with other exercises', () => {
+    expect(canSupersetWithNext(w(), 'a')).toBe(false);
+    expect(supersetWithNext(w(), 'a')).toEqual(w());
+    const ss = supersetWithNext(w(), 'd1');
+    expect(ss.blocks[1]).toMatchObject({ superset: true, rehabDose: 'hamstring' });
+    expect(splitBlock(ss, 'd1').blocks.map((b) => b.rehabDose)).toEqual([undefined, 'hamstring', 'hamstring']);
   });
 });

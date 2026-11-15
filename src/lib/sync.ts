@@ -1,6 +1,7 @@
 import type { Exercise, Routine, Workout } from '../types';
 import type { QueueOp, RemoteData, SyncSettings, VideoPin } from '../state/store';
 import { mergeForPush, mergeKeyed } from './merge';
+import { merge3 } from './merge3';
 
 const API = 'https://api.github.com';
 
@@ -84,8 +85,9 @@ async function existingSha(s: SyncSettings, path: string): Promise<string | unde
   }
 }
 
-async function putJson(s: SyncSettings, path: string, data: unknown, message: string, sha?: string): Promise<void> {
-  await gh(s, `/contents/${path}`, {
+/** PUT a file; returns the new blob sha. */
+async function putJson(s: SyncSettings, path: string, data: unknown, message: string, sha?: string): Promise<string | undefined> {
+  const res = await gh(s, `/contents/${path}`, {
     method: 'PUT',
     body: JSON.stringify({
       message,
@@ -94,16 +96,45 @@ async function putJson(s: SyncSettings, path: string, data: unknown, message: st
       ...(sha ? { sha } : {}),
     }),
   });
+  try {
+    return (await res.json()).content?.sha;
+  } catch {
+    return undefined;
+  }
 }
 
-export async function putWorkout(s: SyncSettings, w: Workout): Promise<void> {
+const isConflict = (e: unknown) => e instanceof GitHubError && (e.status === 409 || e.status === 422);
+
+/**
+ * Push a workout. `lastSha` is the copy we last pulled or pushed: when the file has changed in the repo since (e.g.
+ * Claude fixed a label), the push is refused, so we merge — the repo's changes and ours both kept, ours winning
+ * where both touched the same field — and push that. Returns the new sha and what was saved.
+ */
+export async function putWorkout(s: SyncSettings, w: Workout, lastSha?: string): Promise<{ sha?: string; saved: Workout }> {
   const path = workoutPath(w);
-  await putJson(s, path, w, `Workout ${w.startedAt.slice(0, 10)}: ${w.name}`, await existingSha(s, path));
+  const message = `Workout ${w.startedAt.slice(0, 10)}: ${w.name}`;
+  if (!lastSha) return { sha: await putJson(s, path, w, message, await existingSha(s, path)), saved: w };
+  try {
+    return { sha: await putJson(s, path, w, message, lastSha), saved: w };
+  } catch (e) {
+    if (!isConflict(e)) throw e;
+  }
+  let remote: { sha?: string; data?: Workout } = {};
+  try {
+    const file = await (await gh(s, `/contents/${path}?ref=${s.branch}`)).json();
+    remote = { sha: file.sha, data: JSON.parse(fromBase64(file.content)) };
+  } catch (e) {
+    if (!(e instanceof GitHubError && e.status === 404)) throw e;
+  }
+  if (!remote.data) return { sha: await putJson(s, path, w, message), saved: w }; // gone from the repo: ours again
+  const blob = await (await gh(s, `/git/blobs/${lastSha}`)).json();
+  const saved = merge3(JSON.parse(fromBase64(blob.content)), w, remote.data);
+  return { sha: await putJson(s, path, saved, message, remote.sha), saved };
 }
 
-export async function putRoutine(s: SyncSettings, r: Routine): Promise<void> {
+export async function putRoutine(s: SyncSettings, r: Routine): Promise<string | undefined> {
   const path = routinePath(r.id);
-  await putJson(s, path, r, `${r.archived ? 'Archive' : 'Save'} routine: ${r.name}`, await existingSha(s, path));
+  return putJson(s, path, r, `${r.archived ? 'Archive' : 'Save'} routine: ${r.name}`, await existingSha(s, path));
 }
 
 /** Fetch–merge–put, so edits made to the file in the repo (e.g. by Claude) are never overwritten. */
@@ -124,7 +155,7 @@ async function mergePut<T>(s: SyncSettings, path: string, empty: T, merge: (remo
       return;
     } catch (e) {
       // Someone else wrote the file between our read and write: read again and retry once.
-      if (attempt === 0 && e instanceof GitHubError && (e.status === 409 || e.status === 422)) continue;
+      if (attempt === 0 && isConflict(e)) continue;
       throw e;
     }
   }
@@ -211,6 +242,7 @@ export interface SyncInput {
 
 export interface RunResult {
   completed: QueueOp[];
+  /** Workouts to take into history: changed in the repo, or merged with repo changes while pushing. */
   pulled: Workout[];
   remote?: RemoteData;
   error?: string;
@@ -219,16 +251,25 @@ export interface RunResult {
 export async function runSync(s: SyncSettings, input: SyncInput): Promise<RunResult> {
   const { queue, history, routines, customExercises, remoteShas, videos = {} } = input;
   const completed: QueueOp[] = [];
+  const merged: Workout[] = [];
+  // shas of what we pushed, so the pull below doesn't download our own copies again
+  const pushed: Record<string, string> = {};
+  const record = (path: string, sha?: string) => sha && (pushed[path] = sha);
   try {
     for (const op of queue) {
       const kind = op.kind ?? 'workout';
       if (op.op === 'delete') await deleteWorkout(s, op.path);
       else if (kind === 'workout') {
         const w = history.find((h) => h.id === op.id);
-        if (w) await putWorkout(s, w);
+        if (w) {
+          const path = workoutPath(w);
+          const { sha, saved } = await putWorkout(s, w, pushed[path] ?? remoteShas[path]);
+          record(path, sha);
+          if (saved !== w) merged.push(saved);
+        }
       } else if (kind === 'routine') {
         const r = routines.find((x) => x.id === op.id);
-        if (r) await putRoutine(s, r);
+        if (r) record(routinePath(r.id), await putRoutine(s, r));
       } else if (kind === 'videos') {
         await putVideos(s, videos);
       } else {
@@ -238,9 +279,11 @@ export async function runSync(s: SyncSettings, input: SyncInput): Promise<RunRes
     }
     const known = new Set(history.map((w) => w.id));
     for (const op of queue) if (op.op === 'delete') known.add(op.id);
-    const { workouts, remote } = await pullAll(s, known, remoteShas);
-    return { completed, pulled: workouts, remote };
+    const { workouts, remote } = await pullAll(s, known, { ...remoteShas, ...pushed });
+    const pulled = [...merged.filter((m) => !workouts.some((w) => w.id === m.id)), ...workouts];
+    return { completed, pulled, remote: { ...remote, shas: { ...pushed, ...remote.shas } } };
   } catch (e) {
-    return { completed, pulled: [], error: e instanceof Error ? e.message : String(e) };
+    const error = e instanceof Error ? e.message : String(e);
+    return { completed, pulled: merged, remote: { routines: [], shas: pushed }, error };
   }
 }

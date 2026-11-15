@@ -17,6 +17,7 @@ import {
   replaceItem,
   roundComplete,
   splitBlock,
+  canSupersetWithNext,
   supersetWithNext,
   toggleComplete,
   toggleSet,
@@ -417,7 +418,11 @@ function ItemMenu({
           {item.warmups?.length ? 'Remove warm-up sets' : 'Add warm-up sets'}
         </button>
       )}
-      <button className="menu-item" disabled={index >= count - 1} onClick={() => act((w) => supersetWithNext(w, block.id))}>
+      <button
+        className="menu-item"
+        disabled={index >= count - 1 || !(state.active && canSupersetWithNext(state.active, block.id))}
+        onClick={() => act((w) => supersetWithNext(w, block.id))}
+      >
         Superset with next exercise
       </button>
       {block.superset && (

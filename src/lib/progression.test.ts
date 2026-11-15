@@ -5,6 +5,7 @@ import { recentRecords, recordsIn } from './records';
 import { doseItems, rehabState } from './rehab';
 import {
   completeHold,
+  finishHolds,
   goUpFrom,
   keepLastWeight,
   makeItem,
@@ -137,6 +138,21 @@ describe('back to running (rehab phase 4)', () => {
     expect(nextInterval(after, jog.id, 0, getExercise)).toBeNull(); // the next one is already done
     const nordic = w.blocks[1].items[0];
     expect(nextInterval(w, nordic.id, 0, getExercise)).toBeNull();
+  });
+
+  it('times each interval from the end of the one before, ticking the ones that ran out while the phone was locked', () => {
+    const w = workoutFromRoutine(phase4, [], getExercise);
+    const [jog, walk] = w.blocks[0].items;
+    const j = jog.sets[0].seconds! * 1000;
+    const k = walk.sets[0].seconds! * 1000;
+    const hold = { itemId: jog.id, set: 0, goAt: 0, endsAt: j };
+    // opened again halfway through the second jog
+    const { workout, next, last } = finishHolds(w, hold, j + k + 1000, getExercise);
+    const [jog2, walk2] = workout.blocks[0].items;
+    expect([jog2.sets[0].done, walk2.sets[0].done, jog2.sets[1].done]).toEqual([true, true, false]);
+    expect(next).toEqual({ itemId: jog.id, set: 1, goAt: j + k, endsAt: j + k + jog.sets[1].seconds! * 1000 });
+    expect(last).toMatchObject({ itemId: walk.id, set: 0 });
+    expect(finishHolds(w, hold, j, getExercise).next).toEqual({ itemId: walk.id, set: 0, goAt: j, endsAt: j + k });
   });
 
   it('keeps the intervals out of the daily dose in upper sessions', () => {

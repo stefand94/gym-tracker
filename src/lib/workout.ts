@@ -301,6 +301,26 @@ export function nextInterval(
   return { itemId: next.i.id, set: next.r, seconds: s.seconds };
 }
 
+type Hold = { itemId: string; set: number; goAt: number; endsAt: number };
+
+/**
+ * A hold that has run out: tick it, and with walk/jog intervals each one after it, timed from the moment the one
+ * before ended — so the ones that ran out while the phone was locked are ticked too. Returns the workout, the
+ * interval running now (if any) and the last hold ticked.
+ */
+export function finishHolds(w: Workout, hold: Hold, now: number, lookup: Lookup): { workout: Workout; next: Hold | null; last: Hold } {
+  let cur = hold;
+  let out = w;
+  for (;;) {
+    out = completeHold(out, cur.itemId, cur.set, Math.round((cur.endsAt - cur.goAt) / 1000));
+    const n = nextInterval(out, cur.itemId, cur.set, lookup);
+    if (!n) return { workout: out, next: null, last: cur };
+    const next = { itemId: n.itemId, set: n.set, goAt: cur.endsAt, endsAt: cur.endsAt + n.seconds * 1000 };
+    if (next.endsAt > now) return { workout: out, next, last: cur };
+    cur = next;
+  }
+}
+
 /** Apply a value to every set that hasn't been ticked yet. */
 export function updateUnticked(w: Workout, itemId: string, patch: SetPatch): Workout {
   return mapItem(w, itemId, (i) => ({
@@ -373,13 +393,19 @@ export function moveBlock(w: Workout, blockId: string, dir: -1 | 1): Workout {
   return { ...w, blocks };
 }
 
+/** Can a block be merged with the one below it? Not across the rehab dose's edge: the dose stays apart. */
+export function canSupersetWithNext(w: Workout, blockId: string): boolean {
+  const idx = w.blocks.findIndex((b) => b.id === blockId);
+  return idx >= 0 && idx < w.blocks.length - 1 && w.blocks[idx].rehabDose === w.blocks[idx + 1].rehabDose;
+}
+
 /** Merge a block with the one below it into a superset. */
 export function supersetWithNext(w: Workout, blockId: string): Workout {
+  if (!canSupersetWithNext(w, blockId)) return w;
   const idx = w.blocks.findIndex((b) => b.id === blockId);
-  if (idx < 0 || idx >= w.blocks.length - 1) return w;
   const a = w.blocks[idx];
   const b = w.blocks[idx + 1];
-  const merged: WorkoutBlock = { id: a.id, superset: true, items: [...a.items, ...b.items] };
+  const merged: WorkoutBlock = { id: a.id, superset: true, ...doseMark(a), items: [...a.items, ...b.items] };
   const blocks = [...w.blocks];
   blocks.splice(idx, 2, merged);
   return { ...w, blocks };
@@ -392,6 +418,7 @@ export function splitBlock(w: Workout, blockId: string): Workout {
   const parts: WorkoutBlock[] = w.blocks[idx].items.map((item, n) => ({
     id: n === 0 ? w.blocks[idx].id : uid(),
     superset: false,
+    ...doseMark(w.blocks[idx]),
     items: [item],
   }));
   const blocks = [...w.blocks];
@@ -509,9 +536,23 @@ export function moveItems<I extends { id: string }, B extends BlockLike<I>>(
   });
 }
 
+const doseMark = (b: WorkoutBlock): Pick<WorkoutBlock, 'rehabDose'> => (b.rehabDose ? { rehabDose: b.rehabDose } : {});
+
+/**
+ * Drag-and-drop in a workout. The rehab dose's exercises never share a block with the rest (that's how the finish
+ * screen and the planner tell them apart), so a join across that edge is refused, and dose exercises dragged to a
+ * gap stay marked.
+ */
 export function moveInWorkout(w: Workout, ids: string[], target: DropTarget): Workout {
+  const set = new Set(ids);
+  const doses = new Set(w.blocks.filter((b) => b.items.some((i) => set.has(i.id))).map((b) => b.rehabDose));
+  if (doses.size !== 1) return w;
+  const [dose] = doses;
+  if ('join' in target && w.blocks.find((b) => b.id === target.join)?.rehabDose !== dose) return w;
+  const old = new Set(w.blocks.map((b) => b.id));
   const blocks = moveItems(w.blocks, ids, target);
-  return blocks === w.blocks ? w : { ...w, blocks };
+  if (blocks === w.blocks) return w;
+  return { ...w, blocks: dose ? blocks.map((b) => (old.has(b.id) ? b : { ...b, rehabDose: dose })) : blocks };
 }
 
 /** Same blocks, same exercises, same order? */
