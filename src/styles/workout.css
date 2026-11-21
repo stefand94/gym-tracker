@@ -398,3 +398,63 @@
   grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr) 56px;
   gap: 6px;
 }
+
+/* Hold an exercise's name to drag its block (useLiftBlocks) */
+.lift {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body.lifting {
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: grabbing;
+}
+
+.wo-hint {
+  margin: 8px 2px 0;
+  text-align: center;
+}
+
+.wo-list.is-lifting {
+  gap: 6px;
+}
+
+.lift-row {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+}
+
+.lift-row .crow-mark {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.lift-row.lift-ss .crow-mark {
+  background: color-mix(in oklab, var(--rest) 18%, transparent);
+  color: var(--rest);
+}
+
+.lift-row.lift-done {
+  opacity: 0.6;
+}
+
+/* where the lifted block will land */
+.wo-block.wo-ghost .lift-row {
+  opacity: 0.4;
+  border: 2px dashed var(--accent);
+}
+
+/* the copy under your finger */
+.wo-block.wo-dragging {
+  z-index: 1000;
+  opacity: 1 !important;
+  pointer-events: none;
+}
+
+.wo-block.wo-dragging .lift-row {
+  border-color: var(--accent);
+  box-shadow: 0 14px 32px rgb(0 0 0 / 0.35);
+  transform: scale(1.02);
+}

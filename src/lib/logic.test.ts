@@ -4,8 +4,8 @@ import {
   addSet,
   blockComplete,
   removeItem,
-  splitBlock,
-  supersetWithNext,
+  standAlone,
+  supersetWith,
   toggleComplete,
   toggleSet,
   toggleSkip,
@@ -218,9 +218,9 @@ describe('supersets', () => {
 
   it('merges and splits blocks', () => {
     let w = fresh();
-    w = splitBlock(w, w.blocks[1].id);
+    w = { ...w, blocks: standAlone(w.blocks, itemId(w, 1, 1)) };
     expect(w.blocks).toHaveLength(3);
-    w = supersetWithNext(w, w.blocks[0].id);
+    w = supersetWith(w, w.blocks[0].items[0].id, w.blocks[1].id);
     expect(w.blocks).toHaveLength(2);
     expect(w.blocks[0].superset).toBe(true);
     expect(w.blocks[0].items.map((i) => i.exerciseId)).toEqual(['hammer-curl', 'push-up']);

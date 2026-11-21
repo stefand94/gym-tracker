@@ -2,16 +2,15 @@ import { describe, expect, it } from 'vitest';
 import type { Workout } from '../types';
 import {
   applyLayout,
-  canSupersetWithNext,
   moveBlock,
   moveBlocks,
   moveInWorkout,
   moveItems,
   sameLayout,
   shiftInBlock,
-  splitBlock,
   standAlone,
-  supersetWithNext,
+  supersetTargets,
+  supersetWith,
 } from './workout';
 
 type B = { id: string; superset?: boolean; rehabDose?: string; items: { id: string }[] };
@@ -97,12 +96,11 @@ describe('the rehab dose stays its own block', () => {
     ]);
   });
 
-  it('superset with next and split keep the mark, and never mix it with other exercises', () => {
-    expect(canSupersetWithNext(w(), 'a')).toBe(false);
-    expect(supersetWithNext(w(), 'a')).toEqual(w());
-    const ss = supersetWithNext(w(), 'd1');
+  it('supersets inside the dose keep the mark, and never mix it with other exercises', () => {
+    expect(supersetWith(w(), 'A', 'd1')).toEqual(w());
+    const ss = supersetWith(w(), 'D1', 'd2');
     expect(ss.blocks[1]).toMatchObject({ superset: true, rehabDose: 'hamstring' });
-    expect(splitBlock(ss, 'd1').blocks.map((b) => b.rehabDose)).toEqual([undefined, 'hamstring', 'hamstring']);
+    expect(standAlone(ss.blocks, 'D2').map((b) => b.rehabDose)).toEqual([undefined, 'hamstring', 'hamstring']);
   });
 });
 
@@ -162,5 +160,37 @@ describe('the reorder sheet', () => {
       ['x', false, undefined, 'X9'],
     ]);
     expect(out[1].note).toBe('kept');
+  });
+});
+
+describe('superset with any exercise', () => {
+  const item = (id: string) => ({ id, exerciseId: 'x', status: 'pending' as const, sets: [] });
+  const w = (): Workout => ({
+    id: 'w',
+    name: 'w',
+    startedAt: '',
+    blocks: [
+      { id: 'a', superset: false, items: [item('A')] },
+      { id: 'bc', superset: true, items: [item('B'), item('C')] },
+      { id: 'd', superset: false, items: [item('D')] },
+      { id: 'dose', superset: false, rehabDose: 'hamstring', items: [item('H')] },
+    ],
+  });
+  const ids = (x: Workout) => x.blocks.map((b) => `${b.superset ? 'S' : ''}${b.items.map((i) => i.id).join('+')}`);
+
+  it('offers every other block on the same side of the rehab dose', () => {
+    expect(supersetTargets(w(), 'A').map((b) => b.id)).toEqual(['bc', 'd']);
+    expect(supersetTargets(w(), 'H')).toEqual([]);
+  });
+
+  it('brings a lone exercise from anywhere to join this one where it is', () => {
+    expect(ids(supersetWith(w(), 'A', 'd'))).toEqual(['SA+D', 'SB+C', 'H']);
+    expect(ids(supersetWith(w(), 'D', 'a'))).toEqual(['SB+C', 'SD+A', 'H']);
+  });
+
+  it('a superset takes the exercise in, and nothing crosses the rehab edge', () => {
+    expect(ids(supersetWith(w(), 'D', 'bc'))).toEqual(['A', 'SB+C+D', 'H']);
+    expect(ids(supersetWith(w(), 'B', 'd'))).toEqual(['A', 'SB+C+D', 'H']);
+    expect(supersetWith(w(), 'A', 'dose')).toEqual(w());
   });
 });

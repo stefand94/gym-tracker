@@ -6,16 +6,15 @@ import { ExercisePicker } from '../components/ExercisePicker';
 import { HoldWatcher } from '../components/HoldTimer';
 import { IconPlus, IconSpark } from '../components/Icons';
 import { RestBar, TimerButton } from '../components/RestBar';
-import { ReorderSheet, type ReorderBlock } from '../components/ReorderSheet';
 import { ConfirmSheet } from '../components/Sheet';
-import { blockLetter } from '../components/workout/shared';
 import { useFollowWorkout } from '../components/workout/useFollowWorkout';
+import { useLiftBlocks } from '../components/workout/useLiftBlocks';
 import { WorkoutBlockView } from '../components/workout/WorkoutBlockView';
 import { getExercise } from '../data/library';
 import { workoutLoad } from '../lib/muscleLoad';
 import { routineFromWorkout } from '../lib/routineEdit';
 import { useWakeLock } from '../lib/useWakeLock';
-import { addExercise, applyLayout, blockComplete, currentBlockIndex, workoutProgress } from '../lib/workout';
+import { addExercise, blockComplete, currentBlockIndex, moveBlock, workoutProgress } from '../lib/workout';
 import { useStore } from '../state/store';
 import { useClaude } from '../state/useClaude';
 import { AskSheet } from '../components/AskSheet';
@@ -44,7 +43,9 @@ export function WorkoutScreen() {
   const [ask, setAsk] = useState<Ask>(null);
   const [noting, setNoting] = useState(false);
   const [asking, setAsking] = useState(false);
-  const [reordering, setReordering] = useState(false);
+  /** An exercise is held up and being dragged: every block shows as one row. */
+  const [lifting, setLifting] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
   const { ready: aiReady } = useClaude();
   /** Blocks opened or closed by hand; everything else follows "only the current block is open". */
   const [override, setOverride] = useState<Record<string, boolean>>({});
@@ -64,6 +65,7 @@ export function WorkoutScreen() {
     });
   }, []);
   useFollowWorkout(w, cur, headRef, onBlocksDone);
+  useLiftBlocks(listRef, !!w, setLifting, (from, to) => update((x) => ({ ...x, blocks: moveBlock(x.blocks, from, to) })));
 
   if (!w) return <Navigate to="/" replace />;
 
@@ -84,12 +86,6 @@ export function WorkoutScreen() {
   const finish = () => (prog.done > 0 && left === 0 ? doFinish() : setAsk('finish'));
 
   const toggle = (id: string, open: boolean) => setOverride((o) => ({ ...o, [id]: !open }));
-  const reorderBlocks: ReorderBlock[] = w.blocks.map((b) => ({
-    id: b.id,
-    superset: b.superset,
-    rehabDose: b.rehabDose,
-    items: b.items.map((i) => ({ id: i.id, name: getExercise(i.exerciseId)?.name ?? i.exerciseId })),
-  }));
   let shownNextLabel = false;
 
   return (
@@ -122,7 +118,7 @@ export function WorkoutScreen() {
 
       {w.note && <WorkoutNoteCard note={w.note} onEdit={() => setNoting(true)} />}
 
-      <div className="wo-list">
+      <div className={'wo-list' + (lifting ? ' is-lifting' : '')} ref={listRef}>
         {w.blocks.map((b, i) => {
           const open = override[b.id] ?? i === cur;
           const upcoming = !open && i > cur && cur >= 0 && !blockComplete(b);
@@ -130,15 +126,15 @@ export function WorkoutScreen() {
           if (label) shownNextLabel = true;
           return (
             <div key={b.id} id={`blk-${b.id}`} className="wo-block">
-              {label && <div className="list-label">Up next</div>}
+              {label && !lifting && <div className="list-label">Up next</div>}
               <WorkoutBlockView
                 block={b}
                 index={i}
                 update={update}
                 open={open}
                 current={i === cur}
+                lifting={lifting}
                 onToggle={() => toggle(b.id, open)}
-                onReorder={() => setReordering(true)}
               />
             </div>
           );
@@ -159,12 +155,8 @@ export function WorkoutScreen() {
         <button className="btn btn-lg btn-dashed grow" onClick={() => setPicking(true)}>
           <IconPlus /> Add exercise
         </button>
-        {w.blocks.length > 1 && (
-          <button className="btn btn-lg" onClick={() => setReordering(true)}>
-            Reorder
-          </button>
-        )}
       </div>
+      {w.blocks.length > 1 && <p className="small dim wo-hint">Hold an exercise’s name to drag it somewhere else.</p>}
 
       <div className="card wo-map">
         <button className="spread map-toggle" onClick={() => setShowMap(!showMap)} aria-expanded={showMap}>
@@ -232,14 +224,6 @@ export function WorkoutScreen() {
         />
       )}
 
-      {reordering && (
-        <ReorderSheet
-          blocks={reorderBlocks}
-          markOf={(bs, i) => (bs[i].superset ? blockLetter(i) : String(i + 1))}
-          onDone={(layout) => update((x) => ({ ...x, blocks: applyLayout(x.blocks, layout) }))}
-          onClose={() => setReordering(false)}
-        />
-      )}
       {asking && <AskSheet from={{ kind: 'workout', workout: w }} onClose={() => setAsking(false)} />}
       {noting && (
         <NoteChat

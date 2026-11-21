@@ -50,8 +50,6 @@ export function moveItems<I extends { id: string }, B extends BlockLike<I>>(
   });
 }
 
-const doseMark = (b: WorkoutBlock): Pick<WorkoutBlock, 'rehabDose'> => (b.rehabDose ? { rehabDose: b.rehabDose } : {});
-
 /**
  * `moveItems` with the rehab dose's edge: its exercises never share a block with the rest (that's how the finish
  * screen and the planner tell them apart), so a join across that edge is refused, and dose exercises moved to a gap
@@ -133,37 +131,27 @@ export function applyLayout<I extends { id: string }, B extends BlockLike<I>>(
   return [...out, ...rest];
 }
 
-/** Can a block be merged with the one below it? Not across the rehab dose's edge: the dose stays apart. */
-export function canSupersetWithNext(w: Workout, blockId: string): boolean {
-  const idx = w.blocks.findIndex((b) => b.id === blockId);
-  return idx >= 0 && idx < w.blocks.length - 1 && w.blocks[idx].rehabDose === w.blocks[idx + 1].rehabDose;
+/** The blocks an exercise can be supersetted with: any other block on its side of the rehab dose's edge. */
+export function supersetTargets(w: Workout, itemId: string): WorkoutBlock[] {
+  const own = w.blocks.find((b) => b.items.some((i) => i.id === itemId));
+  if (!own) return [];
+  return w.blocks.filter((b) => b.id !== own.id && b.rehabDose === own.rehabDose);
 }
 
-/** Merge a block with the one below it into a superset. */
-export function supersetWithNext(w: Workout, blockId: string): Workout {
-  if (!canSupersetWithNext(w, blockId)) return w;
-  const idx = w.blocks.findIndex((b) => b.id === blockId);
-  const a = w.blocks[idx];
-  const b = w.blocks[idx + 1];
-  const merged: WorkoutBlock = { id: a.id, superset: true, ...doseMark(a), items: [...a.items, ...b.items] };
-  const blocks = [...w.blocks];
-  blocks.splice(idx, 2, merged);
-  return { ...w, blocks };
-}
-
-/** Break a superset into individual blocks. */
-export function splitBlock(w: Workout, blockId: string): Workout {
-  const idx = w.blocks.findIndex((b) => b.id === blockId);
-  if (idx < 0) return w;
-  const parts: WorkoutBlock[] = w.blocks[idx].items.map((item, n) => ({
-    id: n === 0 ? w.blocks[idx].id : uid(),
-    superset: false,
-    ...doseMark(w.blocks[idx]),
-    items: [item],
-  }));
-  const blocks = [...w.blocks];
-  blocks.splice(idx, 1, ...parts);
-  return { ...w, blocks };
+/**
+ * Superset an exercise with another block. A lone exercise (or a whole block) comes to join this one where it is;
+ * a superset takes this exercise in instead, so a pair becomes a tri-set without breaking up.
+ */
+export function supersetWith(w: Workout, itemId: string, targetBlockId: string): Workout {
+  if (!supersetTargets(w, itemId).some((b) => b.id === targetBlockId)) return w;
+  const own = w.blocks.find((b) => b.items.some((i) => i.id === itemId))!;
+  const target = w.blocks.find((b) => b.id === targetBlockId)!;
+  if (target.superset && target.items.length > 1) return moveInWorkout(w, [itemId], { join: target.id });
+  return moveInWorkout(
+    w,
+    target.items.map((i) => i.id),
+    { join: own.id },
+  );
 }
 
 /** Same blocks, same exercises, same order? */

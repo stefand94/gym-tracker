@@ -51,6 +51,12 @@ export const IconInfo = () => (
 export const IconNote = () => (
   <svg viewBox="0 0 24 24" {...p}><path d="M5 4h10l4 4v12H5z" /><path d="M15 4v4h4M8 12h8M8 16h5" /></svg>
 );
+export const IconSwap = () => (
+  <svg viewBox="0 0 24 24" {...p}><path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5" /></svg>
+);
+export const IconLink = () => (
+  <svg viewBox="0 0 24 24" {...p}><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" /></svg>
+);
 export const IconSpark = () => (
   <svg viewBox="0 0 24 24" {...p}><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" /><path d="M18.5 15.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z" /></svg>
 );

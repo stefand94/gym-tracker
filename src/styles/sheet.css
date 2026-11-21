@@ -113,3 +113,58 @@
     transition: none !important;
   }
 }
+
+/* The ⋯ menu: the three things you reach for most as big tiles, then a short list */
+.menu-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.menu-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 76px;
+  padding: 10px 4px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.menu-tile svg {
+  width: 24px;
+  height: 24px;
+}
+
+.menu-tile.tile-note {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.menu-item svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  color: var(--text-dim);
+}
+
+.menu-item.pick-row {
+  gap: 12px;
+}
+
+.pick-row .crow-mark {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.pick-row .pick-new {
+  background: var(--accent-soft);
+  color: var(--accent);
+}

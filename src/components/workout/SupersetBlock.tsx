@@ -10,7 +10,7 @@ import { blockLetter, useRecords, useStartRest } from './shared';
 import type { BlockProps } from './WorkoutBlockView';
 
 /** Exercises done round by round, resting only once a round is finished. */
-export function SupersetBlock({ block, index, update, current, onToggle, onReorder }: BlockProps) {
+export function SupersetBlock({ block, index, update, current, onToggle }: BlockProps) {
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const [noteFor, setNoteFor] = useState<string | null>(null);
   const startRest = useStartRest();
@@ -47,7 +47,7 @@ export function SupersetBlock({ block, index, update, current, onToggle, onReord
   return (
     <section className={'card ex-card ss-block' + (complete ? ' is-done' : '') + (current ? ' is-current' : '')}>
       <div className="spread ss-top">
-        <span className="badge badge-ss">Superset {letter}</span>
+        <span className="badge badge-ss lift">Superset {letter}</span>
         <span className="ss-top-end">
           {complete && <span className="badge badge-done">Done</span>}
           <button type="button" className="icon-btn fold-btn" aria-label={`Fold superset ${letter}`} onClick={onToggle}>
@@ -131,7 +131,6 @@ export function SupersetBlock({ block, index, update, current, onToggle, onReord
           update={update}
           onClose={() => setMenuFor(null)}
           onNote={() => setNoteFor(menuEntry.item.id)}
-          onReorder={onReorder}
         />
       )}
     </section>

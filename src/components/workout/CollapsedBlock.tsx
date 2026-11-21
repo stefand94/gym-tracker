@@ -15,7 +15,7 @@ export function CollapsedBlock({ block, index, onToggle }: BlockProps) {
       ? `Superset · ${Math.max(...block.items.map((i) => i.sets.length))} rounds`
       : itemSummary(getExercise(first.exerciseId), first);
     return (
-      <button type="button" className="crow crow-next" onClick={onToggle} aria-expanded={false}>
+      <button type="button" className="crow crow-next lift" onClick={onToggle} aria-expanded={false}>
         <span className="crow-mark">{block.superset ? letter : index + 1}</span>
         <span className="crow-stack">
           {names.map((n, k) => (
@@ -34,7 +34,7 @@ export function CollapsedBlock({ block, index, onToggle }: BlockProps) {
         const ex = getExercise(item.exerciseId);
         const skipped = item.status === 'skipped';
         return (
-          <button key={item.id} type="button" className={'crow' + (skipped ? ' crow-skip' : '')} onClick={onToggle}>
+          <button key={item.id} type="button" className={'crow lift' + (skipped ? ' crow-skip' : '')} onClick={onToggle}>
             <span className="crow-mark">{skipped ? '–' : '✓'}</span>
             <span className="crow-name">
               {block.superset && <span className="ss-tag">{`${letter}${n + 1} `}</span>}
