@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { BodyMap } from '../components/BodyMap';
 import { ExerciseEditor } from '../components/ExerciseEditor';
@@ -9,6 +9,7 @@ import { RestBar, TimerButton } from '../components/RestBar';
 import { ReorderSheet, type ReorderBlock } from '../components/ReorderSheet';
 import { ConfirmSheet } from '../components/Sheet';
 import { blockLetter } from '../components/workout/shared';
+import { useFollowWorkout } from '../components/workout/useFollowWorkout';
 import { WorkoutBlockView } from '../components/workout/WorkoutBlockView';
 import { getExercise } from '../data/library';
 import { workoutLoad } from '../lib/muscleLoad';
@@ -53,71 +54,16 @@ export function WorkoutScreen() {
   useWakeLock(!!w);
 
   const cur = w ? currentBlockIndex(w) : -1;
-  const curId = cur >= 0 ? w!.blocks[cur].id : null;
 
-  const scrollToBlock = useCallback((id: string, smooth = true) => {
-    requestAnimationFrame(() => {
-      const el = document.getElementById(`blk-${id}`);
-      if (!el) return;
-      const head = headRef.current?.getBoundingClientRect().height ?? 0;
-      const top = el.getBoundingClientRect().top + window.scrollY - head - 10;
-      window.scrollTo({ top: Math.max(0, top), behavior: smooth ? 'smooth' : 'auto' });
-    });
-  }, []);
-
-  // Coming back to the workout: jump straight to where you are.
-  const landed = useRef(false);
-  useLayoutEffect(() => {
-    if (landed.current || !curId || cur === 0) return;
-    landed.current = true;
-    // after App's scroll-to-top on route change
-    setTimeout(() => scrollToBlock(curId, false), 0);
-  }, [curId, cur, scrollToBlock]);
-
-  // When a block is finished: fold it away and move to the next one.
-  const doneIds = w ? w.blocks.filter(blockComplete).map((b) => b.id) : [];
-  const doneKey = doneIds.join(',');
-  const prevDone = useRef<Set<string> | null>(null);
-  /** A block was just finished and the screen is moving to the next one: the set-follow below leaves it alone. */
-  const jumped = useRef(false);
-  useEffect(() => {
-    const now = new Set(doneKey ? doneKey.split(',') : []);
-    const before = prevDone.current;
-    prevDone.current = now;
-    if (!before) return;
-    const fresh = [...now].filter((id) => !before.has(id));
-    if (!fresh.length) return;
+  const onBlocksDone = useCallback((ids: string[]) => {
+    // a finished block folds again, even if it was opened by hand
     setOverride((o) => {
       const n = { ...o };
-      for (const id of fresh) delete n[id];
+      for (const id of ids) delete n[id];
       return n;
     });
-    jumped.current = true;
-    if (curId) scrollToBlock(curId);
-  }, [doneKey, curId, scrollToBlock]);
-
-  // After a tick: if the next set to do is now behind the header (rest bar) or the bottom nav, bring it into view.
-  const doneSets = w ? workoutProgress(w).done : 0;
-  const prevSets = useRef(doneSets);
-  useEffect(() => {
-    const before = prevSets.current;
-    prevSets.current = doneSets;
-    const blockChanged = jumped.current;
-    jumped.current = false;
-    if (doneSets <= before || blockChanged) return;
-    // let the block-change scroll and the rest bar settle first
-    const t = setTimeout(() => {
-      const row = document.querySelector<HTMLElement>('.set-row.now');
-      if (!row) return;
-      const r = row.getBoundingClientRect();
-      const top = headRef.current?.getBoundingClientRect().bottom ?? 0;
-      const nav = document.querySelector('.nav')?.getBoundingClientRect().top ?? window.innerHeight;
-      if (r.top >= top + 4 && r.bottom <= nav - 4) return;
-      const mid = top + (nav - top) / 2;
-      window.scrollTo({ top: Math.max(0, window.scrollY + r.top + r.height / 2 - mid), behavior: 'smooth' });
-    }, 120);
-    return () => clearTimeout(t);
-  }, [doneSets]);
+  }, []);
+  useFollowWorkout(w, cur, headRef, onBlocksDone);
 
   if (!w) return <Navigate to="/" replace />;
 
@@ -209,7 +155,7 @@ export function WorkoutScreen() {
         </div>
       )}
 
-      <div className="wo-add-row" style={{ marginTop: 16 }}>
+      <div className="wo-add-row">
         <button className="btn btn-lg btn-dashed grow" onClick={() => setPicking(true)}>
           <IconPlus /> Add exercise
         </button>
@@ -220,19 +166,19 @@ export function WorkoutScreen() {
         )}
       </div>
 
-      <div className="card" style={{ marginTop: 16, padding: '10px 14px' }}>
+      <div className="card wo-map">
         <button className="spread map-toggle" onClick={() => setShowMap(!showMap)} aria-expanded={showMap}>
-          <span style={{ fontWeight: 700 }}>Muscles worked so far</span>
+          <span className="wo-map-title">Muscles worked so far</span>
           <span className="small dim">{showMap ? 'Hide' : 'Show'}</span>
         </button>
         {showMap && (
-          <div style={{ marginTop: 8 }} className="bm-compact">
+          <div className="bm-compact wo-map-body">
             <BodyMap load={load} size="small" />
           </div>
         )}
       </div>
 
-      <div className="stack" style={{ marginTop: 16 }}>
+      <div className="stack wo-actions">
         {cur !== -1 && (
           <button className="btn btn-primary btn-block btn-lg" onClick={finish}>
             Finish workout

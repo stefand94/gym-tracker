@@ -351,6 +351,25 @@
 .wo-add-row {
   display: flex;
   gap: 8px;
+  margin-top: 16px;
+}
+
+/* below the exercises: the muscle map card, then Finish / Ask / note / save / discard */
+.wo-map {
+  margin-top: 16px;
+  padding: 10px 14px;
+}
+
+.wo-map-title {
+  font-weight: 700;
+}
+
+.wo-map-body {
+  margin-top: 8px;
+}
+
+.wo-actions {
+  margin-top: 16px;
 }
 
 .ss-tag {

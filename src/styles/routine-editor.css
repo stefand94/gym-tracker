@@ -5,6 +5,22 @@
   margin: 4px 0 8px;
 }
 
+.re-back {
+  margin-left: -10px;
+}
+
+.re .wo-add-row {
+  margin-top: 12px;
+}
+
+.re-ask {
+  margin-top: 8px;
+}
+
+.re-bottom {
+  margin-top: 20px;
+}
+
 .re-name {
   display: block;
   width: 100%;

@@ -99,35 +99,20 @@ export function Progress() {
     <div>
       <h1 className="page-title">Progress</h1>
 
-      <button className="card routine" onClick={() => setPicking(true)}>
+      <button type="button" className="card prog-pick" onClick={() => setPicking(true)}>
         {ex && <BodyMap load={exerciseMap(ex)} scaleMax={1} size="mini" />}
         <div className="grow">
           <div className="small dim">Exercise</div>
           <div className="routine-name">{ex?.name ?? 'Choose an exercise'}</div>
           {ex && <div className="routine-meta">{ex.primary.map((m) => MUSCLE_LABELS[m]).join(', ')}</div>}
         </div>
-        <span className="small" style={{ color: 'var(--accent)', fontWeight: 700 }}>
-          Change
-        </span>
+        <span className="small prog-change">Change</span>
       </button>
 
       {performed.length > 1 && (
-        <div
-          className="chips"
-          style={{
-            marginTop: 10,
-            flexWrap: 'nowrap',
-            overflowX: 'auto',
-            paddingBottom: 4,
-          }}
-        >
+        <div className="chips prog-recent">
           {performed.slice(0, 12).map((pid) => (
-            <button
-              key={pid}
-              className={'chip' + (pid === exId ? ' on' : '')}
-              style={{ flexShrink: 0 }}
-              onClick={() => nav(`/progress/${pid}`, { replace: true })}
-            >
+            <button key={pid} className={'chip' + (pid === exId ? ' on' : '')} onClick={() => nav(`/progress/${pid}`, { replace: true })}>
               {getExercise(pid)?.name ?? pid}
             </button>
           ))}
@@ -136,7 +121,7 @@ export function Progress() {
 
       {ex && metric && (
         <>
-          <div className="chips" style={{ margin: '16px 0 10px' }}>
+          <div className="chips prog-metrics">
             {metrics.map((m) => (
               <button key={m.key} className={'chip' + (m.key === metric.key ? ' on' : '')} onClick={() => setMetricKey(m.key)}>
                 {m.label}
@@ -144,7 +129,7 @@ export function Progress() {
             ))}
           </div>
 
-          <div className="stat-grid" style={{ marginBottom: 10 }}>
+          <div className="stat-grid prog-stats">
             <div className="stat">
               <div className="stat-v">{fmtNum(latest ?? undefined)}</div>
               <div className="stat-l">latest {metric.unit}</div>
@@ -268,13 +253,11 @@ export function Progress() {
               <div className="section-title">Recent sessions</div>
               <div className="card list-card">
                 {sessions.map(({ w, sets, stations }) => (
-                  <div key={w.id} className="list-row" style={{ alignItems: 'flex-start' }}>
-                    <div className="small dim" style={{ width: 64, flexShrink: 0 }}>
-                      {fmtDate(w.startedAt, { day: 'numeric', month: 'short' })}
-                    </div>
+                  <div key={w.id} className="list-row prog-session">
+                    <div className="small dim prog-date">{fmtDate(w.startedAt, { day: 'numeric', month: 'short' })}</div>
                     <div className="hist-sets grow">
                       {stations.map((st) => (
-                        <span key={st} className="station-tag" style={{ marginLeft: 0 }}>
+                        <span key={st} className="station-tag">
                           📍 {st}
                         </span>
                       ))}
@@ -307,9 +290,7 @@ export function Progress() {
                   className="list-row records-link"
                   onClick={() => nav(`/progress/${r.exerciseId}`, { replace: true })}
                 >
-                  <div className="small dim" style={{ width: 64, flexShrink: 0 }}>
-                    {fmtDate(r.date, { day: 'numeric', month: 'short' })}
-                  </div>
+                  <div className="small dim prog-date">{fmtDate(r.date, { day: 'numeric', month: 'short' })}</div>
                   <div className="grow">
                     <div style={{ fontWeight: 700 }}>{rx?.name ?? r.exerciseId}</div>
                     {r.station && <div className="small dim">📍 {r.station}</div>}

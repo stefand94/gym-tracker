@@ -1,47 +1,32 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ExerciseEditor } from '../components/ExerciseEditor';
 import { ExercisePicker } from '../components/ExercisePicker';
-import { HowToSheet } from '../components/HowToSheet';
 import { AskSheet } from '../components/AskSheet';
-import { IconBack, IconClose, IconInfo, IconPlus, IconSpark } from '../components/Icons';
+import { IconBack, IconClose, IconPlus, IconSpark } from '../components/Icons';
 import { ReorderSheet, type ReorderBlock } from '../components/ReorderSheet';
 import { ConfirmSheet } from '../components/Sheet';
-import { StationSheet, usesStations } from '../components/StationSheet';
-import { Stepper } from '../components/Stepper';
+import { RoutineItemEditor } from '../components/RoutineItemEditor';
+import { StationSheet } from '../components/StationSheet';
 import { getExercise, ROUTINES } from '../data/library';
-import { uid } from '../lib/id';
-import { lastPerformance } from '../lib/prefill';
 import { AREA_LABELS } from '../lib/rehab';
+import {
+  appendExercise,
+  fromEditor,
+  removeItems,
+  splitSuperset,
+  toEditor,
+  updateItem as updateBlockItem,
+  type EBlock,
+  type EItem,
+} from '../lib/routineBlocks';
 import { newRoutineId } from '../lib/routineEdit';
 import { applyLayout } from '../lib/workout';
 import { useStore } from '../state/store';
 import { useClaude } from '../state/useClaude';
-import type { Exercise, Routine, RoutineBlock, RoutineItem } from '../types';
-
-type EItem = RoutineItem & { id: string };
-type EBlock = { id: string; superset?: boolean; rehabDose?: RoutineBlock['rehabDose']; items: EItem[] };
+import type { Exercise, Routine, RoutineItem } from '../types';
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-/** Editor blocks: a plain block with several exercises becomes one block each (as in a workout). */
-function toEditor(blocks: RoutineBlock[]): EBlock[] {
-  return blocks.flatMap((b) => {
-    const items = b.items.map((i) => ({ ...i, id: uid() }));
-    if (b.rehabDose || (b.superset && items.length > 1)) return [{ id: uid(), superset: !b.rehabDose, rehabDose: b.rehabDose, items }];
-    return items.map((i) => ({ id: uid(), items: [i] }));
-  });
-}
-
-function fromEditor(blocks: EBlock[]): RoutineBlock[] {
-  return blocks
-    .filter((b) => b.items.length)
-    .map((b) => {
-      const items = b.items.map(({ id: _id, ...i }) => i);
-      if (b.rehabDose) return { rehabDose: b.rehabDose, items };
-      return b.superset && items.length > 1 ? { superset: true, items } : { items };
-    });
-}
 
 /** Build or edit a routine: name, exercises in blocks (reorder and superset in a sheet), sets/reps/weight, stations. */
 export function RoutineEditor() {
@@ -102,28 +87,10 @@ export function RoutineEditor() {
   };
   const leave = () => (dirty ? setAsk('leave') : nav(-1));
 
-  const updateItem = (itemId: string, patch: Partial<RoutineItem>) =>
-    setBlocks((bs) => bs.map((b) => ({ ...b, items: b.items.map((i) => (i.id === itemId ? { ...i, ...patch } : i)) })));
-  const removeIds = (ids: string[]) =>
-    setBlocks((bs) =>
-      bs
-        .map((b) => {
-          const items = b.items.filter((i) => !ids.includes(i.id));
-          return { ...b, items, superset: !!b.superset && items.length > 1 };
-        })
-        .filter((b) => b.items.length),
-    );
-  const split = (blockId: string) =>
-    setBlocks((bs) => bs.flatMap((b) => (b.id === blockId ? b.items.map((i, n) => ({ id: n ? uid() : b.id, items: [i] })) : [b])));
+  const updateItem = (itemId: string, patch: Partial<RoutineItem>) => setBlocks((bs) => updateBlockItem(bs, itemId, patch));
+  const removeIds = (ids: string[]) => setBlocks((bs) => removeItems(bs, ids));
   const add = (ex: Exercise) => {
-    const d = ex.defaults;
-    const item: EItem = {
-      id: uid(),
-      exerciseId: ex.id,
-      sets: d.sets,
-      ...(ex.type === 'timed' ? { seconds: d.seconds } : { reps: d.reps }),
-    };
-    setBlocks((bs) => [...bs, { id: uid(), items: [item] }]);
+    setBlocks((bs) => appendExercise(bs, ex));
     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 50);
   };
 
@@ -137,7 +104,7 @@ export function RoutineEditor() {
   return (
     <div className="re">
       <div className="spread re-top">
-        <button className="icon-btn" aria-label="Back" onClick={leave} style={{ marginLeft: -10 }}>
+        <button className="icon-btn re-back" aria-label="Back" onClick={leave}>
           <IconBack />
         </button>
         <span className="dim small grow">{existing ? 'Edit workout' : 'New workout'}</span>
@@ -191,13 +158,13 @@ export function RoutineEditor() {
               {b.superset && (
                 <div className="re-ss-head">
                   <span className="badge badge-ss">Superset {letter}</span>
-                  <button className="link-btn" onClick={() => split(b.id)}>
+                  <button className="link-btn" onClick={() => setBlocks((bs) => splitSuperset(bs, b.id))}>
                     Split
                   </button>
                 </div>
               )}
               {b.items.map((it, k) => (
-                <ItemEditor
+                <RoutineItemEditor
                   key={it.id}
                   item={it}
                   mark={b.superset ? `${letter}${k + 1}` : String(n + 1)}
@@ -212,7 +179,7 @@ export function RoutineEditor() {
       </div>
 
       {!blocks.length && <div className="empty">No exercises yet.</div>}
-      <div className="wo-add-row" style={{ marginTop: 12 }}>
+      <div className="wo-add-row">
         <button className="btn btn-lg btn-dashed grow" onClick={() => setPicking(true)}>
           <IconPlus /> Add exercise
         </button>
@@ -230,7 +197,7 @@ export function RoutineEditor() {
         />
       )}
       {aiReady && (
-        <button className="btn btn-block btn-ghost ask-btn" style={{ marginTop: 8 }} onClick={() => setAsking(true)}>
+        <button className="btn btn-block btn-ghost ask-btn re-ask" onClick={() => setAsking(true)}>
           <IconSpark /> Ask Claude to build or change this
         </button>
       )}
@@ -245,7 +212,7 @@ export function RoutineEditor() {
         />
       )}
 
-      <div className="stack" style={{ marginTop: 20 }}>
+      <div className="stack re-bottom">
         <button className="btn btn-primary btn-block btn-lg" onClick={save}>
           Save workout
         </button>
@@ -319,102 +286,6 @@ export function RoutineEditor() {
           onClose={() => setAsk(null)}
         />
       )}
-    </div>
-  );
-}
-
-/** One exercise: name, station, and sets / reps (or seconds) / weight steppers. Unset values show last time's, dimmed. */
-function ItemEditor({
-  item,
-  mark,
-  onChange,
-  onRemove,
-  onStation,
-}: {
-  item: EItem;
-  mark: string;
-  onChange: (p: Partial<RoutineItem>) => void;
-  onRemove: () => void;
-  onStation: () => void;
-}) {
-  const { state } = useStore();
-  const [howTo, setHowTo] = useState(false);
-  const ex = getExercise(item.exerciseId);
-  const last = useMemo(() => lastPerformance(item.exerciseId, state.history, item.station), [item.exerciseId, item.station, state.history]);
-  if (!ex) return null;
-  const d = ex.defaults;
-  const timed = ex.type === 'timed';
-  const sets = item.sets ?? last?.length ?? d.sets;
-  const count = timed ? (item.seconds ?? last?.[0]?.seconds ?? d.seconds ?? 30) : (item.reps ?? last?.[0]?.reps ?? d.reps ?? 10);
-  const weight = item.weight ?? last?.[0]?.weight ?? d.weight;
-  const showWeight = ex.type !== 'bodyweight' && ex.type !== 'timed' ? true : item.weight !== undefined;
-  const station = usesStations(ex) || !!item.station;
-
-  return (
-    <div className="re-item">
-      <div className="re-row">
-        <span className="re-mark">{mark}</span>
-        <div className="grow re-ex-wrap">
-          <div className="re-ex">{ex.name}</div>
-          <div className="small dim">
-            {ex.equipment}
-            {ex.weightNote ? ` · ${ex.weightNote}` : ''}
-          </div>
-        </div>
-        <button className="icon-btn" aria-label={`How to do ${ex.name}`} onClick={() => setHowTo(true)}>
-          <IconInfo />
-        </button>
-        <button className="icon-btn" aria-label={`Remove ${ex.name}`} onClick={onRemove}>
-          <IconClose />
-        </button>
-      </div>
-      {howTo && <HowToSheet ex={ex} onClose={() => setHowTo(false)} />}
-      {station && (
-        <button type="button" className={'station-chip' + (item.station ? ' set' : '')} onClick={onStation}>
-          {item.station ? <>📍 {item.station}</> : '+ Station'}
-        </button>
-      )}
-      <div className="re-nums">
-        <div className={'re-num' + (item.sets === undefined ? ' auto' : '')}>
-          <span>sets</span>
-          <Stepper
-            value={sets}
-            step={1}
-            min={1}
-            unit=""
-            label={`${ex.name} sets`}
-            onChange={(v) => onChange({ sets: Math.max(1, Math.round(v)) })}
-          />
-        </div>
-        <div className={'re-num' + ((timed ? item.seconds : item.reps) === undefined ? ' auto' : '')}>
-          <span>{timed ? 'seconds' : 'reps'}</span>
-          <Stepper
-            value={count}
-            step={timed ? 5 : 1}
-            min={1}
-            unit=""
-            label={`${ex.name} ${timed ? 'seconds' : 'reps'}`}
-            onChange={(v) => onChange(timed ? { seconds: Math.round(v) } : { reps: Math.round(v) })}
-          />
-        </div>
-        {showWeight ? (
-          <div className={'re-num' + (item.weight === undefined ? ' auto' : '')}>
-            <span>{item.weight === undefined ? 'kg · last' : 'kg'}</span>
-            <Stepper
-              value={weight}
-              step={ex.type === 'machine' ? 5 : 2.5}
-              unit=""
-              decimals
-              label={`${ex.name} weight`}
-              onChange={(v) => onChange({ weight: v })}
-            />
-          </div>
-        ) : (
-          <button className="re-num re-add-kg" onClick={() => onChange({ weight: 2.5 })}>
-            + kg
-          </button>
-        )}
-      </div>
     </div>
   );
 }

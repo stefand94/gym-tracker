@@ -1,0 +1,57 @@
+/* Progress screen */
+
+.prog-change {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* recently done exercises: one scrolling row of chips */
+.chips.prog-recent {
+  margin-top: 10px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.prog-recent .chip {
+  flex-shrink: 0;
+}
+
+.prog-metrics {
+  margin: 16px 0 10px;
+}
+
+.prog-stats {
+  margin-bottom: 10px;
+}
+
+.prog-session {
+  align-items: flex-start;
+}
+
+.prog-session .station-tag {
+  margin-left: 0;
+}
+
+.prog-date {
+  width: 64px;
+  flex-shrink: 0;
+}
+
+/* the exercise picker card at the top */
+.prog-pick {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 76px;
+  padding: 12px 14px;
+  border: none;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+
+.prog-pick:active {
+  background: var(--surface-2);
+}

@@ -8,16 +8,23 @@ _Last updated 2026-11-21._
 
 ## State
 
-- The newest commit is the SortableJS reorder drag and the workout-card usability pass (below). Check with `git log` and
+- The newest commit is a small tidy (below); before it, the SortableJS reorder drag and the workout-card usability pass. Check with `git log` and
   `gh run list` whether it has been pushed and deployed.
-- `npm run check` passes: types, ESLint, Prettier and 146 tests. `npm run build` passes too (the warning that the
+- `npm run check` passes: types, ESLint, Prettier and 151 tests. `npm run build` passes too (the warning that the
   main chunk is over 500 kB is expected).
 - Stefan uses the app on his phone as an installed PWA, often while driving this session over Remote Control. Keep
   replies short and plain, and ask one clear question when something is his call.
 
 ## Recently built (newest first)
 
-1. **SortableJS reorder drag, workout-card usability pass** (2026-11-21).
+1. **Tidy** (2026-11-21, after Stefan asked whether a full refactor was due: no, it was tidied recently; tidy as you
+   go instead). The workout screen's scroll logic is one hook (`useFollowWorkout`); the store is split into types,
+   reducer, sync queue and persistence; the routine editor's block edits moved to `lib/routineBlocks.ts` (with tests)
+   and its item row to `RoutineItemEditor.tsx`; static inline styles in Progress, the workout screen and the routine
+   editor moved to stylesheets. Fixed on the way: finishing the first block re-ran the "arrival" jump, and the
+   Progress exercise card had lost its styling when Home's routine cards changed. History, Body and Home still have
+   some static inline styles.
+2. **SortableJS reorder drag, workout-card usability pass** (2026-11-21).
    - On his iPhone the hand-made drag grabbed a row but the sheet wouldn't scroll, so he couldn't steer the drop. He
      picked SortableJS: `ReorderSheet` creates it with `forceFallback` and auto-scroll on the `.sheet`, then undoes
      Sortable's DOM move in `onEnd` and applies `moveBlock` to React state. Tried with synthetic touch-type pointer
@@ -31,7 +38,7 @@ _Last updated 2026-11-21._
    - He did **not** pick turning the rest timer on by default; leave it.
    - Known, not fixed: opening `/routines/<id>` straight from a not-found route shows an empty editor (the route has
      no key). Minor.
-2. **Reorder sheet, folding cards, two-sided holds** (from Stefan's app notes, 2026-11-21).
+3. **Reorder sheet, folding cards, two-sided holds** (from Stefan's app notes, 2026-11-21).
    - Drag-and-drop on the cards (`@dnd-kit`, `BlockDnd.tsx`) is gone: it swapped the list for compact rows mid-drag,
      so things jumped under the finger. Now a **Reorder** button (next to Add exercise, and in each exercise's menu)
      opens `ReorderSheet`: a fixed compact list, drag by the grip or tap ↑/↓, and a Superset menu per exercise
@@ -43,7 +50,7 @@ _Last updated 2026-11-21._
    - Also from his workout notes: Russian twist cue (one rep = one side); the note reader now drops a message he
      takes back ("scrap that").
    - All tried in the browser on a mobile viewport with a made-up workout. Not yet tried on his phone (touch drag).
-3. **Stall detection** (`src/lib/stall.ts`, `src/lib/workout/stall.ts`, `src/components/workout/StallSheet.tsx`).
+4. **Stall detection** (`src/lib/stall.ts`, `src/lib/workout/stall.ts`, `src/components/workout/StallSheet.tsx`).
    A "Stuck" tag on the workout card when the last 4 sessions didn't beat the best before them, or reps were missed 2
    sessions running at one weight. The fixes are a ~10% reset, two other sets × reps (saved to the routine), a swap, or
    "Not now". Progress shows a note and greys the stuck points. Claude sees a STUCK list (`aiContext.ts`), and the
@@ -53,12 +60,12 @@ _Last updated 2026-11-21._
      If one looks wrong, check `findStall` against his synced workouts (read-only).
    - Swap reuses the existing Replace picker and wasn't tried in the browser. Reset, the rep schemes and the Progress
      note were tested in the browser with made-up workouts.
-4. **Codebase tidy** (`a5c756f`). Workout logic is split by concern in `src/lib/workout/`, the workout card in
+5. **Codebase tidy** (`a5c756f`). Workout logic is split by concern in `src/lib/workout/`, the workout card in
    `src/components/workout/`, and the CSS in `src/styles/`. ESLint and Prettier were added, and CI lints before
    deploying.
-5. **Fixes** (`943715b`). The rehab dose keeps its own blocks when moved. Sync merges fixes made in the repo
+6. **Fixes** (`943715b`). The rehab dose keeps its own blocks when moved. Sync merges fixes made in the repo
    (`merge3`) instead of overwriting them. Walk–jog intervals chain from when the last one ended.
-6. **Go-up nudges, personal records, warm-up sets, hamstring rehab phase 4** (`870f540`).
+7. **Go-up nudges, personal records, warm-up sets, hamstring rehab phase 4** (`870f540`).
 
 ## Open items and ideas
 

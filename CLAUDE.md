@@ -108,10 +108,16 @@ fixes formatting (Prettier skips `Icons.tsx`, the data JSON and this file). Push
   `sets` and `items` (edits), `stall` (the fixes for a stuck exercise), `layout` (blocks, supersets, the reorder sheet's moves, the rehab dose's edge), `intervals`,
   `status`. Import from `lib/workout`.
 - `src/components/workout/`: the workout card (`WorkoutBlockView` → single, superset or collapsed block; tap a header to fold it).
+  `useFollowWorkout` keeps the screen on the current block and the next set.
+- `src/state/`: `store.tsx` (provider, `useStore`; import from here) re-exports `types` (state, actions), `reducer`,
+  `queue` (the sync queue) and `persist` (localStorage).
+- `src/screens/RoutineEditor.tsx`: its blocks and their edits are in `src/lib/routineBlocks.ts`, one exercise's row in
+  `src/components/RoutineItemEditor.tsx`.
 - `src/components/ReorderSheet.tsx`: Reorder & supersets, shared by the workout and the routine editor (drag a row via
   SortableJS, whose fallback drag scrolls the sheet near its edges, or ↑/↓,
   a Superset menu per exercise); `applyLayout` in `lib/workout/layout` writes its result back.
-- `src/styles/`: one stylesheet per area, imported in cascade order by `index.css`.
+- `src/styles/`: one stylesheet per area, imported in cascade order by `index.css`. Keep `style={{…}}` for values
+  computed at runtime (widths, chart colours); everything else goes in a stylesheet.
 - `src/lib/merge.ts`: every merge — versioned lists, keyed maps, and `merge3` for workouts edited on both sides.
 
 ## Reading Stefan's history
