@@ -5,7 +5,7 @@ import { lastPerformance } from '../prefill';
 import { mapItem } from './core';
 import { fromLast, warmupSets, withFreshWarmups } from './plan';
 
-export type SetPatch = Partial<Pick<SetEntry, 'weight' | 'reps' | 'seconds'>>;
+export type SetPatch = Partial<Pick<SetEntry, 'weight' | 'reps' | 'seconds' | 'secondsR'>>;
 
 export function toggleSet(w: Workout, itemId: string, setIndex: number): Workout {
   return mapItem(w, itemId, (i) => ({
@@ -15,12 +15,23 @@ export function toggleSet(w: Workout, itemId: string, setIndex: number): Workout
   }));
 }
 
-/** Log a timed set as held for `seconds` and tick it (only that set changes). */
-export function completeHold(w: Workout, itemId: string, setIndex: number, seconds: number): Workout {
+/**
+ * Log a timed set as held for `seconds` and tick it (only that set changes). On a two-sided hold the left side
+ * only logs its seconds (the right is still to come); the right side logs its own and ticks the set.
+ */
+export function completeHold(w: Workout, itemId: string, setIndex: number, seconds: number, side?: 'L' | 'R'): Workout {
   return mapItem(w, itemId, (i) => ({
     ...i,
     status: i.status === 'skipped' ? 'pending' : i.status,
-    sets: i.sets.map((s, idx) => (idx === setIndex ? { ...s, seconds, done: true } : s)),
+    sets: i.sets.map((s, idx) =>
+      idx !== setIndex
+        ? s
+        : side === 'L'
+          ? { ...s, seconds }
+          : side === 'R'
+            ? { ...s, secondsR: seconds, done: true }
+            : { ...s, seconds, done: true },
+    ),
   }));
 }
 

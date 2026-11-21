@@ -33,6 +33,8 @@ Stefan adds exercises and routines by asking Claude, not in the app. Weights are
 - `"warmup": true` (heavy barbell lifts) gives an exercise ramp-up sets when a workout starts: bar, ~50%, ~75%.
   They live in `WorkoutItem.warmups`, apart from `sets`, so nothing counts them (load, progress, PRs, pre-fill).
   Any weight/machine exercise can add them from its menu.
+- `"sides": true` (timed, e.g. `side-plank`): each set has left and right seconds (`seconds` = left, `secondsR` = right).
+  The left timer runs into the right after a 5 s switch; records, stalls and progress use the weaker side (`src/lib/sides.ts`).
 - `"intervals": true` (timed, e.g. `jog-interval` / `walk-interval`): in a superset the next interval's timer starts
   as soon as one ends, no rest between. The rehab dose skips them.
 - Never change an existing `id` — logged workouts reference it.
@@ -103,9 +105,11 @@ fixes formatting (Prettier skips `Icons.tsx`, the data JSON and this file). Push
 ## Where things live
 
 - `src/lib/workout/`: the workout in progress, one concern per file: `plan` (starting sets, go-up, warm-ups),
-  `sets` and `items` (edits), `stall` (the fixes for a stuck exercise), `layout` (blocks, supersets, drag-and-drop, the rehab dose's edge), `intervals`,
+  `sets` and `items` (edits), `stall` (the fixes for a stuck exercise), `layout` (blocks, supersets, the reorder sheet's moves, the rehab dose's edge), `intervals`,
   `status`. Import from `lib/workout`.
-- `src/components/workout/`: the workout card (`WorkoutBlockView` → single, superset or collapsed block).
+- `src/components/workout/`: the workout card (`WorkoutBlockView` → single, superset or collapsed block; tap a header to fold it).
+- `src/components/ReorderSheet.tsx`: Reorder & supersets, shared by the workout and the routine editor (drag a row or ↑/↓,
+  a Superset menu per exercise); `applyLayout` in `lib/workout/layout` writes its result back.
 - `src/styles/`: one stylesheet per area, imported in cascade order by `index.css`.
 - `src/lib/merge.ts`: every merge — versioned lists, keyed maps, and `merge3` for workouts edited on both sides.
 

@@ -28,6 +28,7 @@ export function ItemMenu({
   update,
   onClose,
   onNote,
+  onReorder,
 }: {
   ex: Exercise;
   item: WorkoutItem;
@@ -35,6 +36,7 @@ export function ItemMenu({
   update: Update;
   onClose: () => void;
   onNote: () => void;
+  onReorder: () => void;
 }) {
   const { state } = useStore();
   const [armed, setArmed] = useState(false);
@@ -91,6 +93,15 @@ export function ItemMenu({
           {item.warmups?.length ? 'Remove warm-up sets' : 'Add warm-up sets'}
         </button>
       )}
+      <button
+        className="menu-item"
+        onClick={() => {
+          onClose();
+          onReorder();
+        }}
+      >
+        Reorder & supersets…
+      </button>
       <button
         className="menu-item"
         disabled={!state.active || !canSupersetWithNext(state.active, block.id)}

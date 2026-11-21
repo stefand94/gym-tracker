@@ -147,6 +147,7 @@ export function notePrompt(item: WorkoutItem, ex: Exercise, canSwap: boolean): s
     canSwap
       ? '- swap: an exercise from the catalogue to do instead next time, if he says this one did not work for him.'
       : '- (no swaps: this workout is not from a routine)',
+    'If he takes back an earlier message ("scrap that", "ignore that"), that message no longer counts: go by the new one and do not ask about the old.',
     'Return an empty list if it is just a remark. Never invent numbers. Do not repeat a suggestion that is already waiting.',
     'reply: one short line, no praise words. Ask a question only when an answer would change his log (e.g. which set hurt).',
   ]

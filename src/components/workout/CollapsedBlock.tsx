@@ -1,7 +1,6 @@
 import { getExercise } from '../../data/library';
 import { itemSummary } from '../../lib/format';
 import { blockComplete } from '../../lib/workout';
-import { DragHandle, type DragSpec } from '../BlockDnd';
 import { blockLetter } from './shared';
 import type { BlockProps } from './WorkoutBlockView';
 
@@ -15,18 +14,12 @@ export function CollapsedBlock({ block, index, onToggle }: BlockProps) {
     const sub = block.superset
       ? `Superset · ${Math.max(...block.items.map((i) => i.sets.length))} rounds`
       : itemSummary(getExercise(first.exerciseId), first);
-    const spec: DragSpec = block.superset
-      ? { key: `b:${block.id}`, ids: block.items.map((i) => i.id), label: `Superset ${letter}` }
-      : { key: `i:${first.id}`, ids: [first.id], label: names };
     return (
-      <div className="crow-wrap">
-        <DragHandle spec={spec} className="grip-row" />
-        <button type="button" className="crow crow-next" onClick={onToggle}>
-          <span className="crow-mark">{block.superset ? letter : index + 1}</span>
-          <span className="crow-name">{names}</span>
-          <span className="crow-sum num">{sub}</span>
-        </button>
-      </div>
+      <button type="button" className="crow crow-next" onClick={onToggle} aria-expanded={false}>
+        <span className="crow-mark">{block.superset ? letter : index + 1}</span>
+        <span className="crow-name">{names}</span>
+        <span className="crow-sum num">{sub}</span>
+      </button>
     );
   }
   return (

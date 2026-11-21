@@ -9,7 +9,7 @@ import { useRecords, useStartRest } from './shared';
 import type { BlockProps } from './WorkoutBlockView';
 
 /** One exercise on its own, shown in full. */
-export function SingleBlock({ block, update, current, onToggle }: BlockProps) {
+export function SingleBlock({ block, update, current, onToggle, onReorder }: BlockProps) {
   const item = block.items[0];
   const ex = getExercise(item.exerciseId);
   const [menu, setMenu] = useState(false);
@@ -25,9 +25,8 @@ export function SingleBlock({ block, update, current, onToggle }: BlockProps) {
         ex={ex}
         item={item}
         update={update}
-        drag={{ key: `i:${item.id}`, ids: [item.id], label: ex.name }}
         onMenu={() => setMenu(true)}
-        onHeadTap={current ? undefined : onToggle}
+        onHeadTap={onToggle}
         noteOpen={noteOpen}
         onNote={setNoteOpen}
       />
@@ -69,7 +68,15 @@ export function SingleBlock({ block, update, current, onToggle }: BlockProps) {
         </button>
       </div>
       {menu && (
-        <ItemMenu ex={ex} item={item} block={block} update={update} onClose={() => setMenu(false)} onNote={() => setNoteOpen(true)} />
+        <ItemMenu
+          ex={ex}
+          item={item}
+          block={block}
+          update={update}
+          onClose={() => setMenu(false)}
+          onNote={() => setNoteOpen(true)}
+          onReorder={onReorder}
+        />
       )}
     </section>
   );

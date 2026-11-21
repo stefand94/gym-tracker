@@ -72,6 +72,7 @@ export function ExerciseEditor({
   const [touched, setTouched] = useState({ type: !!first, equipment: !!first, muscles: !!first });
   const [copying, setCopying] = useState(false);
   const [cue, setCue] = useState(first?.cue);
+  const [sides, setSides] = useState(!!first?.sides);
   const [howto, setHowto] = useState<HowTo | undefined>(first?.howto);
 
   // Claude fills in type, equipment, muscles, cue and a how-to (still marked for review).
@@ -150,6 +151,7 @@ export function ExerciseEditor({
     setDefaults(e.defaults);
     setWeightNote(e.weightNote);
     setCue(e.cue);
+    setSides(!!e.sides);
     setTouched({ type: true, equipment: true, muscles: true });
   };
 
@@ -170,8 +172,9 @@ export function ExerciseEditor({
     const id = existing?.id ?? uniqueId(clean, new Set(allExercises().map((e) => e.id)));
     const base = type === 'timed' ? { sets: 3, seconds: 30 } : { sets: 3, reps: 10 };
     const d = defaults && (type === 'timed') === (defaults.seconds !== undefined) ? defaults : base;
+    const { sides: _s, ...prev } = existing ?? ({} as Partial<Exercise>);
     const ex: Exercise = {
-      ...(existing ?? {}),
+      ...prev,
       id,
       name: clean,
       type,
@@ -181,6 +184,7 @@ export function ExerciseEditor({
       defaults: { ...d },
       ...(weightNote ? { weightNote } : {}),
       ...(cue ? { cue } : {}),
+      ...(type === 'timed' && sides ? { sides: true } : {}),
       ...(howto ? { howto } : {}),
       custom: true,
       reviewed: false,
@@ -238,6 +242,17 @@ export function ExerciseEditor({
             </button>
           ))}
         </div>
+        {type === 'timed' && (
+          <button
+            type="button"
+            role="switch"
+            aria-checked={sides}
+            className={'chip sides-chip' + (sides ? ' on' : '')}
+            onClick={() => setSides(!sides)}
+          >
+            {sides ? '✓ ' : ''}Each side apart (left / right seconds)
+          </button>
+        )}
 
         <div className="field-label">Equipment</div>
         <div className="chips">

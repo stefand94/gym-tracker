@@ -93,3 +93,7 @@
 .custom-list .picker-item {
   padding-inline: 0;
 }
+
+.sides-chip {
+  margin-top: 8px;
+}

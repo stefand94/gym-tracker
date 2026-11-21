@@ -276,3 +276,26 @@
   padding: 0;
   min-height: 32px;
 }
+
+/* Two-sided holds: left and right on their own lines, one tick for the set */
+.set-row.sided {
+  grid-template-rows: auto auto;
+  row-gap: 4px;
+}
+
+.set-row.sided > .set-idx {
+  grid-row: 1 / span 2;
+}
+
+.set-row.sided > .side-row {
+  grid-column: 2 / span 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 66px;
+  align-items: center;
+  gap: 8px;
+}
+
+.set-row.sided > .tick {
+  grid-column: 4;
+  grid-row: 1 / span 2;
+}

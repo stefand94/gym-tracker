@@ -164,3 +164,33 @@ describe('back to running (rehab phase 4)', () => {
     expect(items.some((i) => getExercise(i.exerciseId)?.intervals)).toBe(false);
   });
 });
+
+describe('two-sided holds', () => {
+  const plank = () => makeItem(ex('side-plank'), []);
+  const wk = (item: WorkoutItem): Workout => ({ id: 'w', name: 'W', startedAt: '', blocks: [{ id: 'b', superset: false, items: [item] }] });
+
+  it('plans left and right seconds, from last time when there is one', () => {
+    const fresh = plank();
+    expect(fresh.sets[0]).toMatchObject({ seconds: 30, secondsR: 30 });
+    const last = done([{ exerciseId: 'side-plank', sets: [{ seconds: 40, secondsR: 30, done: true }] }]);
+    expect(makeItem(ex('side-plank'), [last]).sets[0]).toMatchObject({ seconds: 40, secondsR: 30 });
+    // older logs without a right side: both sides start from the one number
+    const old = done([{ exerciseId: 'side-plank', sets: [{ seconds: 35, done: true }] }]);
+    expect(makeItem(ex('side-plank'), [old]).sets[0]).toMatchObject({ seconds: 35, secondsR: 35 });
+    expect(makeItem(ex('plank'), []).sets[0].secondsR).toBeUndefined();
+  });
+
+  it('the left side runs into the right after a switch, and only the right ticks the set', () => {
+    const item = { ...plank(), sets: [{ seconds: 20, secondsR: 15, done: false }] };
+    const w = wk(item);
+    const hold = { itemId: item.id, set: 0, goAt: 0, endsAt: 20_000, side: 'L' as const };
+    const mid = finishHolds(w, hold, 21_000, getExercise);
+    expect(mid.workout.blocks[0].items[0].sets[0]).toMatchObject({ seconds: 20, done: false });
+    expect(mid.next).toEqual({ itemId: item.id, set: 0, goAt: 25_000, endsAt: 40_000, side: 'R' });
+    // phone locked through both sides: both logged and the set ticked
+    const late = finishHolds(w, hold, 60_000, getExercise);
+    expect(late.next).toBeNull();
+    expect(late.workout.blocks[0].items[0].sets[0]).toEqual({ seconds: 20, secondsR: 15, done: true });
+    expect(completeHold(w, item.id, 0, 12, 'R').blocks[0].items[0].sets[0]).toEqual({ seconds: 20, secondsR: 12, done: true });
+  });
+});

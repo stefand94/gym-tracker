@@ -1382,7 +1382,7 @@
     "name": "Side plank",
     "type": "timed",
     "equipment": "Bodyweight",
-    "weightNote": "seconds per side",
+    "sides": true,
     "primary": [
       "obliques"
     ],
@@ -1515,6 +1515,7 @@
     "name": "Russian twist",
     "type": "bodyweight",
     "equipment": "Bodyweight",
+    "cue": "one rep = a twist to one side",
     "primary": [
       "obliques"
     ],

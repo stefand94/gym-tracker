@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { getExercise } from '../../data/library';
 import { addRound, blockComplete, roundComplete, setPain, toggleComplete } from '../../lib/workout';
-import { DragHandle } from '../BlockDnd';
+import { IconChevronUp } from '../Icons';
 import { PainStrip } from '../PainStrip';
 import { ItemHead } from './ItemHead';
 import { ItemMenu } from './ItemMenu';
@@ -10,7 +10,7 @@ import { blockLetter, useRecords, useStartRest } from './shared';
 import type { BlockProps } from './WorkoutBlockView';
 
 /** Exercises done round by round, resting only once a round is finished. */
-export function SupersetBlock({ block, index, update, current, onToggle }: BlockProps) {
+export function SupersetBlock({ block, index, update, current, onToggle, onReorder }: BlockProps) {
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const [noteFor, setNoteFor] = useState<string | null>(null);
   const startRest = useStartRest();
@@ -47,11 +47,13 @@ export function SupersetBlock({ block, index, update, current, onToggle }: Block
   return (
     <section className={'card ex-card ss-block' + (complete ? ' is-done' : '') + (current ? ' is-current' : '')}>
       <div className="spread ss-top">
-        <span className="ss-grab">
-          <DragHandle spec={{ key: `b:${block.id}`, ids: block.items.map((i) => i.id), label: `Superset ${letter}` }} />
-          <span className="badge badge-ss">Superset {letter}</span>
+        <span className="badge badge-ss">Superset {letter}</span>
+        <span className="ss-top-end">
+          {complete && <span className="badge badge-done">Done</span>}
+          <button type="button" className="icon-btn fold-btn" aria-label={`Fold superset ${letter}`} onClick={onToggle}>
+            <IconChevronUp />
+          </button>
         </span>
-        {complete && <span className="badge badge-done">Done</span>}
       </div>
       {entries.map(({ item, ex, tag }) =>
         ex ? (
@@ -61,9 +63,8 @@ export function SupersetBlock({ block, index, update, current, onToggle }: Block
               item={item}
               tag={tag}
               update={update}
-              drag={{ key: `i:${item.id}`, ids: [item.id], label: ex.name }}
               onMenu={() => setMenuFor(item.id)}
-              onHeadTap={current ? undefined : onToggle}
+              onHeadTap={onToggle}
               noteOpen={noteFor === item.id}
               onNote={(o) => setNoteFor(o ? item.id : null)}
             />
@@ -137,6 +138,7 @@ export function SupersetBlock({ block, index, update, current, onToggle }: Block
           update={update}
           onClose={() => setMenuFor(null)}
           onNote={() => setNoteFor(menuEntry.item.id)}
+          onReorder={onReorder}
         />
       )}
     </section>

@@ -4,6 +4,7 @@ import type { Exercise, Lookup, Routine, SetEntry, Stall, Workout } from '../typ
 import { fmtNum } from './format';
 import { finishedNewestFirst, lastStation, performances, stationKey, type Performance } from './prefill';
 import { epley } from './progress';
+import { holdOf } from './sides';
 
 /** Sessions in a row without beating the best before them. */
 const FLAT = 4;
@@ -28,7 +29,7 @@ function sessionScore(ex: Exercise, sets: SetEntry[]): number {
   return Math.max(
     ...sets.map((s) => {
       const kg = s.weight ?? 0;
-      if (ex.type === 'timed') return kg * 1000 + (s.seconds ?? 0);
+      if (ex.type === 'timed') return kg * 1000 + holdOf(s);
       if (ex.type === 'bodyweight') return kg * 1000 + (s.reps ?? 0);
       if (isAssisted(ex)) return -kg + (s.reps ?? 0) / 1000;
       return epley(kg, s.reps ?? 0);

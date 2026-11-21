@@ -1,11 +1,11 @@
 import { useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { BlockDnd, DragHandle, type DndBlock } from '../components/BlockDnd';
 import { ExerciseEditor } from '../components/ExerciseEditor';
 import { ExercisePicker } from '../components/ExercisePicker';
 import { HowToSheet } from '../components/HowToSheet';
 import { AskSheet } from '../components/AskSheet';
 import { IconBack, IconClose, IconInfo, IconPlus, IconSpark } from '../components/Icons';
+import { ReorderSheet, type ReorderBlock } from '../components/ReorderSheet';
 import { ConfirmSheet } from '../components/Sheet';
 import { StationSheet, usesStations } from '../components/StationSheet';
 import { Stepper } from '../components/Stepper';
@@ -14,7 +14,7 @@ import { uid } from '../lib/id';
 import { lastPerformance } from '../lib/prefill';
 import { AREA_LABELS } from '../lib/rehab';
 import { newRoutineId } from '../lib/routineEdit';
-import { moveItems, sameLayout, type DropTarget } from '../lib/workout';
+import { applyLayout } from '../lib/workout';
 import { useStore } from '../state/store';
 import { useClaude } from '../state/useClaude';
 import type { Exercise, Routine, RoutineBlock, RoutineItem } from '../types';
@@ -43,7 +43,7 @@ function fromEditor(blocks: EBlock[]): RoutineBlock[] {
     });
 }
 
-/** Build or edit a routine: name, exercises in blocks (drag to reorder or superset), sets/reps/weight, stations. */
+/** Build or edit a routine: name, exercises in blocks (reorder and superset in a sheet), sets/reps/weight, stations. */
 export function RoutineEditor() {
   const { id } = useParams();
   const { state, dispatch } = useStore();
@@ -64,13 +64,13 @@ export function RoutineEditor() {
       existing && draft
         ? snapshot(existing.name, existing.description ?? '', toEditor(existing.blocks))
         : snapshot(name, description, blocks);
-  const undo = useRef<EBlock[] | null>(null);
   const [picking, setPicking] = useState(false);
   const [creating, setCreating] = useState<string | null>(null);
   const [station, setStation] = useState<EItem | null>(null);
   const [ask, setAsk] = useState<'leave' | 'delete' | null>(null);
   const [tried, setTried] = useState(false);
   const [asking, setAsking] = useState(false);
+  const [reordering, setReordering] = useState(false);
   const { ready: aiReady } = useClaude();
 
   const itemCount = blocks.reduce((n, b) => n + b.items.length, 0);
@@ -127,21 +127,12 @@ export function RoutineEditor() {
     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 50);
   };
 
-  const dndBlocks: DndBlock[] = blocks.map((b) => ({
+  const reorderBlocks: ReorderBlock[] = blocks.map((b) => ({
     id: b.id,
     superset: !!b.superset,
+    rehabDose: b.rehabDose,
     items: b.items.map((i) => ({ id: i.id, name: getExercise(i.exerciseId)?.name ?? i.exerciseId })),
   }));
-  const onMove = (ids: string[], target: DropTarget) => {
-    const into = 'join' in target ? blocks.find((b) => b.id === target.join) : undefined;
-    const fromDose = blocks.some((b) => b.rehabDose && b.items.some((i) => ids.includes(i.id)));
-    if (into?.rehabDose || (into && fromDose)) return false; // the rehab dose stays its own block
-    const next = moveItems(blocks, ids, target, uid);
-    if (sameLayout(next, blocks)) return false;
-    undo.current = blocks;
-    setBlocks(next);
-    return true;
-  };
 
   return (
     <div className="re">
@@ -176,70 +167,68 @@ export function RoutineEditor() {
         </div>
       )}
 
-      <BlockDnd
-        blocks={dndBlocks}
-        onMove={onMove}
-        onUndo={() => {
-          if (undo.current) setBlocks(undo.current);
-          undo.current = null;
-        }}
-      >
-        <div className="re-list">
-          {blocks.map((b, at) => {
-            // the dose block isn't numbered, so the ones after it don't skip a number
-            const n = blocks.slice(0, at).filter((x) => !x.rehabDose).length;
-            const letter = LETTERS[n % 26];
-            const blockSpec = {
-              key: 'b:' + b.id,
-              ids: b.items.map((i) => i.id),
-              label: b.rehabDose ? `${AREA_LABELS[b.rehabDose]} dose` : `Superset ${letter}`,
-            };
-            if (b.rehabDose)
-              return (
-                <div key={b.id} className="re-block re-dose">
-                  <div className="re-row">
-                    <DragHandle spec={blockSpec} />
-                    <div className="grow">
-                      <div className="re-ex">{AREA_LABELS[b.rehabDose]} daily dose</div>
-                      <div className="small dim">Follows your rehab phase · ~5 min</div>
-                    </div>
-                    <button className="icon-btn" aria-label="Remove the rehab dose" onClick={() => removeIds(blockSpec.ids)}>
-                      <IconClose />
-                    </button>
-                  </div>
-                </div>
-              );
+      <div className="re-list">
+        {blocks.map((b, at) => {
+          // the dose block isn't numbered, so the ones after it don't skip a number
+          const n = blocks.slice(0, at).filter((x) => !x.rehabDose).length;
+          const letter = LETTERS[n % 26];
+          if (b.rehabDose)
             return (
-              <div key={b.id} className={'re-block' + (b.superset ? ' re-ss' : '')}>
-                {b.superset && (
-                  <div className="re-ss-head">
-                    <DragHandle spec={blockSpec} />
-                    <span className="badge badge-ss">Superset {letter}</span>
-                    <button className="link-btn" onClick={() => split(b.id)}>
-                      Split
-                    </button>
+              <div key={b.id} className="re-block re-dose">
+                <div className="re-row">
+                  <div className="grow">
+                    <div className="re-ex">{AREA_LABELS[b.rehabDose]} daily dose</div>
+                    <div className="small dim">Follows your rehab phase · ~5 min</div>
                   </div>
-                )}
-                {b.items.map((it, k) => (
-                  <ItemEditor
-                    key={it.id}
-                    item={it}
-                    mark={b.superset ? `${letter}${k + 1}` : String(n + 1)}
-                    onChange={(p) => updateItem(it.id, p)}
-                    onRemove={() => removeIds([it.id])}
-                    onStation={() => setStation(it)}
-                  />
-                ))}
+                  <button className="icon-btn" aria-label="Remove the rehab dose" onClick={() => removeIds(b.items.map((i) => i.id))}>
+                    <IconClose />
+                  </button>
+                </div>
               </div>
             );
-          })}
-        </div>
-      </BlockDnd>
+          return (
+            <div key={b.id} className={'re-block' + (b.superset ? ' re-ss' : '')}>
+              {b.superset && (
+                <div className="re-ss-head">
+                  <span className="badge badge-ss">Superset {letter}</span>
+                  <button className="link-btn" onClick={() => split(b.id)}>
+                    Split
+                  </button>
+                </div>
+              )}
+              {b.items.map((it, k) => (
+                <ItemEditor
+                  key={it.id}
+                  item={it}
+                  mark={b.superset ? `${letter}${k + 1}` : String(n + 1)}
+                  onChange={(p) => updateItem(it.id, p)}
+                  onRemove={() => removeIds([it.id])}
+                  onStation={() => setStation(it)}
+                />
+              ))}
+            </div>
+          );
+        })}
+      </div>
 
       {!blocks.length && <div className="empty">No exercises yet.</div>}
-      <button className="btn btn-block btn-lg btn-dashed" style={{ marginTop: 12 }} onClick={() => setPicking(true)}>
-        <IconPlus /> Add exercise
-      </button>
+      <div className="wo-add-row" style={{ marginTop: 12 }}>
+        <button className="btn btn-lg btn-dashed grow" onClick={() => setPicking(true)}>
+          <IconPlus /> Add exercise
+        </button>
+        {blocks.length > 1 && (
+          <button className="btn btn-lg" onClick={() => setReordering(true)}>
+            Reorder
+          </button>
+        )}
+      </div>
+      {reordering && (
+        <ReorderSheet
+          blocks={reorderBlocks}
+          onDone={(layout) => setBlocks((bs) => applyLayout(bs, layout))}
+          onClose={() => setReordering(false)}
+        />
+      )}
       {aiReady && (
         <button className="btn btn-block btn-ghost ask-btn" style={{ marginTop: 8 }} onClick={() => setAsking(true)}>
           <IconSpark /> Ask Claude to build or change this
@@ -255,7 +244,6 @@ export function RoutineEditor() {
           }}
         />
       )}
-      {blocks.length > 1 && <p className="small dim re-hint">Hold ⋮⋮ to reorder · drop on another exercise to superset</p>}
 
       <div className="stack" style={{ marginTop: 20 }}>
         <button className="btn btn-primary btn-block btn-lg" onClick={save}>
@@ -365,7 +353,6 @@ function ItemEditor({
   return (
     <div className="re-item">
       <div className="re-row">
-        <DragHandle spec={{ key: 'i:' + item.id, ids: [item.id], label: ex.name }} />
         <span className="re-mark">{mark}</span>
         <div className="grow re-ex-wrap">
           <div className="re-ex">{ex.name}</div>

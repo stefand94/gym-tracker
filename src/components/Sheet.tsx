@@ -60,7 +60,8 @@ export function Sheet({ title, onClose, children, tall }: { title?: string; onCl
       t0 = e.timeStamp;
       dy = 0;
       atTop = el.scrollTop <= 0;
-      mode = null;
+      // a drag grip (the reorder list) owns its own touches
+      mode = (e.target as Element | null)?.closest?.('[data-noswipe]') ? 'scroll' : null;
     };
     const move = (e: TouchEvent) => {
       if (mode === 'scroll' || e.touches.length !== 1) return;

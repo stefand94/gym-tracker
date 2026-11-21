@@ -13,6 +13,8 @@ export interface BlockProps {
   /** The block you're on now. */
   current: boolean;
   onToggle: () => void;
+  /** Open the reorder sheet. */
+  onReorder: () => void;
 }
 
 /** One block of the workout in progress: collapsed to rows, a single exercise, or a superset. */

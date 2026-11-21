@@ -8,9 +8,8 @@ import { stallText } from '../../lib/stall';
 import { keepLastWeight, setStation } from '../../lib/workout';
 import { useStore } from '../../state/store';
 import type { Exercise, WorkoutItem } from '../../types';
-import { DragHandle, type DragSpec } from '../BlockDnd';
 import { BodyMap } from '../BodyMap';
-import { IconMore } from '../Icons';
+import { IconChevronUp, IconMore } from '../Icons';
 import { ItemNote } from '../NoteSheet';
 import { StationSheet, usesStations } from '../StationSheet';
 import type { Update } from './shared';
@@ -30,7 +29,6 @@ export function ItemHead({
   onMenu,
   onHeadTap,
   update,
-  drag,
   noteOpen,
   onNote,
 }: {
@@ -38,9 +36,9 @@ export function ItemHead({
   item: WorkoutItem;
   tag?: string;
   onMenu: () => void;
+  /** Fold the card to a one-line row (a chevron too, unless it's in a superset, whose header has one). */
   onHeadTap?: () => void;
   update: Update;
-  drag: DragSpec;
   noteOpen: boolean;
   onNote: (open: boolean) => void;
 }) {
@@ -70,15 +68,19 @@ export function ItemHead({
   return (
     <>
       <div className="ex-head">
-        <DragHandle spec={drag} className="grip-head" />
         {onHeadTap ? (
-          <button type="button" className="grow ex-head-btn" onClick={onHeadTap} aria-label={`Collapse ${ex.name}`}>
+          <button type="button" className="grow ex-head-btn" onClick={onHeadTap} aria-expanded aria-label={`Fold ${ex.name}`}>
             {text}
           </button>
         ) : (
           <div className="grow">{text}</div>
         )}
         <BodyMap load={exerciseMap(ex)} scaleMax={1} size="mini" />
+        {onHeadTap && !tag && (
+          <button type="button" className="icon-btn fold-btn" aria-label={`Fold ${ex.name}`} onClick={onHeadTap}>
+            <IconChevronUp />
+          </button>
+        )}
         <button type="button" className="icon-btn" aria-label={`Options for ${ex.name}`} onClick={onMenu}>
           <IconMore />
         </button>

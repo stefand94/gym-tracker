@@ -37,6 +37,8 @@ export interface Exercise {
   warmup?: boolean;
   /** Timed intervals (walk–jog): in a superset, each one's timer starts the moment the one before ends. */
   intervals?: boolean;
+  /** Done one side at a time (side plank): each set logs left and right seconds apart (`seconds`, `secondsR`). */
+  sides?: boolean;
   /** Created in the app (lives in the data repo's exercises/custom.json). */
   custom?: boolean;
   /** A custom exercise whose muscles/type Claude has checked. */
@@ -83,7 +85,10 @@ export interface Routine {
 export interface SetEntry {
   weight?: number;
   reps?: number;
+  /** Timed sets: seconds held (the left side, on an exercise with `sides`). */
   seconds?: number;
+  /** The right side's seconds, on an exercise with `sides`. */
+  secondsR?: number;
   done: boolean;
 }
 

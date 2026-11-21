@@ -113,6 +113,7 @@ export function pickFields(exercise: Exercise, s: SetEntry): SetEntry {
   const out: SetEntry = { done: s.done };
   if (exercise.type === 'timed') {
     out.seconds = s.seconds ?? exercise.defaults.seconds ?? 30;
+    if (exercise.sides) out.secondsR = s.secondsR ?? out.seconds;
     if (s.weight) out.weight = s.weight;
   } else {
     out.reps = s.reps ?? exercise.defaults.reps ?? 10;

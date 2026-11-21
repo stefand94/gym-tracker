@@ -1,5 +1,6 @@
 import type { Exercise, ExerciseType, SetEntry, Workout } from '../types';
 import { stationKey, stationsFor } from './prefill';
+import { holdOf, holdTotal } from './sides';
 
 export interface Metric {
   key: string;
@@ -36,8 +37,8 @@ const BODYWEIGHT_METRICS: Metric[] = [
 ];
 
 const TIMED_METRICS: Metric[] = [
-  { key: 'top', label: 'Longest hold', unit: 's', compute: (s) => max(s.map((x) => x.seconds ?? 0)) },
-  { key: 'volume', label: 'Total time', unit: 's', compute: (s) => sum(s.map((x) => x.seconds ?? 0)) },
+  { key: 'top', label: 'Longest hold', unit: 's', compute: (s) => max(s.map(holdOf)) },
+  { key: 'volume', label: 'Total time', unit: 's', compute: (s) => sum(s.map(holdTotal)) },
 ];
 
 export function metricsFor(type: ExerciseType): Metric[] {

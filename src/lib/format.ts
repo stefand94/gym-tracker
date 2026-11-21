@@ -1,4 +1,5 @@
 import type { Exercise, SetEntry, Workout, WorkoutItem } from '../types';
+import { fmtSeconds, holdOf } from './sides';
 
 export function fmtDate(iso: string, opts: Intl.DateTimeFormatOptions = { weekday: 'short', day: 'numeric', month: 'short' }) {
   return new Date(iso).toLocaleDateString(undefined, opts);
@@ -31,7 +32,7 @@ export function fmtNum(n: number | undefined): string {
 }
 
 export function fmtSet(ex: Exercise | undefined, s: SetEntry): string {
-  if (ex?.type === 'timed') return `${fmtNum(s.seconds)}s${s.weight ? ` +${fmtNum(s.weight)}kg` : ''}`;
+  if (ex?.type === 'timed') return `${fmtSeconds(s)}s${s.weight ? ` +${fmtNum(s.weight)}kg` : ''}`;
   if (ex?.type === 'bodyweight') return `${fmtNum(s.reps)}${s.weight ? ` +${fmtNum(s.weight)}kg` : ' reps'}`;
   return `${fmtNum(s.weight)}kg × ${fmtNum(s.reps)}`;
 }
@@ -61,12 +62,13 @@ export function itemSummary(ex: Exercise | undefined, item: WorkoutItem): string
   const done = item.sets.filter((s) => s.done);
   const sets = done.length ? done : item.sets;
   const n = sets.length;
-  const same = (k: 'weight' | 'reps' | 'seconds') => sets.every((s) => s[k] === sets[0][k]);
+  const same = (k: 'weight' | 'reps' | 'seconds' | 'secondsR') => sets.every((s) => s[k] === sets[0][k]);
   const top = Math.max(0, ...sets.map((s) => s.weight ?? 0));
   if (ex?.type === 'timed') {
-    const t = same('seconds')
-      ? `${n} × ${fmtNum(sets[0].seconds)} s`
-      : `${n} sets · best ${fmtNum(Math.max(...sets.map((s) => s.seconds ?? 0)))} s`;
+    const t =
+      same('seconds') && same('secondsR')
+        ? `${n} × ${fmtSeconds(sets[0])} s`
+        : `${n} sets · best ${fmtNum(Math.max(...sets.map(holdOf)))} s`;
     return top ? `${t} · +${fmtNum(top)} kg` : t;
   }
   const reps = same('reps') ? `${n} × ${fmtNum(sets[0].reps)}` : `${n} sets`;

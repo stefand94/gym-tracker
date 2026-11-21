@@ -65,6 +65,8 @@ export interface HoldState {
   set: number;
   goAt: number;
   endsAt: number;
+  /** Which side of a two-sided hold (side plank) is being held. */
+  side?: 'L' | 'R';
 }
 
 const HOLD_LEAD_IN = 5;
@@ -116,6 +118,7 @@ type Action =
       seconds: number;
       now: number;
       /** get-ready seconds (default HOLD_LEAD_IN) */ lead?: number;
+      side?: 'L' | 'R';
     }
   | { type: 'holdStop' }
   | { type: 'routineSave'; routine: Routine; now: string }
@@ -297,7 +300,8 @@ export function reducer(state: State, action: Action): State {
     case 'holdStart': {
       // Starting a hold ends any rest that's still counting.
       const goAt = action.now + (action.lead ?? HOLD_LEAD_IN) * 1000;
-      return { ...state, rest: null, hold: { itemId: action.itemId, set: action.set, goAt, endsAt: goAt + action.seconds * 1000 } };
+      const hold: HoldState = { itemId: action.itemId, set: action.set, goAt, endsAt: goAt + action.seconds * 1000 };
+      return { ...state, rest: null, hold: action.side ? { ...hold, side: action.side } : hold };
     }
     case 'holdStop':
       return state.hold ? { ...state, hold: null } : state;

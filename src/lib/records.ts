@@ -1,15 +1,16 @@
 import type { Exercise, Lookup, SetEntry, Workout, WorkoutItem } from '../types';
 import { stationKey } from './prefill';
 import { epley } from './progress';
+import { holdOf } from './sides';
 
 /**
  * How a set ranks for personal records: estimated 1RM for weights and machines, reps for bodyweight, seconds for
- * holds. Null when records don't make sense: carries and sleds (reps are metres), assisted machines (less is
+ * holds (the weaker side, on two-sided ones). Null when records don't make sense: carries and sleds (reps are metres), assisted machines (less is
  * better), and bodyweight or timed sets with added weight.
  */
 function setScore(ex: Exercise, s: SetEntry): number | null {
   if (/metres|assist/i.test(`${ex.weightNote ?? ''} ${ex.cue ?? ''}`)) return null;
-  if (ex.type === 'timed') return s.weight ? null : s.seconds || null;
+  if (ex.type === 'timed') return s.weight ? null : holdOf(s) || null;
   if (ex.type === 'bodyweight') return s.weight ? null : s.reps || null;
   const v = epley(s.weight ?? 0, s.reps ?? 0);
   return v > 0 ? v : null;

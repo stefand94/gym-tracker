@@ -8,15 +8,28 @@ _Last updated 2026-11-21._
 
 ## State
 
-- `main` is deployed and clean. The last feature commit is `7054b84` (stall detection), and CI passed.
-- `npm run check` passes: types, ESLint, Prettier and 139 tests. `npm run build` passes too (the warning that the
+- The newest commit is the reorder sheet, card folding and two-sided holds (below). Check with `git log` and
+  `gh run list` whether it has been pushed and deployed.
+- `npm run check` passes: types, ESLint, Prettier and 146 tests. `npm run build` passes too (the warning that the
   main chunk is over 500 kB is expected).
 - Stefan uses the app on his phone as an installed PWA, often while driving this session over Remote Control. Keep
   replies short and plain, and ask one clear question when something is his call.
 
 ## Recently built (newest first)
 
-1. **Stall detection** (`src/lib/stall.ts`, `src/lib/workout/stall.ts`, `src/components/workout/StallSheet.tsx`).
+1. **Reorder sheet, folding cards, two-sided holds** (from Stefan's app notes, 2026-11-21).
+   - Drag-and-drop on the cards (`@dnd-kit`, `BlockDnd.tsx`) is gone: it swapped the list for compact rows mid-drag,
+     so things jumped under the finger. Now a **Reorder** button (next to Add exercise, and in each exercise's menu)
+     opens `ReorderSheet`: a fixed compact list, drag by the grip or tap ↑/↓, and a Superset menu per exercise
+     ("With X", "Join superset B", "Take it out"). Cancel discards. The routine editor uses the same sheet. The
+     rehab dose can move but gets no Superset menu and is never offered as a partner.
+   - Any open card folds by tapping its header or chevron, the current one included.
+   - `"sides": true` timed exercises (side plank) log left and right seconds apart; the exercise editor has a switch
+     for custom ones. Older side-plank logs (one number) still read fine.
+   - Also from his workout notes: Russian twist cue (one rep = one side); the note reader now drops a message he
+     takes back ("scrap that").
+   - All tried in the browser on a mobile viewport with a made-up workout. Not yet tried on his phone (touch drag).
+2. **Stall detection** (`src/lib/stall.ts`, `src/lib/workout/stall.ts`, `src/components/workout/StallSheet.tsx`).
    A "Stuck" tag on the workout card when the last 4 sessions didn't beat the best before them, or reps were missed 2
    sessions running at one weight. The fixes are a ~10% reset, two other sets × reps (saved to the routine), a swap, or
    "Not now". Progress shows a note and greys the stuck points. Claude sees a STUCK list (`aiContext.ts`), and the
@@ -26,16 +39,19 @@ _Last updated 2026-11-21._
      If one looks wrong, check `findStall` against his synced workouts (read-only).
    - Swap reuses the existing Replace picker and wasn't tried in the browser. Reset, the rep schemes and the Progress
      note were tested in the browser with made-up workouts.
-2. **Codebase tidy** (`a5c756f`). Workout logic is split by concern in `src/lib/workout/`, the workout card in
+3. **Codebase tidy** (`a5c756f`). Workout logic is split by concern in `src/lib/workout/`, the workout card in
    `src/components/workout/`, and the CSS in `src/styles/`. ESLint and Prettier were added, and CI lints before
    deploying.
-3. **Fixes** (`943715b`). The rehab dose keeps its own blocks when moved. Sync merges fixes made in the repo
+4. **Fixes** (`943715b`). The rehab dose keeps its own blocks when moved. Sync merges fixes made in the repo
    (`merge3`) instead of overwriting them. Walk–jog intervals chain from when the last one ended.
-4. **Go-up nudges, personal records, warm-up sets, hamstring rehab phase 4** (`870f540`).
+5. **Go-up nudges, personal records, warm-up sets, hamstring rehab phase 4** (`870f540`).
 
 ## Open items and ideas
 
 None of these have been started. Ask Stefan before starting any of them.
+
+- **Carries as lengths: skipped** (2026-11-21). He does farmer carries on a track of roughly 10 m, so metres stay.
+  If he asks again: reps = lengths, with a per-station length.
 
 - **Sharing with a friend: declined for now** (Stefan said "not now" on 2026-11-17). Anyone can already open the URL
   and get their own local copy. But the app is tailored to Stefan:

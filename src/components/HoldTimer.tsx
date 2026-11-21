@@ -64,6 +64,7 @@ export function HoldWatcher() {
           seconds: (next.endsAt - next.goAt) / 1000,
           now: next.goAt,
           lead: 0,
+          side: next.side,
         });
       else if (state.prefs.rest && restsAfter(after, last.itemId, last.set)) dispatch({ type: 'restStart', now: at });
     }
@@ -79,14 +80,14 @@ export function HoldDisplay({ hold }: { hold: HoldState }) {
   if (p.phase === 'ready')
     return (
       <div className="hold ready" role="timer" aria-live="assertive">
-        <span className="hold-label">Get set</span>
+        <span className="hold-label">{hold.side === 'R' ? 'Switch sides' : 'Get set'}</span>
         <span className="hold-time num">{p.left}</span>
       </div>
     );
   return (
     <div className="hold" role="timer">
       <div className="hold-fill" style={{ width: `${p.pct}%` }} />
-      <span className="hold-label">Hold</span>
+      <span className="hold-label">{hold.side === 'L' ? 'Left' : hold.side === 'R' ? 'Right' : 'Hold'}</span>
       <span className="hold-time num">{clock(p.left)}</span>
     </div>
   );

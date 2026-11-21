@@ -5,6 +5,7 @@ import { loadSince } from './muscleLoad';
 import { finishedNewestFirst } from './prefill';
 import type { RehabState } from './rehab';
 import { stallText, stuckExercises } from './stall';
+import { fmtSeconds } from './sides';
 
 /** Weighted sets per 7 days a muscle wants (same as suggest.ts). */
 export const WEEK_TARGET = 10;
@@ -42,7 +43,7 @@ export function stableContext(exercises: Exercise[]): string {
     '',
     'EXERCISE CATALOGUE (only these ids exist; never invent ids)',
     'id | name | type | equipment | primary muscles / secondary muscles',
-    'Types: weight = kg × reps; machine = kg × reps (5 kg steps); bodyweight = reps (+ optional added kg); timed = seconds.',
+    'Types: weight = kg × reps; machine = kg × reps (5 kg steps); bodyweight = reps (+ optional added kg); timed = seconds (two-sided holds log left/right, e.g. 35/30s).',
     catalogueText(exercises),
     '',
     `Muscle ids: ${MUSCLE_IDS.join(', ')}.`,
@@ -103,7 +104,7 @@ export function historyText(history: Workout[], lookup: Lookup, now = new Date()
         continue;
       }
       const sets = done
-        .map((s) => (s.seconds !== undefined ? `${s.seconds}s` : `${s.weight !== undefined ? `${n(s.weight)}kg×` : ''}${s.reps ?? ''}`))
+        .map((s) => (s.seconds !== undefined ? `${fmtSeconds(s)}s` : `${s.weight !== undefined ? `${n(s.weight)}kg×` : ''}${s.reps ?? ''}`))
         .join(', ');
       const extra = [
         i.station ? `station ${i.station}` : '',

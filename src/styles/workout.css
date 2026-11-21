@@ -314,7 +314,30 @@
 }
 
 .ss-top {
-  padding: 12px 14px 0;
+  align-items: center;
+  padding: 6px 6px 0 14px;
+}
+
+.ss-top-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fold-btn {
+  width: 36px;
+  height: 36px;
+  margin-top: -4px;
+}
+
+.fold-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.wo-add-row {
+  display: flex;
+  gap: 8px;
 }
 
 .ss-tag {
