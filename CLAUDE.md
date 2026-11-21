@@ -6,6 +6,8 @@ via the GitHub Contents API (`src/lib/sync.ts`); the app never writes to this re
 
 Stefan adds exercises and routines by asking Claude, not in the app. Weights are kg.
 
+**Starting a session? Read `HANDOVER.md`**: recent work, open items, and how to work on this. Update it before you stop.
+
 ## Adding an exercise — `src/data/exercises.json`
 
 ```json

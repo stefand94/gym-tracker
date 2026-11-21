@@ -1,0 +1,71 @@
+# Handover
+
+Where the gym tracker stands, for the next session to pick up. Read `CLAUDE.md` first: it has the data shapes, the
+rules for exercises and routines, and where everything lives. This file covers what changed recently, what's open, and
+how to work on it.
+
+_Last updated 2026-11-21._
+
+## State
+
+- `main` is deployed and clean. The last feature commit is `7054b84` (stall detection), and CI passed.
+- `npm run check` passes: types, ESLint, Prettier and 139 tests. `npm run build` passes too (the warning that the
+  main chunk is over 500 kB is expected).
+- Stefan uses the app on his phone as an installed PWA, often while driving this session over Remote Control. Keep
+  replies short and plain, and ask one clear question when something is his call.
+
+## Recently built (newest first)
+
+1. **Stall detection** (`src/lib/stall.ts`, `src/lib/workout/stall.ts`, `src/components/workout/StallSheet.tsx`).
+   A "Stuck" tag on the workout card when the last 4 sessions didn't beat the best before them, or reps were missed 2
+   sessions running at one weight. The fixes are a ~10% reset, two other sets × reps (saved to the routine), a swap, or
+   "Not now". Progress shows a note and greys the stuck points. Claude sees a STUCK list (`aiContext.ts`), and the
+   weekly check-in mentions it. `CLAUDE.md` has the full rules.
+   - **Not yet seen on real data.** As of 2026-11-21 nothing in his history is flagged: his most-done exercises have
+     about 2 sessions, and the rules need 4. The first real tags should appear after a few more weeks of training.
+     If one looks wrong, check `findStall` against his synced workouts (read-only).
+   - Swap reuses the existing Replace picker and wasn't tried in the browser. Reset, the rep schemes and the Progress
+     note were tested in the browser with made-up workouts.
+2. **Codebase tidy** (`a5c756f`). Workout logic is split by concern in `src/lib/workout/`, the workout card in
+   `src/components/workout/`, and the CSS in `src/styles/`. ESLint and Prettier were added, and CI lints before
+   deploying.
+3. **Fixes** (`943715b`). The rehab dose keeps its own blocks when moved. Sync merges fixes made in the repo
+   (`merge3`) instead of overwriting them. Walk–jog intervals chain from when the last one ended.
+4. **Go-up nudges, personal records, warm-up sets, hamstring rehab phase 4** (`870f540`).
+
+## Open items and ideas
+
+None of these have been started. Ask Stefan before starting any of them.
+
+- **Sharing with a friend: declined for now** (Stefan said "not now" on 2026-11-17). Anyone can already open the URL
+  and get their own local copy. But the app is tailored to Stefan:
+  - the sync settings default to his data repo;
+  - Claude's prompts say "Stefan" and apply his `RULES`;
+  - the seed routines include the hamstring rehab, which holds back leg work.
+
+  The plan, if he asks: a profile in Settings (name, editable rules, rehab on or off), a blank sync owner by default,
+  and general seed routines for new installs, with nothing changing for him. A friend would need their own private
+  data repo and token to sync.
+
+- **Other ideas already pitched to him:** a 45-minute time check while working out (weekday cap), and a plate
+  calculator. Possibly effort per set (RPE) and a calendar view. Not worth doing: a body-weight log, and lock-screen
+  alerts.
+- **Haiku "stopped working"** (2026-11-17) fixed itself within minutes, with no code change. It was most likely an
+  outage or rate limit on Anthropic's side. If it happens again, ask for the exact on-screen message first: credits,
+  the key, rate limits and network each show a different message (`toAiError` in `src/lib/claude.ts`).
+
+## How to work on it
+
+- **Before every push:** `npm run check`, then `npm run build`. Use `npm run format` to fix formatting. Prettier skips
+  `Icons.tsx`, `src/data/*.json` and `CLAUDE.md`; leave their formatting alone.
+- **Deploy:** push to `main`, then follow the run with `gh run watch`. Commit messages are one descriptive line (see
+  `git log`) and end with the `Co-Authored-By` line for the model in use.
+- **Trying the UI:** run the dev server through the preview tools, on a mobile viewport. Put made-up history in
+  localStorage, never Stefan's real data, and clear it afterwards. Test Claude features with `window.__claudeMock`
+  (dev only).
+- **Reading his data:** reading `stefand94/gym-tracker-data` with `gh api` is fine. Download it to the scratchpad, not
+  this repo. Changing it (routines, custom exercises) follows the rules in `CLAUDE.md`: set `updatedAt` to now, PUT
+  with the current `sha`, and never change an `id`. Ask before changes he hasn't asked for.
+- **Keys:** never enter, store or ask for his GitHub token or Anthropic API key. They live only in that device's
+  localStorage. This repo and the site are public, so keep personal details out of commits and this file.
+- **New preferences** go in `RULES` in `src/lib/aiContext.ts`. Exercises and routines follow `CLAUDE.md`.
