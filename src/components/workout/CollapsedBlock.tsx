@@ -9,7 +9,7 @@ export function CollapsedBlock({ block, index, onToggle }: BlockProps) {
   const complete = blockComplete(block);
   const letter = blockLetter(index);
   if (!complete) {
-    const names = block.items.map((i) => getExercise(i.exerciseId)?.name ?? i.exerciseId).join(' + ');
+    const names = block.items.map((i) => getExercise(i.exerciseId)?.name ?? i.exerciseId);
     const first = block.items[0];
     const sub = block.superset
       ? `Superset · ${Math.max(...block.items.map((i) => i.sets.length))} rounds`
@@ -17,8 +17,14 @@ export function CollapsedBlock({ block, index, onToggle }: BlockProps) {
     return (
       <button type="button" className="crow crow-next" onClick={onToggle} aria-expanded={false}>
         <span className="crow-mark">{block.superset ? letter : index + 1}</span>
-        <span className="crow-name">{names}</span>
-        <span className="crow-sum num">{sub}</span>
+        <span className="crow-stack">
+          {names.map((n, k) => (
+            <span key={k} className="crow-name">
+              {n}
+            </span>
+          ))}
+          <span className="crow-sum num">{sub}</span>
+        </span>
       </button>
     );
   }

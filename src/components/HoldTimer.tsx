@@ -74,21 +74,40 @@ export function HoldWatcher() {
 }
 
 /** Replaces the seconds stepper while this set's hold runs. */
-export function HoldDisplay({ hold }: { hold: HoldState }) {
+export function HoldDisplay({ hold, onStop }: { hold: HoldState; onStop?: () => void }) {
   const now = useTicker(true);
   const p = holdPhase(hold, now);
-  if (p.phase === 'ready')
-    return (
-      <div className="hold ready" role="timer" aria-live="assertive">
-        <span className="hold-label">{hold.side === 'R' ? 'Switch sides' : 'Get set'}</span>
-        <span className="hold-time num">{p.left}</span>
-      </div>
-    );
-  return (
-    <div className="hold" role="timer">
+  const ready = p.phase === 'ready';
+  const body = ready ? (
+    <>
+      <span className="hold-label">{hold.side === 'R' ? 'Switch sides' : 'Get set'}</span>
+      <span className="hold-time num">{p.left}</span>
+    </>
+  ) : (
+    <>
       <div className="hold-fill" style={{ width: `${p.pct}%` }} />
       <span className="hold-label">{hold.side === 'L' ? 'Left' : hold.side === 'R' ? 'Right' : 'Hold'}</span>
       <span className="hold-time num">{clock(p.left)}</span>
+    </>
+  );
+  const cls = 'hold' + (ready ? ' ready' : '');
+  // Tapping a running hold stops it and logs what was held, like the tick.
+  if (onStop)
+    return (
+      <button
+        type="button"
+        className={cls + ' hold-tap'}
+        role="timer"
+        aria-live={ready ? 'assertive' : undefined}
+        aria-label="Stop timer and log"
+        onClick={onStop}
+      >
+        {body}
+      </button>
+    );
+  return (
+    <div className={cls} role="timer" aria-live={ready ? 'assertive' : undefined}>
+      {body}
     </div>
   );
 }

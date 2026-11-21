@@ -35,6 +35,18 @@
   background: color-mix(in oklab, var(--accent) 12%, var(--well));
 }
 
+button.hold-tap {
+  width: 100%;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+button.hold-tap:active {
+  transform: scale(0.98);
+}
+
 .hold > * {
   position: relative;
 }
@@ -119,6 +131,41 @@
   padding: 10px 6px 4px;
 }
 
+.warmup-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.warmup-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+.warmup-chev {
+  display: grid;
+  margin-left: auto;
+  transition: transform 0.15s;
+}
+
+.warmup-chev svg {
+  width: 18px;
+  height: 18px;
+}
+
+.warmup-chev.down {
+  transform: rotate(180deg);
+}
+
 .stepper {
   display: flex;
   align-items: center;
@@ -139,6 +186,16 @@
   line-height: 1;
   color: var(--text-dim);
   flex-shrink: 0;
+}
+
+/* Two steppers share a weight × reps row: narrower −/+ (still the full 50 px tall) and a tighter value. */
+.set-row.pair .stepper input {
+  font-size: 20px;
+}
+
+.set-row.pair .stepper button {
+  width: 32px;
+  font-size: 24px;
 }
 
 .stepper button:active {
@@ -298,4 +355,8 @@
 .set-row.sided > .tick {
   grid-column: 4;
   grid-row: 1 / span 2;
+}
+
+.set-row.pair .tick {
+  width: 56px;
 }

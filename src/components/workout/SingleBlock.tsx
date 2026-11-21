@@ -4,7 +4,7 @@ import { addSet, setPain, toggleComplete, toggleSkip } from '../../lib/workout';
 import { PainStrip } from '../PainStrip';
 import { ItemHead } from './ItemHead';
 import { ItemMenu } from './ItemMenu';
-import { fieldLabels, SetHeader, SetRow, WarmupRows } from './SetRows';
+import { fieldLabels, SetHeader, SetRow, WarmupGroup } from './SetRows';
 import { useRecords, useStartRest } from './shared';
 import type { BlockProps } from './WorkoutBlockView';
 
@@ -33,7 +33,7 @@ export function SingleBlock({ block, update, current, onToggle, onReorder }: Blo
       {item.status !== 'skipped' && (
         <div className="sets">
           <SetHeader labels={fieldLabels(ex)} />
-          <WarmupRows ex={ex} item={item} update={update} />
+          <WarmupGroup entries={[{ ex, item }]} update={update} />
           {item.sets.map((_, i) => (
             <SetRow
               key={i}

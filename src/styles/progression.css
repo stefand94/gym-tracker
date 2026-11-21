@@ -36,6 +36,29 @@
   font-size: 13px;
 }
 
+/* Go-up, stuck and station tags on one line under an exercise's name */
+.ex-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin: 0 0 6px 14px;
+}
+
+.ex-tags .station-chip {
+  margin: 0;
+}
+
+.ex-tags .stall-tag {
+  min-height: 32px;
+}
+
+.link-btn.quiet {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text-dim);
+}
+
 .stall-tag {
   border: none;
   color: var(--heat);

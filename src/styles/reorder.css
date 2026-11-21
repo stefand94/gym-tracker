@@ -47,27 +47,25 @@ body.dragging .grip {
   padding: 2px 4px 8px 0;
 }
 
-.ro-block.moving {
-  transition: transform 0.15s ease;
+/* SortableJS: the row's place in the list while it's dragged, and the copy under the finger */
+.ro-block.ro-ghost {
+  opacity: 0.35;
+  outline: 2px dashed var(--accent);
+  outline-offset: -2px;
 }
 
-.ro-block.is-drag {
-  z-index: 2;
-  transition: none;
+.ro-block.ro-dragging,
+.sortable-fallback {
+  z-index: 1000;
+  opacity: 1 !important;
   box-shadow:
     0 0 0 2px var(--accent),
-    0 10px 28px rgb(0 0 0 / 0.3);
+    0 14px 32px rgb(0 0 0 / 0.45);
+  pointer-events: none;
 }
 
 .ro-ss-block {
   box-shadow: inset 3px 0 0 var(--rest);
-}
-
-.ro-ss-block.is-drag {
-  box-shadow:
-    inset 3px 0 0 var(--rest),
-    0 0 0 2px var(--accent),
-    0 10px 28px rgb(0 0 0 / 0.3);
 }
 
 .ro-dose {

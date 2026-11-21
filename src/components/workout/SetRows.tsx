@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { getExercise } from '../../data/library';
 import { primeAudio, tickFeedback } from '../../lib/alert';
 import { weightStep } from '../../lib/format';
@@ -6,7 +7,7 @@ import { completeHold, SWITCH_SIDES, toggleSet, toggleWarmup, updateSetForward, 
 import { useStore, type HoldState } from '../../state/store';
 import type { Exercise, SetEntry, WorkoutItem } from '../../types';
 import { HoldDisplay } from '../HoldTimer';
-import { IconCheck, IconClose, IconPlay } from '../Icons';
+import { IconCheck, IconChevronUp, IconClose, IconPlay } from '../Icons';
 import { NumInput, Stepper } from '../Stepper';
 import type { Update } from './shared';
 
@@ -31,14 +32,17 @@ function SetFields({ ex, set, onChange, units }: { ex: Exercise; set: SetEntry; 
   return (
     <>
       <Stepper label="Weight" unit={u('kg')} step={weightStep(ex)} decimals value={set.weight} onChange={(v) => onChange({ weight: v })} />
-      <NumInput label="Reps" unit={u('reps')} value={set.reps} onChange={(v) => onChange({ reps: v })} />
+      <Stepper label="Reps" unit={u('reps')} step={1} value={set.reps} onChange={(v) => onChange({ reps: Math.round(v) })} />
     </>
   );
 }
 
+/** Weight × reps rows: two steppers side by side, sharing the row evenly. */
+const pairs = (ex: Exercise) => ex.type === 'weight' || ex.type === 'machine';
+
 export function SetHeader({ labels }: { labels: string[] }) {
   return (
-    <div className="set-row set-head" aria-hidden>
+    <div className={'set-row set-head' + (labels[1] === 'reps' ? ' pair' : '')} aria-hidden>
       <div>set</div>
       {labels.map((l) => (
         <div key={l}>{l}</div>
@@ -145,7 +149,7 @@ export function SetRow({
       <IconCheck />
     </button>
   );
-  const cls = 'set-row' + (set.done ? ' done' : '') + (now ? ' now' : '') + (hold ? ' holding' : '');
+  const cls = 'set-row' + (pairs(ex) ? ' pair' : '') + (set.done ? ' done' : '') + (now ? ' now' : '') + (hold ? ' holding' : '');
 
   if (sided) {
     const side = (s: 'L' | 'R') => {
@@ -154,7 +158,7 @@ export function SetRow({
       return (
         <div className={'side-row' + (running ? ' holding' : '')}>
           {running ? (
-            <HoldDisplay hold={running} />
+            <HoldDisplay hold={running} onStop={tap} />
           ) : (
             <Stepper
               label={`${s === 'L' ? 'Left' : 'Right'} side seconds`}
@@ -181,7 +185,7 @@ export function SetRow({
   return (
     <div className={cls}>
       <div className="set-idx">{label}</div>
-      {hold ? <HoldDisplay hold={hold} /> : <SetFields ex={ex} set={set} units={units} onChange={change} />}
+      {hold ? <HoldDisplay hold={hold} onStop={tap} /> : <SetFields ex={ex} set={set} units={units} onChange={change} />}
       {timed && holdButton(hold, set.seconds)}
       {tick}
     </div>
@@ -194,7 +198,7 @@ export function WarmupRows({ ex, item, update, units = false }: { ex: Exercise; 
   return (
     <>
       {item.warmups.map((set, k) => (
-        <div key={`w${k}`} className={'set-row warmup' + (set.done ? ' done' : '')}>
+        <div key={`w${k}`} className={'set-row warmup' + (pairs(ex) ? ' pair' : '') + (set.done ? ' done' : '')}>
           <div className="set-idx" aria-label="Warm-up">
             W
           </div>
@@ -214,5 +218,42 @@ export function WarmupRows({ ex, item, update, units = false }: { ex: Exercise; 
         </div>
       ))}
     </>
+  );
+}
+
+/**
+ * The warm-ups of a card (one exercise, or each in a superset). They fold to a single line once the work sets have
+ * started or every warm-up is ticked, so the set you're on stays near the top; tap the line to open them again.
+ */
+export function WarmupGroup({
+  entries,
+  update,
+  units = false,
+}: {
+  entries: { ex: Exercise; item: WorkoutItem }[];
+  update: Update;
+  units?: boolean;
+}) {
+  const [open, setOpen] = useState<boolean | null>(null);
+  const shown = entries.filter((e) => e.item.warmups?.length && e.item.status !== 'skipped');
+  if (!shown.length) return null;
+  const all = shown.flatMap((e) => e.item.warmups ?? []);
+  const done = all.filter((s) => s.done).length;
+  const started = shown.some((e) => e.item.sets.some((s) => s.done));
+  const folded = !(open ?? !(started || done === all.length));
+  return (
+    <div className="warmups">
+      <button type="button" className="round-label warmup-toggle" aria-expanded={!folded} onClick={() => setOpen(folded)}>
+        <span>Warm-up</span>
+        <span className="warmup-count">
+          {done}/{all.length}
+          {done === all.length ? ' ✓' : ''}
+        </span>
+        <span className={'warmup-chev' + (folded ? ' down' : '')} aria-hidden>
+          <IconChevronUp />
+        </span>
+      </button>
+      {!folded && shown.map((e) => <WarmupRows key={e.item.id} ex={e.ex} item={e.item} update={update} units={units} />)}
+    </div>
   );
 }

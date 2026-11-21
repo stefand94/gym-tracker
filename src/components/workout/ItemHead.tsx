@@ -46,6 +46,9 @@ export function ItemHead({
   const [picking, setPicking] = useState(false);
   const [fixing, setFixing] = useState(false);
   const showStation = item.status !== 'skipped' && (!!item.station || usesStations(ex) || stationsFor(ex.id, state.history).length > 0);
+  const goUp = item.goUp ?? 0;
+  const showGoUp = goUp !== 0 && item.status !== 'skipped';
+  const showStall = !!item.stall && item.status !== 'skipped' && !item.sets.some((s) => s.done);
   const muscles = ex.primary.map((m) => MUSCLE_LABELS[m]).join(', ');
   const text = (
     <>
@@ -85,40 +88,39 @@ export function ItemHead({
           <IconMore />
         </button>
       </div>
-      {showStation && (
-        <button
-          type="button"
-          className={'station-chip' + (item.station ? ' set' : '')}
-          onClick={() => setPicking(true)}
-          aria-label={item.station ? `Station ${item.station}, change` : 'Set station'}
-        >
-          {item.station ? <>📍 {item.station}</> : '+ Station'}
-        </button>
-      )}
-      {!!item.goUp && item.status !== 'skipped' && (
-        <div className="goup">
-          <span className="goup-tag">
-            ↑ {item.goUp > 0 ? `${fmtNum(item.goUp)} kg up` : `${fmtNum(-item.goUp)} kg less help`} · every rep last time
-          </span>
-          {!item.sets.some((s) => s.done) && (
-            <button
-              type="button"
-              className="link-btn small"
-              onClick={() => update((w) => keepLastWeight(w, item.id, state.history, getExercise))}
-            >
-              Keep last weight
+      {(showStation || showGoUp || showStall) && (
+        <div className="ex-tags">
+          {showGoUp && (
+            <>
+              <span className="goup-tag" title="Every set hit the target reps last time">
+                ↑ {goUp > 0 ? `${fmtNum(goUp)} kg` : `${fmtNum(-goUp)} kg less help`}
+              </span>
+              {!item.sets.some((s) => s.done) && (
+                <button
+                  type="button"
+                  className="link-btn small quiet"
+                  onClick={() => update((w) => keepLastWeight(w, item.id, state.history, getExercise))}
+                >
+                  Keep last weight
+                </button>
+              )}
+            </>
+          )}
+          {showStall && item.stall && (
+            <button type="button" className="goup-tag stall-tag" onClick={() => setFixing(true)}>
+              Stuck · {stallText(item.stall)} · Fix
             </button>
           )}
-        </div>
-      )}
-      {item.stall && item.status !== 'skipped' && !item.sets.some((s) => s.done) && (
-        <div className="goup">
-          <button type="button" className="goup-tag stall-tag" onClick={() => setFixing(true)}>
-            Stuck · {stallText(item.stall)}
-          </button>
-          <button type="button" className="link-btn small" onClick={() => setFixing(true)}>
-            Fix it
-          </button>
+          {showStation && (
+            <button
+              type="button"
+              className={'station-chip' + (item.station ? ' set' : '')}
+              onClick={() => setPicking(true)}
+              aria-label={item.station ? `Station ${item.station}, change` : 'Set station'}
+            >
+              {item.station ? <>📍 {item.station}</> : '+ Station'}
+            </button>
+          )}
         </div>
       )}
       <ItemNote ex={ex} item={item} update={update} open={noteOpen} onOpen={onNote} />

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import Sortable from 'sortablejs';
 import { AREA_LABELS } from '../lib/rehab';
 import { moveBlock, moveBlocks, shiftInBlock, standAlone } from '../lib/workout';
 import type { RehabArea } from '../types';
@@ -23,23 +24,10 @@ export function defaultMark(blocks: ReorderBlock[], index: number): string {
 
 const sig = (bs: ReorderBlock[]) => bs.map((b) => `${b.superset ? 'S' : ''}${b.items.map((i) => i.id).join(',')}`).join('|');
 
-/** Distance from the sheet's top/bottom edge where a drag starts scrolling it. */
-const EDGE = 64;
-
-interface Drag {
-  index: number;
-  /** Pointer y when the drag started, and the sheet's scroll then. */
-  y0: number;
-  scroll0: number;
-  /** Rows' tops and heights in the sheet's content, at the start. */
-  rows: { top: number; height: number }[];
-  gap: number;
-}
-
 /**
- * Reorder a workout or routine in a plain list that never changes shape under your finger: drag a row by its grip
- * (or ↑ / ↓, or arrow keys on the grip), and put exercises together with each one's Superset menu. Closing the sheet
- * keeps the changes; Cancel throws them away.
+ * Reorder a workout or routine in a plain list: drag a row by its grip (SortableJS, which scrolls the sheet when you
+ * hold a row near its top or bottom edge), tap ↑ / ↓, or use the arrow keys on the grip; put exercises together with
+ * each one's Superset menu. Closing the sheet keeps the changes; Cancel throws them away.
  */
 export function ReorderSheet({
   blocks: initial,
@@ -54,11 +42,7 @@ export function ReorderSheet({
   onClose: () => void;
 }) {
   const [blocks, setBlocks] = useState(initial);
-  const [drag, setDrag] = useState<Drag | null>(null);
-  /** Where the dragged row is now: its offset and the index it would land at. */
-  const [view, setView] = useState<{ dy: number; to: number } | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  const pointerY = useRef(0);
   const cancelled = useRef(false);
 
   const finish = () => {
@@ -66,84 +50,48 @@ export function ReorderSheet({
     onClose();
   };
 
-  const scroller = () => listRef.current?.closest<HTMLElement>('.sheet') ?? null;
-
-  /** Where the dragged row would land, from how far it has moved. */
-  const locate = (d: Drag, dy: number) => {
-    const r = d.rows[d.index];
-    const mid = r.top + dy + r.height / 2;
-    let to = 0;
-    d.rows.forEach((x, j) => {
-      if (j !== d.index && x.top + x.height / 2 < mid) to++;
-    });
-    return to;
-  };
-
-  // While dragging: follow the finger, scroll the sheet near its edges.
+  // Drag to move. Sortable moves the DOM node; we put it back and let React re-render from state, so React stays
+  // the only one rearranging the list.
   useEffect(() => {
-    if (!drag) return;
-    document.body.classList.add('dragging');
-    let raf = 0;
-    const frame = () => {
-      const sc = scroller();
-      if (sc) {
-        const box = sc.getBoundingClientRect();
-        const y = pointerY.current;
-        if (y < box.top + EDGE) sc.scrollTop -= Math.ceil((box.top + EDGE - y) / 6);
-        else if (y > box.bottom - EDGE) sc.scrollTop += Math.ceil((y - box.bottom + EDGE) / 6);
-        const dy = y - drag.y0 + sc.scrollTop - drag.scroll0;
-        const to = locate(drag, dy);
-        setView((v) => (v && v.dy === dy && v.to === to ? v : { dy, to }));
-      }
-      raf = requestAnimationFrame(frame);
-    };
-    raf = requestAnimationFrame(frame);
+    const list = listRef.current;
+    if (!list) return;
+    const sortable = Sortable.create(list, {
+      handle: '.ro-grip',
+      draggable: '.ro-block',
+      animation: 150,
+      forceFallback: true,
+      fallbackOnBody: true,
+      fallbackTolerance: 3,
+      scroll: list.closest<HTMLElement>('.sheet') ?? true,
+      scrollSensitivity: 90,
+      scrollSpeed: 14,
+      bubbleScroll: true,
+      ghostClass: 'ro-ghost',
+      chosenClass: 'ro-chosen',
+      dragClass: 'ro-dragging',
+      onStart: () => {
+        navigator.vibrate?.(10);
+        document.body.classList.add('dragging');
+      },
+      onEnd: (e) => {
+        document.body.classList.remove('dragging');
+        const { oldIndex, newIndex, item, from } = e;
+        if (oldIndex == null || newIndex == null || oldIndex === newIndex) return;
+        from.removeChild(item);
+        from.insertBefore(item, from.children[oldIndex] ?? null);
+        setBlocks((bs) => moveBlock(bs, oldIndex, newIndex));
+      },
+    });
     return () => {
-      cancelAnimationFrame(raf);
+      sortable.destroy();
       document.body.classList.remove('dragging');
     };
-  }, [drag]);
+  }, []);
 
-  const onGripDown = (e: PointerEvent<HTMLButtonElement>, index: number) => {
-    if (e.button !== 0) return;
-    const list = listRef.current;
-    const sc = scroller();
-    if (!list || !sc) return;
-    e.preventDefault();
-    e.currentTarget.setPointerCapture(e.pointerId);
-    const off = sc.getBoundingClientRect().top - sc.scrollTop;
-    const rows = [...list.children].map((el) => {
-      const r = el.getBoundingClientRect();
-      return { top: r.top - off, height: r.height };
-    });
-    const gap = rows.length > 1 ? rows[1].top - rows[0].top - rows[0].height : 8;
-    pointerY.current = e.clientY;
-    navigator.vibrate?.(10);
-    setDrag({ index, y0: e.clientY, scroll0: sc.scrollTop, rows, gap });
-    setView({ dy: 0, to: index });
-  };
-  const onGripMove = (e: PointerEvent) => {
-    if (drag) pointerY.current = e.clientY;
-  };
-  const onGripUp = () => {
-    if (!drag) return;
-    if (view) setBlocks((bs) => moveBlock(bs, drag.index, view.to));
-    setDrag(null);
-    setView(null);
-  };
   const onGripKey = (e: KeyboardEvent, index: number) => {
     if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
     e.preventDefault();
     setBlocks((bs) => moveBlock(bs, index, index + (e.key === 'ArrowUp' ? -1 : 1)));
-  };
-
-  /** How far a row is pushed aside while another is dragged over it. */
-  const shift = (j: number) => {
-    if (!drag || !view || j === drag.index) return 0;
-    const h = drag.rows[drag.index].height + drag.gap;
-    if (view.to > drag.index && j > drag.index && j <= view.to) return -h;
-    if (view.to < drag.index && j >= view.to && j < drag.index) return h;
-    return 0;
   };
 
   const label = (b: ReorderBlock, i: number) =>
@@ -200,39 +148,17 @@ export function ReorderSheet({
       <p className="small dim ro-hint">Drag ⋮⋮ or tap the arrows to move. Pick a partner in Superset to pair exercises up.</p>
       <div className="ro-list" ref={listRef} data-noswipe>
         {blocks.map((b, i) => {
-          const dragging = drag?.index === i;
           const mark = markOf(blocks, i);
           const up = i > 0 ? () => setBlocks((bs) => moveBlock(bs, i, i - 1)) : undefined;
           const down = i < blocks.length - 1 ? () => setBlocks((bs) => moveBlock(bs, i, i + 1)) : undefined;
-          const style =
-            dragging && view ? { transform: `translateY(${view.dy}px)` } : drag ? { transform: `translateY(${shift(i)}px)` } : undefined;
           const grip = (
-            <button
-              type="button"
-              className="grip ro-grip"
-              aria-label={`Drag ${label(b, i)}`}
-              onPointerDown={(e) => onGripDown(e, i)}
-              onPointerMove={onGripMove}
-              onPointerUp={onGripUp}
-              onPointerCancel={onGripUp}
-              onKeyDown={(e) => onGripKey(e, i)}
-            >
+            <button type="button" className="grip ro-grip" aria-label={`Drag ${label(b, i)}`} onKeyDown={(e) => onGripKey(e, i)}>
               <IconGrip />
             </button>
           );
           const multi = b.items.length > 1;
           return (
-            <div
-              key={b.id}
-              className={
-                'ro-block' +
-                (b.superset && multi ? ' ro-ss-block' : '') +
-                (b.rehabDose ? ' ro-dose' : '') +
-                (dragging ? ' is-drag' : '') +
-                (drag ? ' moving' : '')
-              }
-              style={style}
-            >
+            <div key={b.id} className={'ro-block' + (b.superset && multi ? ' ro-ss-block' : '') + (b.rehabDose ? ' ro-dose' : '')}>
               {multi || b.rehabDose ? (
                 <>
                   <div className="ro-row ro-head">

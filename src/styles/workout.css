@@ -224,6 +224,19 @@
   border: 1.5px dashed var(--border);
 }
 
+.crow-stack {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  text-align: left;
+}
+
+.crow-stack .crow-sum {
+  font-size: 13px;
+}
+
 .crow-next .crow-mark {
   background: var(--surface-2);
   color: var(--text-dim);
@@ -325,9 +338,9 @@
 }
 
 .fold-btn {
-  width: 36px;
-  height: 36px;
-  margin-top: -4px;
+  width: 44px;
+  height: 44px;
+  margin-top: -8px;
 }
 
 .fold-btn svg {
@@ -360,4 +373,9 @@
   gap: 8px;
   padding: 5px 6px;
   border-radius: var(--radius-sm);
+}
+
+.set-row.pair {
+  grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr) 56px;
+  gap: 6px;
 }

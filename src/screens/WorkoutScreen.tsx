@@ -78,6 +78,8 @@ export function WorkoutScreen() {
   const doneIds = w ? w.blocks.filter(blockComplete).map((b) => b.id) : [];
   const doneKey = doneIds.join(',');
   const prevDone = useRef<Set<string> | null>(null);
+  /** A block was just finished and the screen is moving to the next one: the set-follow below leaves it alone. */
+  const jumped = useRef(false);
   useEffect(() => {
     const now = new Set(doneKey ? doneKey.split(',') : []);
     const before = prevDone.current;
@@ -90,8 +92,32 @@ export function WorkoutScreen() {
       for (const id of fresh) delete n[id];
       return n;
     });
+    jumped.current = true;
     if (curId) scrollToBlock(curId);
   }, [doneKey, curId, scrollToBlock]);
+
+  // After a tick: if the next set to do is now behind the header (rest bar) or the bottom nav, bring it into view.
+  const doneSets = w ? workoutProgress(w).done : 0;
+  const prevSets = useRef(doneSets);
+  useEffect(() => {
+    const before = prevSets.current;
+    prevSets.current = doneSets;
+    const blockChanged = jumped.current;
+    jumped.current = false;
+    if (doneSets <= before || blockChanged) return;
+    // let the block-change scroll and the rest bar settle first
+    const t = setTimeout(() => {
+      const row = document.querySelector<HTMLElement>('.set-row.now');
+      if (!row) return;
+      const r = row.getBoundingClientRect();
+      const top = headRef.current?.getBoundingClientRect().bottom ?? 0;
+      const nav = document.querySelector('.nav')?.getBoundingClientRect().top ?? window.innerHeight;
+      if (r.top >= top + 4 && r.bottom <= nav - 4) return;
+      const mid = top + (nav - top) / 2;
+      window.scrollTo({ top: Math.max(0, window.scrollY + r.top + r.height / 2 - mid), behavior: 'smooth' });
+    }, 120);
+    return () => clearTimeout(t);
+  }, [doneSets]);
 
   if (!w) return <Navigate to="/" replace />;
 
@@ -136,7 +162,8 @@ export function WorkoutScreen() {
             </div>
           </div>
           <TimerButton />
-          <button className="btn btn-primary" onClick={finish}>
+          {/* quiet until most sets are done, so it isn't the loudest thing on screen mid-workout */}
+          <button className={'btn' + (prog.total && prog.done >= prog.total * 0.8 ? ' btn-primary' : '')} onClick={finish}>
             Finish
           </button>
         </div>

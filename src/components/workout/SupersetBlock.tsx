@@ -5,7 +5,7 @@ import { IconChevronUp } from '../Icons';
 import { PainStrip } from '../PainStrip';
 import { ItemHead } from './ItemHead';
 import { ItemMenu } from './ItemMenu';
-import { fieldLabels, SetHeader, SetRow, WarmupRows } from './SetRows';
+import { fieldLabels, SetHeader, SetRow, WarmupGroup } from './SetRows';
 import { blockLetter, useRecords, useStartRest } from './shared';
 import type { BlockProps } from './WorkoutBlockView';
 
@@ -73,14 +73,7 @@ export function SupersetBlock({ block, index, update, current, onToggle, onReord
       )}
       <div className="sets">
         {shared && <SetHeader labels={shared} />}
-        {active.some((e) => e.item.warmups?.length) && (
-          <div>
-            <div className="round-label">Warm-up</div>
-            {active.map((e) => (
-              <WarmupRows key={e.item.id} ex={e.ex!} item={e.item} update={update} units={!shared} />
-            ))}
-          </div>
-        )}
+        <WarmupGroup entries={active.map((e) => ({ ex: e.ex!, item: e.item }))} update={update} units={!shared} />
         {Array.from({ length: rounds }, (_, r) => (
           <div key={r}>
             <div className="round-label">Round {r + 1}</div>
