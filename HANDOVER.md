@@ -8,7 +8,7 @@ _Last updated 2026-11-22._
 
 ## State
 
-- **v0.9 (the UI review fixes, below) is in the working tree, not committed.** Before it, the newest commit is grip-drag
+- **v0.9 (the UI review fixes, below) is committed (`a4e4031`) and deployed** (2026-11-22). Before it came grip-drag
   on the workout page. Check with `git status`, `git log` and `gh run list` what has been committed, pushed and deployed.
 - **Version label:** `APP_VERSION` in `src/version.ts` shows at the top right of every screen and in Settings. Bump it
   by 0.1 for each change set Stefan gets (0.9 → 1.0 → 1.1), so he can tell which one his phone is running.
