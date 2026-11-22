@@ -140,6 +140,11 @@ export function ExercisePicker({
             className="input"
             type="search"
             enterKeyHint="search"
+            aria-label="Search exercises"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
             placeholder="Search, e.g. one arm cable row"
             value={q}
             onChange={(e) => setQ(e.target.value)}

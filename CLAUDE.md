@@ -101,6 +101,7 @@ exercise was done, then routine values, then exercise defaults.
 `npm run check` runs everything CI runs: types, ESLint, Prettier and the tests (which include a check that every
 exercise uses valid muscle ids and every routine references real exercises); then `npm run build`. `npm run format`
 fixes formatting (Prettier skips `Icons.tsx`, the data JSON and this file). Push to `main` to deploy.
+Bump `APP_VERSION` in `src/version.ts` by 0.1 for each change set (0.9 → 1.0 → 1.1); it shows at the top of every screen.
 
 ## Where things live
 
@@ -108,10 +109,12 @@ fixes formatting (Prettier skips `Icons.tsx`, the data JSON and this file). Push
   `sets` and `items` (edits), `stall` (the fixes for a stuck exercise), `layout` (blocks, supersets, the reorder sheet's moves, the rehab dose's edge), `intervals`,
   `status`. Import from `lib/workout`.
 - `src/components/workout/`: the workout card (`WorkoutBlockView` → single, superset or collapsed block; tap a header to fold it).
-  `useFollowWorkout` keeps the screen on the current block and the next set. `useLiftBlocks`: drag a block's ⋮⋮ grip
+  `useFollowWorkout` keeps the screen on the current block and the next set. A set's label (1, A1, W) shows inside its
+  tick until it's done. `useUndo` (`UndoProvider`, `useUndoable(label, fn)`): workout edits that reshape it (replace,
+  superset, take out, remove, skip, drag) show a 6 s Undo toast; route new ones like that through it. `useLiftBlocks`: drag a block's ⋮⋮ grip
   (`.wo-grip`, top left of every card and row) to move it right on the page: the reorder sheet's SortableJS set-up, no
   delay; every block folds to a row while lifted. The grip sits outside the folding content (`.wo-block-body`) because
-  iOS drops a drag whose touched element leaves the page. The ⋯ menu (`ItemMenu`) has Note / How to / Replace tiles, "Superset with…" any
+  iOS drops a drag whose touched element leaves the page. The ⋯ menu (`ItemMenu`) has Note / How to / Replace / Progress tiles, "Superset with…" any
   other block or a new exercise (`supersetWith` in `lib/workout/layout`), and leaves out what the card has buttons for.
 - `src/state/`: `store.tsx` (provider, `useStore`; import from here) re-exports `types` (state, actions), `reducer`,
   `queue` (the sync queue) and `persist` (localStorage).
@@ -122,6 +125,9 @@ fixes formatting (Prettier skips `Icons.tsx`, the data JSON and this file). Push
   a Superset menu per exercise); `applyLayout` in `lib/workout/layout` writes its result back.
 - `src/styles/`: one stylesheet per area, imported in cascade order by `index.css`. Keep `style={{…}}` for values
   computed at runtime (widths, chart colours); everything else goes in a stylesheet.
+- `src/lib/viewport.ts`: tracks the visual viewport (`--vvh`, `--vv-top`, `html.kb-open` while the keyboard is up) so
+  sheets fit above the keyboard; `--top` (safe-area inset) is the height of the status strip with the version.
+- `src/components/SyncAlert.tsx`: Home's sync warning, shown only when something is wrong.
 - `src/lib/merge.ts`: every merge — versioned lists, keyed maps, and `merge3` for workouts edited on both sides.
 
 ## Reading Stefan's history

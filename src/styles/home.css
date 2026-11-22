@@ -1,7 +1,7 @@
 /* Home */
 
 .resume {
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--accent-ink);
   display: block;
   text-decoration: none;
@@ -48,7 +48,7 @@
   padding: 1px 7px;
   border-radius: 999px;
   background: var(--surface-2);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text);
 }
@@ -56,6 +56,15 @@
 .card-menu {
   flex-shrink: 0;
   color: var(--text-dim);
+}
+
+/* a hairline and a gap between "start this routine" and its ⋯, so a slightly-off tap doesn't start a workout */
+.routine > .card-menu {
+  margin-left: 8px;
+  border-left: 0.5px solid var(--hairline);
+  border-radius: 0;
+  height: 52px;
+  width: 48px;
 }
 
 .today {
@@ -103,8 +112,6 @@
 .today-label {
   font-size: 13px;
   font-weight: 750;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--accent);
 }
 
@@ -121,7 +128,7 @@
 }
 
 .today-list {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-dim);
   line-height: 1.45;
   margin: 10px 0 14px;
@@ -133,7 +140,7 @@
 
 .routine-name {
   font-weight: 750;
-  font-size: 18px;
+  font-size: 17px;
   letter-spacing: -0.01em;
 }
 
@@ -161,4 +168,38 @@
 .list-card {
   padding: 0;
   overflow: hidden;
+}
+
+/* Home's sync line: only there when the backup isn't working */
+.sync-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 10px 6px 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--text-dim);
+}
+
+.sync-alert.warn {
+  color: var(--text);
+  background: color-mix(in oklab, var(--heat) 12%, var(--surface));
+  box-shadow: inset 3px 0 0 var(--heat);
+}
+
+.sync-alert-fix {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 10px;
+  font-weight: 700;
+  color: var(--heat-text);
+  text-decoration: none;
+}
+
+.sync-alert-fix:active {
+  opacity: 0.55;
 }

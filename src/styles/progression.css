@@ -4,11 +4,6 @@
   opacity: 0.78;
 }
 
-.set-row.warmup .set-idx {
-  font-size: 13px;
-  letter-spacing: 0.02em;
-}
-
 .set-row.warmup.done {
   opacity: 0.55;
 }
@@ -61,7 +56,7 @@
 
 .stall-tag {
   border: none;
-  color: var(--heat);
+  color: var(--heat-text);
   background: color-mix(in oklab, var(--heat) 14%, transparent);
 }
 
@@ -91,12 +86,12 @@
   display: inline-block;
   padding: 1px 5px;
   border-radius: 5px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   line-height: 1.4;
   letter-spacing: 0.04em;
   color: #fff;
-  background: var(--heat);
+  background: var(--pr);
   vertical-align: 2px;
 }
 
@@ -107,12 +102,12 @@
   right: -6px;
   padding: 1px 5px;
   border-radius: 5px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   line-height: 1.4;
   letter-spacing: 0.04em;
   color: #fff;
-  background: var(--heat);
+  background: var(--pr);
   box-shadow: 0 0 0 2px var(--surface);
   animation: pr-pop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
 }

@@ -2,7 +2,16 @@
 
 .re-top {
   gap: 8px;
-  margin: 4px 0 8px;
+  /* the one Save stays in reach while scrolling the exercises */
+  position: sticky;
+  top: var(--top);
+  z-index: 5;
+  margin: -12px -16px 8px;
+  padding: 8px 16px;
+  background: var(--bar);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid var(--hairline);
 }
 
 .re-back {
@@ -45,7 +54,7 @@
 
 .re-error {
   margin-top: 8px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 650;
   color: var(--danger);
 }
@@ -72,11 +81,12 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px 0 4px;
+  padding: 6px 12px 0 8px;
 }
 
 .re-ss-head .link-btn {
   margin-left: auto;
+  color: var(--text-dim);
 }
 
 .re-item + .re-item {
@@ -127,9 +137,10 @@
   margin: 6px 0 0 50px;
 }
 
+/* two to a row, so every −/+ keeps its 44 px */
 .re-nums {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   padding: 8px 12px 0;
 }
@@ -140,25 +151,18 @@
 
 .re-num > span {
   display: block;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 650;
   color: var(--text-dim);
   margin: 0 0 4px 2px;
 }
 
 .re-num .stepper {
-  height: 42px;
-}
-
-.re-num .stepper button {
-  width: 30px;
-  font-size: 21px;
+  height: 44px;
 }
 
 .re-num .stepper input {
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .re-num.auto .stepper input {
@@ -168,7 +172,7 @@
 
 .re-add-kg {
   align-self: end;
-  height: 42px;
+  height: 44px;
   border-radius: var(--radius-sm);
   border: 1.5px dashed var(--border);
   background: transparent;

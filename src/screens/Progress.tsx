@@ -92,6 +92,16 @@ export function Progress() {
   const pointColor = pts.map((p) => (stuckDates.has(p.date) ? colors.text : colors.accent));
 
   const best = pts.length ? Math.max(...pts.map((p) => p.value)) : null;
+  /** Holds and reps start from zero; weights get at least ±10% so a flat line doesn't look precise. */
+  const yRange = useMemo(() => {
+    const vals = (lines.length ? lines.flatMap((l) => l.data) : pts.map((p) => p.value)).filter((v): v is number => v != null);
+    if (!vals.length || !metric) return {};
+    if (metric.unit !== 'kg') return { beginAtZero: true };
+    const lo = Math.min(...vals);
+    const hi = Math.max(...vals);
+    const pad = Math.max((hi - lo) * 0.1, hi * 0.1, 1);
+    return { suggestedMin: Math.max(0, lo - pad), suggestedMax: hi + pad };
+  }, [lines, pts, metric]);
   const first = pts[0]?.value;
   const latest = pts[pts.length - 1]?.value;
 
@@ -106,7 +116,7 @@ export function Progress() {
           <div className="routine-name">{ex?.name ?? 'Choose an exercise'}</div>
           {ex && <div className="routine-meta">{ex.primary.map((m) => MUSCLE_LABELS[m]).join(', ')}</div>}
         </div>
-        <span className="small prog-change">Change</span>
+        <span className="small prog-change">{ex ? 'Change' : 'Choose'}</span>
       </button>
 
       {performed.length > 1 && (
@@ -214,6 +224,7 @@ export function Progress() {
                           grid: { display: false },
                           ticks: {
                             color: colors.text,
+                            font: { size: 13 },
                             maxRotation: 0,
                             autoSkipPadding: 12,
                           },
@@ -221,8 +232,8 @@ export function Progress() {
                         y: {
                           grid: { color: colors.grid },
                           border: { display: false },
-                          ticks: { color: colors.text, precision: 0 },
-                          beginAtZero: false,
+                          ticks: { color: colors.text, precision: 0, font: { size: 13 } },
+                          ...yRange,
                         },
                       },
                     }}
@@ -275,7 +286,14 @@ export function Progress() {
         </>
       )}
 
-      {!ex && <div className="card empty">Finish a workout to start tracking progress, or pick any exercise above.</div>}
+      {!ex && (
+        <div className="card empty">
+          <p>Finish a workout to start tracking progress, or look at any exercise.</p>
+          <button className="btn btn-primary empty-go" onClick={() => setPicking(true)}>
+            Choose an exercise
+          </button>
+        </div>
+      )}
 
       {records.length > 0 && (
         <>

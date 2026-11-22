@@ -1,8 +1,10 @@
 /* Sheet */
 
+/* Follows the visible area (src/lib/viewport.ts), so with the keyboard up the sheet sits on top of it. */
 .sheet-backdrop {
   position: fixed;
-  inset: 0;
+  inset: var(--vv-top, 0px) 0 auto;
+  height: var(--vvh, 100%);
   z-index: 50;
   background: rgb(0 0 0 / 0.45);
   display: flex;
@@ -14,18 +16,18 @@
 .sheet {
   width: 100%;
   max-width: 560px;
-  max-height: 88dvh;
+  max-height: min(88dvh, calc(var(--vvh, 100dvh) - var(--top) - 8px));
   overflow: auto;
   background: var(--surface);
   border-radius: 22px 22px 0 0;
-  padding: 8px 16px calc(env(safe-area-inset-bottom) + 16px);
+  padding: 8px max(16px, env(safe-area-inset-right)) var(--sheet-pad-b) max(16px, env(safe-area-inset-left));
   overscroll-behavior: contain;
   will-change: transform;
   animation: rise 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
 .sheet-tall {
-  height: 88dvh;
+  height: min(88dvh, calc(var(--vvh, 100dvh) - var(--top) - 8px));
 }
 
 .sheet-grip {
@@ -64,10 +66,8 @@
 
 .menu-section {
   padding: 16px 4px 2px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--text-dim);
 }
 
@@ -117,7 +117,7 @@
 /* The ⋯ menu: the three things you reach for most as big tiles, then a short list */
 .menu-tiles {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   margin-bottom: 6px;
 }

@@ -62,7 +62,7 @@ export function RoutineItemEditor({
       )}
       <div className="re-nums">
         <div className={'re-num' + (item.sets === undefined ? ' auto' : '')}>
-          <span>sets</span>
+          <span>Sets</span>
           <Stepper
             value={sets}
             step={1}
@@ -73,7 +73,7 @@ export function RoutineItemEditor({
           />
         </div>
         <div className={'re-num' + ((timed ? item.seconds : item.reps) === undefined ? ' auto' : '')}>
-          <span>{timed ? 'seconds' : 'reps'}</span>
+          <span>{timed ? 'Seconds' : 'Reps'}</span>
           <Stepper
             value={count}
             step={timed ? 5 : 1}
@@ -85,7 +85,7 @@ export function RoutineItemEditor({
         </div>
         {showWeight ? (
           <div className={'re-num' + (item.weight === undefined ? ' auto' : '')}>
-            <span>{item.weight === undefined ? 'kg · last' : 'kg'}</span>
+            <span>{item.weight === undefined ? 'Kg (last time)' : 'Kg'}</span>
             <Stepper
               value={weight}
               step={ex.type === 'machine' ? 5 : 2.5}

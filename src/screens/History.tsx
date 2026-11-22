@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { BodyMap } from '../components/BodyMap';
 import { IconBack } from '../components/Icons';
 import { ConfirmSheet } from '../components/Sheet';
+import { blockLetter } from '../components/workout/shared';
 import { getExercise } from '../data/library';
 import { MUSCLE_LABELS, MUSCLE_IDS } from '../data/muscles';
 import { doneSetCount, duration, exerciseCount, fmtDate, fmtSet } from '../lib/format';
@@ -27,7 +28,14 @@ export function HistoryList() {
   return (
     <div>
       <h1 className="page-title">History</h1>
-      {!list.length && <div className="card empty">No workouts yet. Finish one and it’ll show up here.</div>}
+      {!list.length && (
+        <div className="card empty">
+          <p>No workouts yet. Finish one and it’ll show up here.</p>
+          <Link to="/" className="btn btn-primary empty-go">
+            Start a workout
+          </Link>
+        </div>
+      )}
       {[...groups.entries()].map(([month, ws]) => (
         <div key={month}>
           <div className="section-title">
@@ -83,12 +91,10 @@ export function HistoryDetail() {
 
   return (
     <div>
-      <div className="row" style={{ marginLeft: -10 }}>
-        <button className="icon-btn" aria-label="Back" onClick={() => (justFinished ? nav('/') : nav(-1))}>
-          <IconBack />
-        </button>
-        <span className="dim small">{justFinished ? 'Workout saved' : 'History'}</span>
-      </div>
+      <button className="back-btn" onClick={() => (justFinished ? nav('/') : nav(-1))}>
+        <IconBack />
+        {justFinished ? 'Workout saved' : 'History'}
+      </button>
       <h1 className="page-title" style={{ marginTop: 0 }}>
         {w.name}
       </h1>
@@ -173,14 +179,14 @@ export function HistoryDetail() {
 
       <div className="section-title">Exercises</div>
       <div className="card list-card">
-        {w.blocks.flatMap((b) =>
+        {w.blocks.flatMap((b, bi) =>
           b.items.map((i, n) => {
             const ex = getExercise(i.exerciseId);
             return (
               <div key={i.id} className="list-row" style={{ alignItems: 'flex-start' }}>
                 <div className="grow">
                   <div style={{ fontWeight: 700 }}>
-                    {b.superset && <span className="ss-tag">SS{n + 1} </span>}
+                    {b.superset && <span className="ss-tag">{`${blockLetter(bi)}${n + 1} `}</span>}
                     {ex?.name ?? i.exerciseId} {i.station && <span className="station-tag">📍 {i.station}</span>}{' '}
                     {i.status === 'skipped' && <span className="badge badge-skip">Skipped</span>}
                     {i.pain !== undefined && <span className="station-tag">pain {i.pain}/10</span>}
@@ -208,11 +214,7 @@ export function HistoryDetail() {
                   )}
                 </div>
                 {ex && (
-                  <Link
-                    to={`/progress/${ex.id}`}
-                    className="small"
-                    style={{ color: 'var(--accent)', fontWeight: 700, whiteSpace: 'nowrap' }}
-                  >
+                  <Link to={`/progress/${ex.id}`} className="small hist-progress">
                     Progress
                   </Link>
                 )}

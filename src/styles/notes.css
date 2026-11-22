@@ -23,7 +23,7 @@
   padding: 8px 10px;
   border-radius: var(--radius-sm);
   background: var(--well);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.35;
 }
 
@@ -80,7 +80,7 @@
   border: none;
   background: transparent;
   font: inherit;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 650;
   color: var(--text);
 }
@@ -102,7 +102,7 @@
 
 .hist-note {
   margin: 2px 0 4px;
-  font-size: 14px;
+  font-size: 15px;
   font-style: italic;
   color: var(--text-dim);
 }

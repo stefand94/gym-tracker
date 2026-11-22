@@ -7,7 +7,7 @@
 }
 
 .muscle-info strong {
-  font-size: 18px;
+  font-size: 17px;
 }
 
 .mrow {
@@ -54,4 +54,16 @@
 .mrow .when.cold {
   color: var(--heat);
   font-weight: 700;
+}
+
+.seg-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.body-range {
+  margin-bottom: 12px;
+}
+
+.body-range .seg-btn {
+  font-size: 15px;
 }

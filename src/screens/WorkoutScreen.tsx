@@ -9,6 +9,7 @@ import { RestBar, TimerButton } from '../components/RestBar';
 import { ConfirmSheet } from '../components/Sheet';
 import { useFollowWorkout } from '../components/workout/useFollowWorkout';
 import { useLiftBlocks } from '../components/workout/useLiftBlocks';
+import { UndoProvider, useUndoable } from '../components/workout/useUndo';
 import { WorkoutBlockView } from '../components/workout/WorkoutBlockView';
 import { getExercise } from '../data/library';
 import { workoutLoad } from '../lib/muscleLoad';
@@ -34,7 +35,19 @@ function Elapsed({ startedAt }: { startedAt: string }) {
 
 type Ask = 'finish' | 'discard' | null;
 
+const blockName = (w: Workout, i: number) =>
+  w.blocks[i]?.items.map((it) => getExercise(it.exerciseId)?.name ?? it.exerciseId).join(' + ') ?? '';
+
+/** The workout in progress. Changes made from a menu or a drag can be undone from a toast for a few seconds. */
 export function WorkoutScreen() {
+  return (
+    <UndoProvider>
+      <WorkoutView />
+    </UndoProvider>
+  );
+}
+
+function WorkoutView() {
   const { state, dispatch } = useStore();
   const nav = useNavigate();
   const [picking, setPicking] = useState(false);
@@ -52,6 +65,7 @@ export function WorkoutScreen() {
   const headRef = useRef<HTMLDivElement>(null);
   const w = state.active;
   const update = useCallback((fn: (w: Workout) => Workout) => dispatch({ type: 'updateActive', fn }), [dispatch]);
+  const undoable = useUndoable();
   useWakeLock(!!w);
 
   const cur = w ? currentBlockIndex(w) : -1;
@@ -65,7 +79,10 @@ export function WorkoutScreen() {
     });
   }, []);
   useFollowWorkout(w, cur, headRef, onBlocksDone);
-  useLiftBlocks(listRef, !!w, setLifting, (from, to) => update((x) => ({ ...x, blocks: moveBlock(x.blocks, from, to) })));
+  useLiftBlocks(listRef, !!w, setLifting, (from, to) => {
+    if (!w || from === to) return;
+    undoable(`Moved ${blockName(w, from)}`, (x) => ({ ...x, blocks: moveBlock(x.blocks, from, to) }));
+  });
 
   if (!w) return <Navigate to="/" replace />;
 
@@ -133,7 +150,7 @@ export function WorkoutScreen() {
                 <button
                   type="button"
                   className="grip wo-grip"
-                  aria-label={`Drag ${b.items.map((it) => getExercise(it.exerciseId)?.name ?? it.exerciseId).join(' + ')}`}
+                  aria-label={`Drag ${blockName(w, i)}`}
                   onKeyDown={(e) => {
                     if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
                     e.preventDefault();

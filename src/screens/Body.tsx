@@ -11,7 +11,7 @@ const PERIODS = [7, 30, 90] as const;
 const COLD_DAYS = 10;
 
 function whenText(iso: string | undefined) {
-  if (!iso) return 'never';
+  if (!iso) return 'not yet';
   const d = daysAgo(iso);
   return d === 0 ? 'today' : d === 1 ? 'yesterday' : `${d}d ago`;
 }
@@ -32,9 +32,15 @@ export function Body() {
   return (
     <div>
       <h1 className="page-title">Body</h1>
-      <div className="chips" style={{ marginBottom: 12 }}>
+      <div className="seg seg-3 body-range" role="radiogroup" aria-label="Period">
         {PERIODS.map((p) => (
-          <button key={p} className={'chip' + (days === p ? ' on' : '')} onClick={() => setDays(p)}>
+          <button
+            key={p}
+            role="radio"
+            aria-checked={days === p}
+            className={'seg-btn' + (days === p ? ' on' : '')}
+            onClick={() => setDays(p)}
+          >
             {p} days
           </button>
         ))}
@@ -51,7 +57,7 @@ export function Body() {
             <>
               <strong>{MUSCLE_LABELS[sel]}</strong>
               <div className="small dim num">
-                {fmtNum(load[sel])} sets in {days} days · last trained {whenText(last[sel])}
+                {fmtNum(load[sel])} sets in {days} days · {last[sel] ? `last trained ${whenText(last[sel])}` : 'not trained yet'}
               </div>
             </>
           ) : (

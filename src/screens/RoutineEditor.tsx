@@ -159,7 +159,7 @@ export function RoutineEditor() {
                 <div className="re-ss-head">
                   <span className="badge badge-ss">Superset {letter}</span>
                   <button className="link-btn" onClick={() => setBlocks((bs) => splitSuperset(bs, b.id))}>
-                    Split
+                    Break up
                   </button>
                 </div>
               )}
@@ -212,21 +212,16 @@ export function RoutineEditor() {
         />
       )}
 
-      <div className="stack re-bottom">
-        <button className="btn btn-primary btn-block btn-lg" onClick={save}>
-          Save workout
-        </button>
-        {existing && (
-          <div className="re-actions">
-            <button className="btn grow" onClick={duplicate}>
-              Duplicate
-            </button>
-            <button className="btn btn-ghost btn-danger grow" onClick={() => setAsk('delete')}>
-              Delete
-            </button>
-          </div>
-        )}
-      </div>
+      {existing && (
+        <div className="re-actions re-bottom">
+          <button className="btn grow" onClick={duplicate}>
+            Duplicate
+          </button>
+          <button className="btn btn-ghost btn-danger grow" onClick={() => setAsk('delete')}>
+            Delete
+          </button>
+        </div>
+      )}
 
       {picking && (
         <ExercisePicker

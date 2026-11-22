@@ -29,14 +29,14 @@
 }
 
 .stat-v {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
 .stat-l {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-dim);
 }
 
@@ -78,7 +78,7 @@
 ol.steps {
   padding-left: 20px;
   margin: 8px 0 0;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.55;
 }
 
@@ -87,4 +87,18 @@ ol.steps code {
   background: var(--surface-2);
   padding: 1px 5px;
   border-radius: 5px;
+}
+
+/* an exercise's Progress link: 44 px to tap, without making the row taller */
+.hist-progress {
+  padding: 12px 0 12px 12px;
+  margin: -12px 0;
+  color: var(--accent);
+  font-weight: 700;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.hist-progress:active {
+  opacity: 0.55;
 }

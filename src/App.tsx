@@ -10,6 +10,7 @@ import { Settings } from './screens/Settings';
 import { WorkoutScreen } from './screens/WorkoutScreen';
 import { useStore } from './state/store';
 import { useSync } from './state/useSync';
+import { APP_VERSION } from './version';
 
 function Nav() {
   const { state } = useStore();
@@ -42,6 +43,10 @@ export function App() {
 
   return (
     <>
+      {/* Frosted strip behind the status bar, so content doesn't scroll under the clock; carries the version. */}
+      <div className="status-strip">
+        <span className="app-version">v{APP_VERSION}</span>
+      </div>
       <main className="app">
         <Routes>
           <Route path="/" element={<Home />} />

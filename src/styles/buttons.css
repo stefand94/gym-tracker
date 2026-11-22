@@ -38,7 +38,7 @@
 }
 
 .btn-primary {
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--accent-ink);
 }
 
@@ -68,12 +68,20 @@
 .btn-sm {
   min-height: 36px;
   padding: 0 12px;
-  font-size: 14px;
+  font-size: 15px;
   border-radius: 10px;
 }
 
 .btn:disabled {
-  opacity: 0.4;
+  opacity: 0.55;
+}
+
+/* a primary action that isn't ready yet reads as "not yet" (grey), not as a pale red warning */
+.btn-primary:disabled,
+.composer-send:disabled {
+  opacity: 1;
+  background: var(--surface-2);
+  color: var(--text-dim);
 }
 
 .btn.on {
@@ -138,12 +146,12 @@
 }
 
 .chip {
-  min-height: 36px;
+  min-height: 40px;
   padding: 0 14px;
   border-radius: 999px;
   border: none;
   background: var(--surface-2);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-dim);
 }
@@ -151,4 +159,42 @@
 .chip.on {
   background: var(--text);
   color: var(--bg);
+}
+
+/*
+ * Tap feedback. The tap highlight is off app-wide, so every control needs its own pressed state:
+ * a grey wash on rows and chips, a dip on icon and text buttons.
+ */
+.chip:not(.on):active,
+.menu-item:active,
+.menu-tile:active,
+.picker-item:active,
+.list-row:active,
+.seg-btn:not(.on):active {
+  background-color: var(--surface-2);
+}
+
+.chip.on:active,
+.icon-btn:active,
+.link-btn:active {
+  opacity: 0.55;
+}
+
+/* Small pills keep their look but take a 44 px tall tap */
+button.stall-tag,
+.station-chip,
+.link-btn.small {
+  position: relative;
+}
+
+button.stall-tag::before,
+.station-chip::before,
+.link-btn.small::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
 }

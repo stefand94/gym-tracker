@@ -5,6 +5,7 @@ import { AskSheet } from '../components/AskSheet';
 import { CheckInCard } from '../components/CheckInCard';
 import { IconMore, IconPlus, IconSettings, IconSpark } from '../components/Icons';
 import { PainStrip } from '../components/PainStrip';
+import { SyncAlert } from '../components/SyncAlert';
 import { ConfirmSheet, Sheet } from '../components/Sheet';
 import { getExercise, ROUTINES } from '../data/library';
 import { doneSetCount, fmtDate, relDay } from '../lib/format';
@@ -23,6 +24,13 @@ function routineSummary(r: Routine): string {
     .flatMap((b) => b.items)
     .map((i) => getExercise(i.exerciseId)?.name ?? i.exerciseId)
     .join(' · ');
+}
+
+/** The first few exercises and how many more, so the suggested card stays scannable. */
+function routineShort(r: Routine, show = 4): string {
+  const names = r.blocks.flatMap((b) => b.items).map((i) => getExercise(i.exerciseId)?.name ?? i.exerciseId);
+  if (names.length <= show + 1) return names.join(' · ');
+  return `${names.slice(0, show).join(' · ')} + ${names.length - show} more`;
 }
 
 function routineMeta(r: Routine): string {
@@ -89,6 +97,7 @@ export function Home() {
           <IconSettings />
         </Link>
       </div>
+      <SyncAlert />
 
       {aiReady && (
         <button className="ask-bar" onClick={() => setAsking(true)}>
@@ -143,9 +152,11 @@ export function Home() {
           </div>
           <div className={'rehab-status' + (rehab.dropBack ? ' warn' : '')}>{rehabStatus(rehab)}</div>
           {rehab.next && (
-            <button className="btn btn-block" onClick={() => startRoutine(rehab.next!)}>
-              Start {rehab.next.name}
-            </button>
+            <div className="rehab-foot">
+              <button className="link-btn" onClick={() => startRoutine(rehab.next!)}>
+                Start {rehab.next.name} ›
+              </button>
+            </div>
           )}
         </div>
       )}
@@ -161,7 +172,7 @@ export function Home() {
               </div>
               <BodyMap load={routineLoad(top.routine)} size="mini" />
             </div>
-            <div className="today-list">{routineSummary(top.routine)}</div>
+            <div className="today-list">{routineShort(top.routine)}</div>
             <span className="btn btn-primary btn-block btn-lg today-go">Start {top.routine.name}</span>
           </button>
           <button className="icon-btn card-menu" aria-label={`${top.routine.name} options`} onClick={() => setMenu(top.routine)}>
@@ -204,11 +215,15 @@ export function Home() {
 
       <Link to="/body" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
         <BodyMap load={week} size="small" />
-        <div className="legend">
-          <span>none</span>
-          <span className="legend-bar" />
-          <span>most sets</span>
-        </div>
+        {Object.values(week).some((v) => v > 0) ? (
+          <div className="legend">
+            <span>none</span>
+            <span className="legend-bar" />
+            <span>most sets</span>
+          </div>
+        ) : (
+          <div className="legend-empty">Muscles you train this week light up here.</div>
+        )}
       </Link>
 
       {recent.length > 0 && (
@@ -231,6 +246,15 @@ export function Home() {
       )}
       {menu && (
         <Sheet title={menu.name} onClose={() => setMenu(null)}>
+          <button
+            className="menu-item"
+            onClick={() => {
+              setMenu(null);
+              startRoutine(menu);
+            }}
+          >
+            Start {menu.name}
+          </button>
           <button className="menu-item" onClick={() => nav(`/routines/${menu.id}`)}>
             Edit
           </button>

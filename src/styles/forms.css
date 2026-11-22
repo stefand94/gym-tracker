@@ -137,8 +137,6 @@
   flex: none;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
   padding: 2px 6px;
   border-radius: 6px;
   background: var(--accent-soft);
@@ -169,4 +167,44 @@
   border-radius: 50%;
   background: var(--accent-soft);
   font-size: 22px;
+}
+
+/* Keys and tokens: masked like a password, but a text field, so iOS doesn't offer to save them to Passwords */
+.input.secret {
+  -webkit-text-security: disc;
+}
+
+.input.secret:placeholder-shown {
+  -webkit-text-security: none;
+}
+
+/* "How to get a key": the app's chevron instead of the native ▶ */
+.disclose {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  font-weight: 650;
+  cursor: pointer;
+  list-style: none;
+}
+
+.disclose::-webkit-details-marker {
+  display: none;
+}
+
+.disclose::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  margin: 0 6px 4px 12px;
+  border: solid var(--text-dim);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  transition: transform 0.2s;
+}
+
+details[open] > .disclose::after {
+  margin-bottom: -4px;
+  transform: rotate(-135deg);
 }

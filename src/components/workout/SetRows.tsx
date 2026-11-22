@@ -37,17 +37,16 @@ function SetFields({ ex, set, onChange, units }: { ex: Exercise; set: SetEntry; 
   );
 }
 
-/** Weight × reps rows: two steppers side by side, sharing the row evenly. */
+/** Weight × reps rows: two steppers side by side, sharing the row evenly. The set's number (1, A1, W) sits in its tick box. */
 const pairs = (ex: Exercise) => ex.type === 'weight' || ex.type === 'machine';
 
 export function SetHeader({ labels }: { labels: string[] }) {
   return (
     <div className={'set-row set-head' + (labels[1] === 'reps' ? ' pair' : '')} aria-hidden>
-      <div>set</div>
       {labels.map((l) => (
         <div key={l}>{l}</div>
       ))}
-      <div>done</div>
+      <div>set</div>
     </div>
   );
 }
@@ -146,7 +145,7 @@ export function SetRow({
       aria-pressed={set.done}
       onClick={tap}
     >
-      <IconCheck />
+      {set.done || hold ? <IconCheck /> : <span className="tick-label">{label}</span>}
     </button>
   );
   const cls = 'set-row' + (pairs(ex) ? ' pair' : '') + (set.done ? ' done' : '') + (now ? ' now' : '') + (hold ? ' holding' : '');
@@ -174,7 +173,6 @@ export function SetRow({
     };
     return (
       <div className={cls + ' sided'}>
-        <div className="set-idx">{label}</div>
         {side('L')}
         {tick}
         {side('R')}
@@ -184,7 +182,6 @@ export function SetRow({
 
   return (
     <div className={cls}>
-      <div className="set-idx">{label}</div>
       {hold ? <HoldDisplay hold={hold} onStop={tap} /> : <SetFields ex={ex} set={set} units={units} onChange={change} />}
       {timed && holdButton(hold, set.seconds)}
       {tick}
@@ -199,9 +196,6 @@ export function WarmupRows({ ex, item, update, units = false }: { ex: Exercise; 
     <>
       {item.warmups.map((set, k) => (
         <div key={`w${k}`} className={'set-row warmup' + (pairs(ex) ? ' pair' : '') + (set.done ? ' done' : '')}>
-          <div className="set-idx" aria-label="Warm-up">
-            W
-          </div>
           <SetFields ex={ex} set={set} units={units} onChange={(p) => update((w) => updateWarmup(w, item.id, k, p))} />
           <button
             type="button"
@@ -213,7 +207,7 @@ export function WarmupRows({ ex, item, update, units = false }: { ex: Exercise; 
               update((w) => toggleWarmup(w, item.id, k));
             }}
           >
-            <IconCheck />
+            {set.done ? <IconCheck /> : <span className="tick-label">W</span>}
           </button>
         </div>
       ))}

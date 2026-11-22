@@ -53,7 +53,7 @@
 
 .bubble-me {
   border-bottom-right-radius: 6px;
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--accent-ink);
 }
 
@@ -113,12 +113,8 @@
   height: 44px;
   border: none;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--accent-ink);
-}
-
-.composer-send:disabled {
-  opacity: 0.35;
 }
 
 .composer-send svg {
@@ -165,7 +161,7 @@
 
 .note-more,
 .note-reply {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 650;
   color: var(--text-dim);
 }

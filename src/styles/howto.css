@@ -28,7 +28,7 @@
 }
 
 .howto-meta {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.35;
 }
 
@@ -57,7 +57,7 @@
   border-radius: 50%;
   background: var(--surface-2);
   font-weight: 800;
-  font-size: 14px;
+  font-size: 15px;
   display: grid;
   place-items: center;
 }
@@ -72,16 +72,14 @@
 
 .howto-mistake-label {
   display: block;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
   color: var(--accent);
   margin-bottom: 2px;
 }
 
 .howto-cue {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-dim);
   margin-bottom: 8px;
 }

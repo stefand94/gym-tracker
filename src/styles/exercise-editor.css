@@ -9,7 +9,7 @@
 
 .input-lg {
   min-height: 52px;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 650;
 }
 
@@ -17,8 +17,6 @@
   margin-top: 8px;
   font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   color: var(--text-dim);
 }
 
@@ -31,8 +29,9 @@
 .link-btn {
   border: none;
   background: transparent;
-  padding: 8px 0 8px 12px;
-  margin: -8px 0;
+  /* 44 px tall to tap, without taking that much room in the line */
+  padding: 12px 0 12px 12px;
+  margin: -12px 0;
   font-size: 15px;
   font-weight: 700;
   color: var(--accent);
@@ -50,7 +49,7 @@
 }
 
 .seg-btn {
-  min-height: 40px;
+  min-height: 44px;
   border: none;
   border-radius: 9px;
   background: transparent;
@@ -73,7 +72,7 @@
 }
 
 .note-soft {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.4;
   color: var(--text-dim);
   padding: 10px 12px;
@@ -83,9 +82,9 @@
 
 .sheet-footer {
   position: sticky;
-  bottom: calc(-16px - env(safe-area-inset-bottom));
+  bottom: calc(-1 * var(--sheet-pad-b));
   margin: 0 -16px;
-  padding: 8px 16px calc(env(safe-area-inset-bottom) + 16px);
+  padding: 8px 16px var(--sheet-pad-b);
   background: var(--surface);
   box-shadow: 0 -0.5px 0 var(--hairline);
 }

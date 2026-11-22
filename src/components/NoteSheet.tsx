@@ -19,6 +19,7 @@ import { aiMessage, useClaude } from '../state/useClaude';
 import type { Exercise, NoteMessage, NoteSuggestion, Workout, WorkoutItem } from '../types';
 import { IconCheck, IconClose, IconNote, IconSend, IconSpark } from './Icons';
 import { Sheet } from './Sheet';
+import { useOnline } from '../state/useOnline';
 
 /**
  * A note as a chat: your messages on the right, Claude's replies on the left, and a box at the bottom that clears
@@ -67,7 +68,8 @@ export function NoteChat({
   };
 
   return (
-    <Sheet title={title} onClose={onClose} tall>
+    // an empty thread fits its content, so the composer sits just under the hint, not at the bottom of a tall sheet
+    <Sheet title={title} onClose={onClose} tall={shown.length > 0}>
       <div className="chat">
         {shown.length === 0 && <div className="small dim chat-empty">Type, or tap the mic on your keyboard to dictate.</div>}
         {shown.map(({ m, k }) =>
@@ -144,21 +146,6 @@ export function NoteChat({
     </Sheet>
   );
 }
-
-const useOnline = () => {
-  const [online, setOnline] = useState(typeof navigator === 'undefined' || navigator.onLine !== false);
-  useEffect(() => {
-    const on = () => setOnline(true);
-    const off = () => setOnline(false);
-    window.addEventListener('online', on);
-    window.addEventListener('offline', off);
-    return () => {
-      window.removeEventListener('online', on);
-      window.removeEventListener('offline', off);
-    };
-  }, []);
-  return online;
-};
 
 /** Claude reading a note, or the changes it read out of it as chips: ✓ applies one, ✕ drops it. */
 function NoteExtras({

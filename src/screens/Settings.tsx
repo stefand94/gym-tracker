@@ -9,6 +9,7 @@ import { checkKey, MODEL_LABELS, type ModelKey } from '../lib/claude';
 import { testConnection } from '../lib/sync';
 import { useStore } from '../state/store';
 import type { Exercise, Workout } from '../types';
+import { APP_VERSION } from '../version';
 
 export function Settings({ syncNow }: { syncNow: () => void }) {
   const { state, dispatch } = useStore();
@@ -18,6 +19,7 @@ export function Settings({ syncNow }: { syncNow: () => void }) {
   const [test, setTest] = useState<{ ok: boolean; msg: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [askDisconnect, setAskDisconnect] = useState(false);
+  const [imported, setImported] = useState<{ ok: boolean; msg: string } | null>(null);
   const [editing, setEditing] = useState<Exercise | 'new' | null>(null);
   const mine = [...state.customExercises].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -70,9 +72,9 @@ export function Settings({ syncNow }: { syncNow: () => void }) {
       const history: Workout[] = Array.isArray(data) ? data : data.history;
       if (!Array.isArray(history)) throw new Error('No workouts found in file');
       dispatch({ type: 'restore', history });
-      alert(`Imported ${history.length} workouts (duplicates skipped).`);
+      setImported({ ok: true, msg: `Imported ${history.length} workouts (duplicates skipped).` });
     } catch (e) {
-      alert(`Import failed: ${e instanceof Error ? e.message : e}`);
+      setImported({ ok: false, msg: `Import failed: ${e instanceof Error ? e.message : e}` });
     }
   };
 
@@ -153,8 +155,11 @@ export function Settings({ syncNow }: { syncNow: () => void }) {
         <label className="field">
           <span>Personal access token</span>
           <input
-            className="input"
-            type="password"
+            type="text"
+            className="input secret"
+            autoComplete="off"
+            data-1p-ignore
+            data-lpignore="true"
             placeholder="github_pat_…"
             value={token}
             onChange={(e) => setToken(e.target.value)}
@@ -188,9 +193,7 @@ export function Settings({ syncNow }: { syncNow: () => void }) {
           />
         )}
         <details>
-          <summary className="small" style={{ fontWeight: 650, cursor: 'pointer' }}>
-            How to create a token
-          </summary>
+          <summary className="small disclose">How to create a token</summary>
           <ol className="steps">
             <li>
               On GitHub go to <b>Settings → Developer settings → Personal access tokens → Fine-grained tokens</b> and tap{' '}
@@ -235,10 +238,15 @@ export function Settings({ syncNow }: { syncNow: () => void }) {
             e.target.value = '';
           }}
         />
+        {imported && (
+          <div className={imported.ok ? 'small dim' : 'error-text'} role="status">
+            {imported.msg}
+          </div>
+        )}
       </div>
 
-      <p className="small dim" style={{ textAlign: 'center', marginTop: 24 }}>
-        Gym Tracker · v{__APP_VERSION__}
+      <p className="small dim settings-version">
+        Gym Tracker v{APP_VERSION} · built {__APP_VERSION__}
       </p>
     </div>
   );
@@ -276,8 +284,11 @@ function ClaudeSettings() {
         <label className="field">
           <span>API key</span>
           <input
-            className="input"
-            type="password"
+            type="text"
+            className="input secret"
+            autoComplete="off"
+            data-1p-ignore
+            data-lpignore="true"
             placeholder="sk-ant-…"
             value={key}
             onChange={(e) => setKey(e.target.value)}
@@ -350,9 +361,7 @@ function ClaudeSettings() {
           />
         )}
         <details>
-          <summary className="small" style={{ fontWeight: 650, cursor: 'pointer' }}>
-            How to get a key
-          </summary>
+          <summary className="small disclose">How to get a key</summary>
           <ol className="steps">
             <li>
               Go to <b>console.anthropic.com</b>, sign in, and add a little credit under <b>Billing</b> ($5 lasts a long time on Haiku).

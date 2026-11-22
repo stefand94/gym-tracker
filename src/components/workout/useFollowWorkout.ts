@@ -22,7 +22,9 @@ export function useFollowWorkout(
       requestAnimationFrame(() => {
         const el = document.getElementById(`blk-${id}`);
         if (!el) return;
-        const head = headRef.current?.getBoundingClientRect().height ?? 0;
+        const h = headRef.current;
+        // where the sticky header ends once stuck: its top (below the status-bar strip) plus its height
+        const head = h ? parseFloat(getComputedStyle(h).top) + h.getBoundingClientRect().height : 0;
         const top = el.getBoundingClientRect().top + window.scrollY - head - 10;
         window.scrollTo({ top: Math.max(0, top), behavior: smooth ? 'smooth' : 'auto' });
       });

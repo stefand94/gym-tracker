@@ -10,7 +10,10 @@
   margin-top: 10px;
   flex-wrap: nowrap;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding: 0 24px 4px 0;
+  /* fade at the right edge says "scrolls", so the cut-off chip doesn't look broken */
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
 }
 
 .prog-recent .chip {
