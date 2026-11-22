@@ -56,8 +56,6 @@ function WorkoutView() {
   const [ask, setAsk] = useState<Ask>(null);
   const [noting, setNoting] = useState(false);
   const [asking, setAsking] = useState(false);
-  /** A block is being dragged by its grip: every block shows as one row. */
-  const [lifting, setLifting] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const { ready: aiReady } = useClaude();
   /** Blocks opened or closed by hand; everything else follows "only the current block is open". */
@@ -79,7 +77,7 @@ function WorkoutView() {
     });
   }, []);
   useFollowWorkout(w, cur, headRef, onBlocksDone);
-  useLiftBlocks(listRef, !!w, setLifting, (from, to) => {
+  useLiftBlocks(listRef, !!w, (from, to) => {
     if (!w || from === to) return;
     undoable(`Moved ${blockName(w, from)}`, (x) => ({ ...x, blocks: moveBlock(x.blocks, from, to) }));
   });
@@ -135,7 +133,7 @@ function WorkoutView() {
 
       {w.note && <WorkoutNoteCard note={w.note} onEdit={() => setNoting(true)} />}
 
-      <div className={'wo-list' + (lifting ? ' is-lifting' : '')} ref={listRef}>
+      <div className="wo-list" ref={listRef}>
         {w.blocks.map((b, i) => {
           const open = override[b.id] ?? i === cur;
           const upcoming = !open && i > cur && cur >= 0 && !blockComplete(b);
@@ -143,9 +141,7 @@ function WorkoutView() {
           if (label) shownNextLabel = true;
           return (
             <div key={b.id} id={`blk-${b.id}`} className="wo-block">
-              {label && !lifting && <div className="list-label">Up next</div>}
-              {/* the grip stays the same element while the cards fold under it: on iOS, a drag whose element
-                  leaves the page stops getting touch moves */}
+              {label && <div className="list-label">Up next</div>}
               <div className="wo-block-body">
                 <button
                   type="button"
@@ -159,15 +155,7 @@ function WorkoutView() {
                 >
                   <IconGrip />
                 </button>
-                <WorkoutBlockView
-                  block={b}
-                  index={i}
-                  update={update}
-                  open={open}
-                  current={i === cur}
-                  lifting={lifting}
-                  onToggle={() => toggle(b.id, open)}
-                />
+                <WorkoutBlockView block={b} index={i} update={update} open={open} current={i === cur} onToggle={() => toggle(b.id, open)} />
               </div>
             </div>
           );

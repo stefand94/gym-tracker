@@ -386,17 +386,12 @@
 /* A set: its fields, then the tick box (which shows the set's number until it's done) */
 .set-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 66px 60px;
+  /* the same columns on every row, so a superset's rows line up: kg | reps (or seconds, then play) | tick */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 56px;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 5px 4px;
   border-radius: var(--radius-sm);
-}
-
-/* weight × reps: two full-size steppers side by side */
-.set-row.pair {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 56px;
-  gap: 6px;
 }
 
 /* Drag a block by its grip (useLiftBlocks): the grip sits at the top left of the card or row */
@@ -433,46 +428,31 @@ body.lifting {
   text-align: center;
 }
 
-.wo-list.is-lifting {
-  gap: 6px;
+/* where the lifted block will land: the block itself, faded, at full size so nothing else on the page moves */
+.wo-block.wo-ghost > .wo-block-body {
+  opacity: 0.35;
 }
 
-.lift-row {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
+.wo-block.wo-ghost {
+  border-radius: var(--radius);
+  outline: 2px dashed var(--accent);
+  outline-offset: 2px;
 }
 
-.lift-row .crow-mark {
-  background: var(--surface-2);
-  color: var(--text);
-}
-
-.lift-row.lift-ss .crow-mark {
-  background: color-mix(in oklab, var(--rest) 18%, transparent);
-  color: var(--rest);
-}
-
-.lift-row.lift-done {
-  opacity: 0.6;
-}
-
-/* where the lifted block will land */
-.wo-block.wo-ghost .lift-row {
-  opacity: 0.4;
-  border: 2px dashed var(--accent);
-}
-
-/* the copy under your finger */
+/* the copy under your finger: just the top of the card (its name), so it doesn't cover the page */
 .wo-block.wo-dragging {
   z-index: 1000;
-  opacity: 1 !important;
+  max-height: 120px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  opacity: 0.96 !important;
   pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
 }
 
-.wo-block.wo-dragging .lift-row {
-  border-color: var(--accent);
-  box-shadow: 0 14px 32px rgb(0 0 0 / 0.35);
-  transform: scale(1.02);
+.wo-block.wo-dragging .list-label {
+  display: none;
 }
 
 /* the workout's name is a field: show it while it's being renamed */

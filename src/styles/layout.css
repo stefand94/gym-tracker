@@ -32,10 +32,12 @@
 
 /* Bottom right of the strip: under the battery on an iPhone with a Dynamic Island, clear of the island itself. */
 .app-version {
-  position: absolute;
+  position: fixed;
+  z-index: 31;
   right: max(16px, env(safe-area-inset-right));
-  bottom: 3px;
-  font-size: 11px;
+  top: calc(var(--top) - 15px);
+  pointer-events: none;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.02em;

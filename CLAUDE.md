@@ -113,8 +113,9 @@ Bump `APP_VERSION` in `src/version.ts` by 0.1 for each change set (0.9 → 1.0 �
   tick until it's done. `useUndo` (`UndoProvider`, `useUndoable(label, fn)`): workout edits that reshape it (replace,
   superset, take out, remove, skip, drag) show a 6 s Undo toast; route new ones like that through it. `useLiftBlocks`: drag a block's ⋮⋮ grip
   (`.wo-grip`, top left of every card and row) to move it right on the page: the reorder sheet's SortableJS set-up, no
-  delay; every block folds to a row while lifted. The grip sits outside the folding content (`.wo-block-body`) because
-  iOS drops a drag whose touched element leaves the page. The ⋯ menu (`ItemMenu`) has Note / How to / Replace / Progress tiles, "Superset with…" any
+  delay. The page stays as it is while dragging: the block's place shows dashed (`.wo-ghost`) and a short copy of it
+  (`.wo-dragging`, max 120 px) follows the finger. Every set row has the same three columns (weight or +kg | reps or
+  seconds | tick), so bodyweight and hold rows line up with the rest. The ⋯ menu (`ItemMenu`) has Note / How to / Replace / Progress tiles, "Superset with…" any
   other block or a new exercise (`supersetWith` in `lib/workout/layout`), and leaves out what the card has buttons for.
 - `src/state/`: `store.tsx` (provider, `useStore`; import from here) re-exports `types` (state, actions), `reducer`,
   `queue` (the sync queue) and `persist` (localStorage).

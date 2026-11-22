@@ -14,7 +14,7 @@ import type { Update } from './shared';
 /** Column labels for an exercise's set fields, in display order. */
 export function fieldLabels(ex: Exercise): string[] {
   if (ex.type === 'timed') return [ex.sides ? 'sec · each side' : 'sec', ''];
-  if (ex.type === 'bodyweight') return ['reps', '+kg'];
+  if (ex.type === 'bodyweight') return ['+kg', 'reps'];
   return ['kg', 'reps'];
 }
 
@@ -25,8 +25,8 @@ function SetFields({ ex, set, onChange, units }: { ex: Exercise; set: SetEntry; 
   if (ex.type === 'bodyweight')
     return (
       <>
-        <Stepper label="Reps" unit={u('reps')} step={1} value={set.reps} onChange={(v) => onChange({ reps: Math.round(v) })} />
         <NumInput label="Added weight" unit={u('+kg')} decimals value={set.weight ?? 0} onChange={(v) => onChange({ weight: v })} />
+        <Stepper label="Reps" unit={u('reps')} step={1} value={set.reps} onChange={(v) => onChange({ reps: Math.round(v) })} />
       </>
     );
   return (
@@ -37,12 +37,14 @@ function SetFields({ ex, set, onChange, units }: { ex: Exercise; set: SetEntry; 
   );
 }
 
-/** Weight × reps rows: two steppers side by side, sharing the row evenly. The set's number (1, A1, W) sits in its tick box. */
-const pairs = (ex: Exercise) => ex.type === 'weight' || ex.type === 'machine';
+/*
+ * Every set row has the same three columns, so a superset's rows line up: weight (kg, or +kg on bodyweight) | reps
+ * (or seconds, then the hold's play button) | the tick, which shows the set's number (1, A1, W) until it's done.
+ */
 
 export function SetHeader({ labels }: { labels: string[] }) {
   return (
-    <div className={'set-row set-head' + (labels[1] === 'reps' ? ' pair' : '')} aria-hidden>
+    <div className="set-row set-head" aria-hidden>
       {labels.map((l) => (
         <div key={l}>{l}</div>
       ))}
@@ -148,7 +150,7 @@ export function SetRow({
       {set.done || hold ? <IconCheck /> : <span className="tick-label">{label}</span>}
     </button>
   );
-  const cls = 'set-row' + (pairs(ex) ? ' pair' : '') + (set.done ? ' done' : '') + (now ? ' now' : '') + (hold ? ' holding' : '');
+  const cls = 'set-row' + (set.done ? ' done' : '') + (now ? ' now' : '') + (hold ? ' holding' : '');
 
   if (sided) {
     const side = (s: 'L' | 'R') => {
@@ -195,7 +197,7 @@ export function WarmupRows({ ex, item, update, units = false }: { ex: Exercise; 
   return (
     <>
       {item.warmups.map((set, k) => (
-        <div key={`w${k}`} className={'set-row warmup' + (pairs(ex) ? ' pair' : '') + (set.done ? ' done' : '')}>
+        <div key={`w${k}`} className={'set-row warmup' + (set.done ? ' done' : '')}>
           <SetFields ex={ex} set={set} units={units} onChange={(p) => update((w) => updateWarmup(w, item.id, k, p))} />
           <button
             type="button"

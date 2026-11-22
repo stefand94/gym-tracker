@@ -176,8 +176,8 @@ button.hold-tap:active {
   flex-shrink: 0;
 }
 
-/* Two steppers share a weight × reps row: the −/+ keep their 44 px, the value is set a little smaller. */
-.set-row.pair .stepper input {
+/* Two columns share a set row: the −/+ keep their 44 px, the value is set a little smaller. */
+.set-row .stepper input {
   font-size: 20px;
 }
 
@@ -343,9 +343,9 @@ button.hold-tap:active {
 .set-row.sided > .side-row {
   grid-column: 1 / span 2;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 66px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .set-row.sided > .tick {
@@ -353,6 +353,6 @@ button.hold-tap:active {
   grid-row: 1 / span 2;
 }
 
-.set-row.pair .tick {
+.set-row .tick {
   width: 56px;
 }

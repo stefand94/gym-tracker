@@ -43,10 +43,10 @@ export function App() {
 
   return (
     <>
-      {/* Frosted strip behind the status bar, so content doesn't scroll under the clock; carries the version. */}
-      <div className="status-strip">
-        <span className="app-version">v{APP_VERSION}</span>
-      </div>
+      {/* Frosted strip behind the status bar, so content doesn't scroll under the clock. The version sits on top of it,
+          not inside it: iOS blurs a child of a backdrop-filtered element along with what's behind it. */}
+      <div className="status-strip" aria-hidden />
+      <span className="app-version">v{APP_VERSION}</span>
       <main className="app">
         <Routes>
           <Route path="/" element={<Home />} />
