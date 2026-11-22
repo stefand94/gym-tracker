@@ -6,6 +6,7 @@ import { daysAgo, fmtNum } from '../lib/format';
 import { balanceNote, groupSets } from '../lib/groups';
 import { lastTrained, loadSince } from '../lib/muscleLoad';
 import { useStore } from '../state/store';
+import { ClaudeButton } from '../components/ClaudeButton';
 
 const PERIODS = [7, 30, 90] as const;
 const COLD_DAYS = 10;
@@ -31,7 +32,10 @@ export function Body() {
 
   return (
     <div>
-      <h1 className="page-title">Body</h1>
+      <div className="spread title-row">
+        <h1 className="page-title">Body</h1>
+        <ClaudeButton />
+      </div>
       <div className="seg seg-3 body-range" role="radiogroup" aria-label="Period">
         {PERIODS.map((p) => (
           <button

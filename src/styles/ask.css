@@ -1,23 +1,5 @@
 /* Ask Claude */
 
-.ask-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 48px;
-  margin: 0 0 12px;
-  padding: 0 14px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--surface);
-  font: inherit;
-  font-size: 15px;
-  text-align: left;
-  color: var(--text-dim);
-}
-
-.ask-bar svg,
 .ask-busy svg {
   width: 18px;
   height: 18px;
@@ -25,7 +7,8 @@
   color: var(--accent);
 }
 
-.ask-btn svg {
+/* the ✦ in each screen's top bar: the one way to open the Ask chat */
+.claude-btn {
   color: var(--accent);
 }
 

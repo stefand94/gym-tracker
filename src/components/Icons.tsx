@@ -3,6 +3,9 @@ const p = { fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap:
 export const IconHome = () => (
   <svg viewBox="0 0 24 24" {...p}><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" /></svg>
 );
+export const IconDumbbell = () => (
+  <svg viewBox="0 0 24 24" {...p}><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11" /></svg>
+);
 export const IconBody = () => (
   <svg viewBox="0 0 24 24" {...p}><circle cx="12" cy="4.5" r="2.5" /><path d="M5 9h14M12 9v5m0 0-3 7m3-7 3 7" /></svg>
 );

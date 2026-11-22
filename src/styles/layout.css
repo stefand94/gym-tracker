@@ -24,9 +24,8 @@
   inset: 0 0 auto;
   z-index: 30;
   height: var(--top);
-  background: var(--bar);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  /* solid, not frosted: on iOS a backdrop-filtered layer can draw over the version label above it */
+  background: var(--bg);
   pointer-events: none;
 }
 
@@ -43,6 +42,8 @@
   letter-spacing: 0.02em;
   color: var(--text-dim);
   font-variant-numeric: tabular-nums;
+  /* its own layer, so nothing composited under it can cover it */
+  transform: translateZ(0);
 }
 
 .settings-version {
@@ -60,6 +61,13 @@
 
 .title-row {
   align-items: center;
+}
+
+.title-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-right: -10px;
 }
 
 .title-row .page-title {

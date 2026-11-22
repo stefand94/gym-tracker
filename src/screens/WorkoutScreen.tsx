@@ -4,7 +4,7 @@ import { BodyMap } from '../components/BodyMap';
 import { ExerciseEditor } from '../components/ExerciseEditor';
 import { ExercisePicker } from '../components/ExercisePicker';
 import { HoldWatcher } from '../components/HoldTimer';
-import { IconGrip, IconPlus, IconSpark } from '../components/Icons';
+import { IconGrip, IconPlus } from '../components/Icons';
 import { RestBar, TimerButton } from '../components/RestBar';
 import { ConfirmSheet } from '../components/Sheet';
 import { useFollowWorkout } from '../components/workout/useFollowWorkout';
@@ -17,8 +17,7 @@ import { routineFromWorkout } from '../lib/routineEdit';
 import { useWakeLock } from '../lib/useWakeLock';
 import { addExercise, blockComplete, currentBlockIndex, moveBlock, workoutProgress } from '../lib/workout';
 import { useStore } from '../state/store';
-import { useClaude } from '../state/useClaude';
-import { AskSheet } from '../components/AskSheet';
+import { ClaudeButton } from '../components/ClaudeButton';
 import { NoteChat, WorkoutNoteCard } from '../components/NoteSheet';
 import { addNote, removeNote, threadOf } from '../lib/notes';
 import type { Workout } from '../types';
@@ -55,9 +54,7 @@ function WorkoutView() {
   const [showMap, setShowMap] = useState(true);
   const [ask, setAsk] = useState<Ask>(null);
   const [noting, setNoting] = useState(false);
-  const [asking, setAsking] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
-  const { ready: aiReady } = useClaude();
   /** Blocks opened or closed by hand; everything else follows "only the current block is open". */
   const [override, setOverride] = useState<Record<string, boolean>>({});
   const headRef = useRef<HTMLDivElement>(null);
@@ -118,6 +115,7 @@ function WorkoutView() {
               <Elapsed startedAt={w.startedAt} /> · <strong className="wo-count">{prog.done}</strong>/{prog.total} sets
             </div>
           </div>
+          <ClaudeButton from={{ kind: 'workout', workout: w }} boxed />
           <TimerButton />
           {/* quiet until most sets are done, so it isn't the loudest thing on screen mid-workout */}
           <button className={'btn' + (prog.total && prog.done >= prog.total * 0.8 ? ' btn-primary' : '')} onClick={finish}>
@@ -197,11 +195,6 @@ function WorkoutView() {
             Finish workout
           </button>
         )}
-        {aiReady && (
-          <button className="btn btn-block ask-btn" onClick={() => setAsking(true)}>
-            <IconSpark /> Ask Claude
-          </button>
-        )}
         {!w.note && (
           <button className="btn btn-ghost btn-block" onClick={() => setNoting(true)}>
             Add a session note
@@ -245,7 +238,6 @@ function WorkoutView() {
         />
       )}
 
-      {asking && <AskSheet from={{ kind: 'workout', workout: w }} onClose={() => setAsking(false)} />}
       {noting && (
         <NoteChat
           title="Session note"

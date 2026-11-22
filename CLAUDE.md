@@ -150,5 +150,7 @@ never in the repo or the data repo (the site is public). Never enter either key 
 - `src/lib/aiValidate.ts` (`checkPlan`): every plan is checked in code — unknown ids dropped, leg work held back
   during rehab, sets/reps clamped, the rehab dose appended. `src/lib/ask.ts` (Ask), `notes.ts`, `helpers.ts`
   (exercise auto-fill, picker fallback, weekly check-in cached in `state.ai.checkIn`) read Claude's answers.
+- `src/components/ClaudeButton.tsx`: the ✦ in each screen's top bar, the one way into Ask (`AskSheet`) — no other
+  Ask buttons. Notes, the picker's "Ask Claude what X is", exercise auto-fill and the check-in card work in place.
 - Nothing Claude proposes is saved without a tap. Custom exercises it fills in stay `reviewed: false`.
 - Dev only: `window.__claudeMock = ({ prompt, today, model }) => data` answers instead of the API (no key needed).

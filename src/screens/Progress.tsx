@@ -12,6 +12,7 @@ import { metricsFor, performedExerciseIds, series, stationsIn } from '../lib/pro
 import { recentRecords } from '../lib/records';
 import { stallNow, stallText } from '../lib/stall';
 import { useStore } from '../state/store';
+import { ClaudeButton } from '../components/ClaudeButton';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Filler);
 
@@ -107,7 +108,10 @@ export function Progress() {
 
   return (
     <div>
-      <h1 className="page-title">Progress</h1>
+      <div className="spread title-row">
+        <h1 className="page-title">Progress</h1>
+        <ClaudeButton />
+      </div>
 
       <button type="button" className="card prog-pick" onClick={() => setPicking(true)}>
         {ex && <BodyMap load={exerciseMap(ex)} scaleMax={1} size="mini" />}

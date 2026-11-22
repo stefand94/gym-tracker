@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
-import { IconBody, IconChart, IconHistory, IconHome } from './components/Icons';
+import { IconBody, IconChart, IconDumbbell, IconHistory, IconHome } from './components/Icons';
 import { Body } from './screens/Body';
 import { HistoryDetail, HistoryList } from './screens/History';
 import { Home } from './screens/Home';
@@ -14,8 +14,10 @@ import { APP_VERSION } from './version';
 
 function Nav() {
   const { state } = useStore();
+  // Home is always Home; the workout gets its own tab, with a live dot, only while one is in progress
   const tabs = [
-    { to: state.active ? '/workout' : '/', label: state.active ? 'Workout' : 'Home', icon: <IconHome />, live: !!state.active, end: true },
+    { to: '/', label: 'Home', icon: <IconHome />, end: true },
+    ...(state.active ? [{ to: '/workout', label: 'Workout', icon: <IconDumbbell />, live: true }] : []),
     { to: '/body', label: 'Body', icon: <IconBody /> },
     { to: '/progress', label: 'Progress', icon: <IconChart /> },
     { to: '/history', label: 'History', icon: <IconHistory /> },
@@ -43,8 +45,8 @@ export function App() {
 
   return (
     <>
-      {/* Frosted strip behind the status bar, so content doesn't scroll under the clock. The version sits on top of it,
-          not inside it: iOS blurs a child of a backdrop-filtered element along with what's behind it. */}
+      {/* Solid strip behind the status bar, so content doesn't scroll under the clock, with the version on top of it.
+          Not frosted: on iOS a backdrop-filtered layer covered the label even with a lower z-index. */}
       <div className="status-strip" aria-hidden />
       <span className="app-version">v{APP_VERSION}</span>
       <main className="app">

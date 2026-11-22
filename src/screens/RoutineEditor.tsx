@@ -2,8 +2,8 @@ import { useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ExerciseEditor } from '../components/ExerciseEditor';
 import { ExercisePicker } from '../components/ExercisePicker';
-import { AskSheet } from '../components/AskSheet';
-import { IconBack, IconClose, IconPlus, IconSpark } from '../components/Icons';
+import { ClaudeButton } from '../components/ClaudeButton';
+import { IconBack, IconClose, IconPlus } from '../components/Icons';
 import { ReorderSheet, type ReorderBlock } from '../components/ReorderSheet';
 import { ConfirmSheet } from '../components/Sheet';
 import { RoutineItemEditor } from '../components/RoutineItemEditor';
@@ -23,7 +23,6 @@ import {
 import { newRoutineId } from '../lib/routineEdit';
 import { applyLayout } from '../lib/workout';
 import { useStore } from '../state/store';
-import { useClaude } from '../state/useClaude';
 import type { Exercise, Routine, RoutineItem } from '../types';
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -54,9 +53,7 @@ export function RoutineEditor() {
   const [station, setStation] = useState<EItem | null>(null);
   const [ask, setAsk] = useState<'leave' | 'delete' | null>(null);
   const [tried, setTried] = useState(false);
-  const [asking, setAsking] = useState(false);
   const [reordering, setReordering] = useState(false);
-  const { ready: aiReady } = useClaude();
 
   const itemCount = blocks.reduce((n, b) => n + b.items.length, 0);
   const valid = name.trim().length > 0 && itemCount > 0;
@@ -108,6 +105,14 @@ export function RoutineEditor() {
           <IconBack />
         </button>
         <span className="dim small grow">{existing ? 'Edit workout' : 'New workout'}</span>
+        {/* plans Claude makes here go into the editor, not straight into the saved routine */}
+        <ClaudeButton
+          from={{ kind: 'routine', routine: { ...routine(), id: existing?.id } }}
+          onUseInEditor={(n, bs) => {
+            if (!name.trim()) setName(n);
+            setBlocks(toEditor(bs));
+          }}
+        />
         <button className="btn btn-primary" onClick={save} disabled={tried && !valid}>
           Save
         </button>
@@ -196,22 +201,6 @@ export function RoutineEditor() {
           onClose={() => setReordering(false)}
         />
       )}
-      {aiReady && (
-        <button className="btn btn-block btn-ghost ask-btn re-ask" onClick={() => setAsking(true)}>
-          <IconSpark /> Ask Claude to build or change this
-        </button>
-      )}
-      {asking && (
-        <AskSheet
-          from={{ kind: 'routine', routine: { ...routine(), id: existing?.id } }}
-          onClose={() => setAsking(false)}
-          onUseInEditor={(n, bs) => {
-            if (!name.trim()) setName(n);
-            setBlocks(toEditor(bs));
-          }}
-        />
-      )}
-
       {existing && (
         <div className="re-actions re-bottom">
           <button className="btn grow" onClick={duplicate}>

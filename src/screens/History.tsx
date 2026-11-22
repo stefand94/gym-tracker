@@ -16,6 +16,7 @@ import { useStore } from '../state/store';
 import { NoteChat, WorkoutNoteCard } from '../components/NoteSheet';
 import { addNote, removeNote, threadOf } from '../lib/notes';
 import type { Workout } from '../types';
+import { ClaudeButton } from '../components/ClaudeButton';
 
 export function HistoryList() {
   const { state } = useStore();
@@ -27,7 +28,10 @@ export function HistoryList() {
   }
   return (
     <div>
-      <h1 className="page-title">History</h1>
+      <div className="spread title-row">
+        <h1 className="page-title">History</h1>
+        <ClaudeButton />
+      </div>
       {!list.length && (
         <div className="card empty">
           <p>No workouts yet. Finish one and it’ll show up here.</p>
