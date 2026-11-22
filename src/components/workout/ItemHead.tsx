@@ -72,11 +72,11 @@ export function ItemHead({
     <>
       <div className="ex-head">
         {onHeadTap ? (
-          <button type="button" className="grow ex-head-btn lift" onClick={onHeadTap} aria-expanded aria-label={`Fold ${ex.name}`}>
+          <button type="button" className="grow ex-head-btn" onClick={onHeadTap} aria-expanded aria-label={`Fold ${ex.name}`}>
             {text}
           </button>
         ) : (
-          <div className="grow lift">{text}</div>
+          <div className="grow">{text}</div>
         )}
         <BodyMap load={exerciseMap(ex)} scaleMax={1} size="mini" />
         {onHeadTap && !tag && (

@@ -4,7 +4,7 @@ import { BodyMap } from '../components/BodyMap';
 import { ExerciseEditor } from '../components/ExerciseEditor';
 import { ExercisePicker } from '../components/ExercisePicker';
 import { HoldWatcher } from '../components/HoldTimer';
-import { IconPlus, IconSpark } from '../components/Icons';
+import { IconGrip, IconPlus, IconSpark } from '../components/Icons';
 import { RestBar, TimerButton } from '../components/RestBar';
 import { ConfirmSheet } from '../components/Sheet';
 import { useFollowWorkout } from '../components/workout/useFollowWorkout';
@@ -43,7 +43,7 @@ export function WorkoutScreen() {
   const [ask, setAsk] = useState<Ask>(null);
   const [noting, setNoting] = useState(false);
   const [asking, setAsking] = useState(false);
-  /** An exercise is held up and being dragged: every block shows as one row. */
+  /** A block is being dragged by its grip: every block shows as one row. */
   const [lifting, setLifting] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const { ready: aiReady } = useClaude();
@@ -127,15 +127,31 @@ export function WorkoutScreen() {
           return (
             <div key={b.id} id={`blk-${b.id}`} className="wo-block">
               {label && !lifting && <div className="list-label">Up next</div>}
-              <WorkoutBlockView
-                block={b}
-                index={i}
-                update={update}
-                open={open}
-                current={i === cur}
-                lifting={lifting}
-                onToggle={() => toggle(b.id, open)}
-              />
+              {/* the grip stays the same element while the cards fold under it: on iOS, a drag whose element
+                  leaves the page stops getting touch moves */}
+              <div className="wo-block-body">
+                <button
+                  type="button"
+                  className="grip wo-grip"
+                  aria-label={`Drag ${b.items.map((it) => getExercise(it.exerciseId)?.name ?? it.exerciseId).join(' + ')}`}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+                    e.preventDefault();
+                    update((x) => ({ ...x, blocks: moveBlock(x.blocks, i, i + (e.key === 'ArrowUp' ? -1 : 1)) }));
+                  }}
+                >
+                  <IconGrip />
+                </button>
+                <WorkoutBlockView
+                  block={b}
+                  index={i}
+                  update={update}
+                  open={open}
+                  current={i === cur}
+                  lifting={lifting}
+                  onToggle={() => toggle(b.id, open)}
+                />
+              </div>
             </div>
           );
         })}
@@ -156,7 +172,7 @@ export function WorkoutScreen() {
           <IconPlus /> Add exercise
         </button>
       </div>
-      {w.blocks.length > 1 && <p className="small dim wo-hint">Hold an exercise’s name to drag it somewhere else.</p>}
+      {w.blocks.length > 1 && <p className="small dim wo-hint">Drag ⋮⋮ to move an exercise.</p>}
 
       <div className="card wo-map">
         <button className="spread map-toggle" onClick={() => setShowMap(!showMap)} aria-expanded={showMap}>

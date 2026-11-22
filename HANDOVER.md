@@ -18,13 +18,17 @@ _Last updated 2026-11-21._
 ## Recently built (newest first)
 
 1. **Drag in place, simpler ⋯ menu, superset with anything** (2026-11-21, from Stefan: the Reorder sheet's drag
-   "works perfectly", but there was no grip on the normal page and too many taps to get there; the menu was "crazy busy").
-   - Hold an exercise's name (or a superset's badge, or a folded row) ~0.3 s: every block folds to a row, the page
-     scrolls so the held row is under the finger, drag and let go (`useLiftBlocks`, SortableJS `delay` on the
-     `.wo-list`). A quick tap still folds or opens the card; the click after a lift is swallowed. The Reorder button
+   "works perfectly", but there was no grip on the normal page and too many taps to get there; the menu was "crazy busy";
+   then "just do what you did on the separate reorder page" on the main page).
+   - Every card and folded row has the sheet's ⋮⋮ grip at its top left: touch it and drag straight away, every block
+     folds to a row, the page scrolls so the row is under the finger, let go (`useLiftBlocks`: SortableJS on the
+     `.wo-list`, `handle: '.wo-grip'`, the reorder sheet's options). The first version was hold-the-name-0.3 s; Stefan
+     said it still didn't work on his phone, most likely because folding removed the touched element and iOS then
+     stops the drag, so the grip now stays put while the cards fold under it. The click after a drop is swallowed. The Reorder button
      and the menu's Reorder entry are gone from the workout; the routine editor keeps `ReorderSheet`. Superset members'
-     order inside a superset can no longer be changed in a workout (take one out and add it back). Tried with
-     synthetic touch-type pointer events at 375×812. **Stefan needs to try the hold-and-drag on his phone.**
+     order inside a superset can no longer be changed in a workout (take one out and add it back). Tried at 375×812 with
+     synthetic pointer events and with real `TouchEvent`s on Sortable's touch path (the one iOS Safari takes).
+     **Stefan needs to try the grip drag on his phone.**
    - ⋯ menu: Note (accent, same note icon as elsewhere) / How to / Replace tiles, then Superset with… (any other block
      on the same side of the rehab dose, or "Another exercise…" from the library), Take out of superset, Remove last
      set, warm-ups, Log pain, Skip (supersets only; single cards have a Skip button), Remove. Complete all and Add a

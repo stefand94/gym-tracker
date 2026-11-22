@@ -2,17 +2,16 @@ import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
 import { flushSync } from 'react-dom';
 import Sortable from 'sortablejs';
 
-/** How long you hold an exercise's name before it lifts. Moving sooner scrolls the page as usual. */
-const HOLD_MS = 300;
-
 /**
- * Hold an exercise's name (anything marked `.lift`) on the workout screen and drag it to move its block, right on the
- * page. When it lifts, every block folds to a one-line row (`onLift(true)`) and the page scrolls so the lifted row is
- * under your finger; near the top or bottom edge the page scrolls by itself. Let go and the block moves there
- * (`onMove`), the cards open again, and the page is put back so the moved block stays where you dropped it.
+ * Drag a block by its ⋮⋮ grip (`.wo-grip`) to move it, right on the workout page: the same SortableJS set-up as the
+ * reorder sheet (the drag starts on touch; the grip has `touch-action: none`, so the page doesn't scroll instead).
+ * When it's picked up, every block folds to a one-line row (`onLift(true)`) and the page scrolls so the row is under
+ * your finger; near the top or bottom edge the page scrolls by itself. Let go and the block moves there (`onMove`),
+ * the cards open again, and the page is put back so the moved block stays where you dropped it.
  *
- * SortableJS does the drag. It moves the DOM node while dragging; on drop we put it back and let React re-render
- * from state, so React stays the only one rearranging the list.
+ * The grip must stay the same DOM element while the cards fold: iOS stops sending touch moves to the page when the
+ * touched element is removed. Sortable moves the DOM node while dragging; on drop we put it back and let React
+ * re-render from state, so React stays the only one rearranging the list.
  */
 export function useLiftBlocks(
   listRef: RefObject<HTMLElement | null>,
@@ -50,11 +49,8 @@ export function useLiftBlocks(
     document.addEventListener('contextmenu', noMenu, true);
 
     const sortable = Sortable.create(list as HTMLElement, {
-      handle: '.lift',
+      handle: '.wo-grip',
       draggable: '.wo-block',
-      delay: HOLD_MS,
-      delayOnTouchOnly: false,
-      touchStartThreshold: 6,
       animation: 150,
       forceFallback: true,
       fallbackOnBody: true,
@@ -81,7 +77,7 @@ export function useLiftBlocks(
         sortable.option('fallbackOffset', { x: 0, y: want - e.item.getBoundingClientRect().top });
       },
       onUnchoose: (e) => {
-        // Sortable also says this after a quick tap that never lifted anything: leave those alone
+        // only once something was picked up (and Sortable says this once per touch)
         if (!document.body.classList.contains('lifting')) return;
         anchor.current = { el: e.item, top: e.item.getBoundingClientRect().top };
         document.body.classList.remove('lifting');

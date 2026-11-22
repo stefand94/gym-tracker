@@ -69,7 +69,7 @@ function SupersetPicker({ ex, item, update, onClose }: { ex: Exercise; item: Wor
 
 /**
  * The ⋯ sheet for one exercise. What the card already has buttons for (tick all, + set, skip on a single exercise)
- * isn't repeated here; moving it is done by holding its name on the card and dragging.
+ * isn't repeated here; moving it is done by dragging the card's ⋮⋮ grip.
  */
 export function ItemMenu({
   ex,

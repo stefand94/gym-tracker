@@ -108,9 +108,10 @@ fixes formatting (Prettier skips `Icons.tsx`, the data JSON and this file). Push
   `sets` and `items` (edits), `stall` (the fixes for a stuck exercise), `layout` (blocks, supersets, the reorder sheet's moves, the rehab dose's edge), `intervals`,
   `status`. Import from `lib/workout`.
 - `src/components/workout/`: the workout card (`WorkoutBlockView` → single, superset or collapsed block; tap a header to fold it).
-  `useFollowWorkout` keeps the screen on the current block and the next set. `useLiftBlocks`: hold an exercise's name
-  (anything with class `lift`) ~0.3 s and drag to move its block right on the page (SortableJS with `delay`; every
-  block folds to a row while lifted). The ⋯ menu (`ItemMenu`) has Note / How to / Replace tiles, "Superset with…" any
+  `useFollowWorkout` keeps the screen on the current block and the next set. `useLiftBlocks`: drag a block's ⋮⋮ grip
+  (`.wo-grip`, top left of every card and row) to move it right on the page: the reorder sheet's SortableJS set-up, no
+  delay; every block folds to a row while lifted. The grip sits outside the folding content (`.wo-block-body`) because
+  iOS drops a drag whose touched element leaves the page. The ⋯ menu (`ItemMenu`) has Note / How to / Replace tiles, "Superset with…" any
   other block or a new exercise (`supersetWith` in `lib/workout/layout`), and leaves out what the card has buttons for.
 - `src/state/`: `store.tsx` (provider, `useStore`; import from here) re-exports `types` (state, actions), `reducer`,
   `queue` (the sync queue) and `persist` (localStorage).

@@ -47,7 +47,7 @@ export function SupersetBlock({ block, index, update, current, onToggle }: Block
   return (
     <section className={'card ex-card ss-block' + (complete ? ' is-done' : '') + (current ? ' is-current' : '')}>
       <div className="spread ss-top">
-        <span className="badge badge-ss lift">Superset {letter}</span>
+        <span className="badge badge-ss">Superset {letter}</span>
         <span className="ss-top-end">
           {complete && <span className="badge badge-done">Done</span>}
           <button type="button" className="icon-btn fold-btn" aria-label={`Fold superset ${letter}`} onClick={onToggle}>

@@ -399,11 +399,27 @@
   gap: 6px;
 }
 
-/* Hold an exercise's name to drag its block (useLiftBlocks) */
-.lift {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
+/* Drag a block by its grip (useLiftBlocks): the grip sits at the top left of the card or row */
+.wo-block-body {
+  position: relative;
+}
+
+.wo-block-body > .wo-grip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 36px;
+  height: 54px;
+}
+
+.wo-block-body .ex-card:not(.ss-block) > .ex-head,
+.wo-block-body .ss-block > .ss-top {
+  padding-left: 36px;
+}
+
+.wo-block-body .crow {
+  padding-left: 40px;
 }
 
 body.lifting {
