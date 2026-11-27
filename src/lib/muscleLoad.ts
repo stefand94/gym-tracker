@@ -1,5 +1,5 @@
 import { MUSCLE_IDS, type MuscleId } from '../data/muscles';
-import type { Exercise, Lookup, Workout, WorkoutItem } from '../types';
+import type { Exercise, Lookup, RoutineBlock, Workout, WorkoutItem } from '../types';
 
 export type MuscleLoad = Record<MuscleId, number>;
 
@@ -56,4 +56,12 @@ export function lastTrained(history: Workout[], lookup: Lookup): Partial<Record<
     }
   }
   return out;
+}
+
+/** What a plan works, for the body map on its card: one ticked set per exercise. */
+export function routineMap(blocks: RoutineBlock[], lookup: Lookup): MuscleLoad {
+  const load = emptyLoad();
+  for (const b of blocks)
+    for (const i of b.items) addItemLoad(load, { id: '', exerciseId: i.exerciseId, status: 'pending', sets: [{ done: true }] }, lookup);
+  return load;
 }

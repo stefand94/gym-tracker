@@ -4,23 +4,44 @@ Where the gym tracker stands, for the next session to pick up. Read `CLAUDE.md` 
 rules for exercises and routines, and where everything lives. This file covers what changed recently, what's open, and
 how to work on it.
 
-_Last updated 2026-11-22._
+_Last updated 2026-11-27._
 
 ## State
 
-- **v1.1 (one Claude button, Home tab, version label) is committed but not pushed yet.** v1.0 (row alignment, drag without
-  folding) is committed and deployed (2026-11-22). Check with `git status`, `git log` and `gh run list` what has been
-  committed, pushed and deployed.
+- **v1.2 (today's workout on Home, set times) is pushed to `main`** (2026-11-27); v1.1 (one Claude button) was
+  deployed before it. Check with `gh run list` that the deploy finished.
 - **Version label:** `APP_VERSION` in `src/version.ts` shows at the top right of every screen and in Settings. Bump it
   by 0.1 for each change set Stefan gets (0.9 → 1.0 → 1.1), so he can tell which one his phone is running.
-- `npm run check` passes: types, ESLint, Prettier and 154 tests. `npm run build` passes too (the warning that the
+- `npm run check` passes: types, ESLint, Prettier and 167 tests. `npm run build` passes too (the warning that the
   main chunk is over 500 kB is expected).
 - Stefan uses the app on his phone as an installed PWA, often while driving this session over Remote Control. Keep
   replies short and plain, and ask one clear question when something is his call.
 
 ## Recently built (newest first)
 
-1. **v1.1: one Claude button, Home always reachable, the version label shows** (2026-11-22, from Stefan: "too many
+1. **v1.2: today's workout, built for the day** (2026-11-27, from Stefan: set the day's workout from training load and
+   time, reusing what he likes and pairs; his answers: code drafts and Haiku tweaks, time + optional focus + avoid,
+   archive the old routines, load-driven with a loose push/pull lean, mostly favourites plus 1 new, record set times,
+   leave the functional kit out, ready on open).
+   - `src/lib/daily.ts` (`buildDaily`): scores each muscle by what's left of its 10 sets this week minus 48 h fatigue,
+     plus small bonuses (side/rear delts, the push/pull lean, a focus); scores exercises by the muscles they hit times
+     how often he's done them; picks greedily (one per main-muscle set, at most one new, a focus gets half the picks)
+     until the time estimate fills the minutes. `layoutBlocks` pairs best-first: pairs he does (history, then routines),
+     same station or kit, push with pull; never the same main muscle, core only with core, heavy barbell lifts only at
+     30 min. Tests in `daily.test.ts`.
+   - `TodayCard` on Home (the old Suggested card is gone; saved routines are listed under it): name, reason line,
+     mini body map, time chips, focus/avoid chips, the plan with Superset and New tags, the ✦ change box
+     (`dailyTweak.ts`, Haiku, checked by `checkPlan`, "Back to the draft"), Start.
+   - Rehab dose: `findDoseBlock`/`DEFAULT_DOSE` in `rehab.ts`, also used by `checkPlan`, so archiving routines with a
+     dose doesn't lose it.
+   - `SetEntry.at`: every tick saves its time (`tick()` in `lib/workout/sets.ts`); an untick or a new set drops it.
+   - Archived in the data repo: Upper A, Upper B, Functional, Chest+back+biceps quick, Thursday (the rehab routines
+     stay). `RULES` now says to program the functional area only when he asks.
+   - Checked at 402×874 with made-up history and the dev Claude mock: focus, avoid, the ✦ change, Back to the draft,
+     Start, a tick saving `at`. On his real data (45 min) it gave a machine row, farmer carry +
+     lateral raise, incline DB press + incline Y raise (new), plank + side plank, dose. **Stefan needs to try it on his
+     phone and say whether the picks and the time feel right.**
+2. **v1.1: one Claude button, Home always reachable, the version label shows** (2026-11-22, from Stefan: "too many
    ways to do the same thing", maybe a floating button or one next to the timer or settings; and no way back Home
    without discarding).
    - `ClaudeButton` (✦, accent) in every screen's top bar opens the Ask chat with that screen's context: Home, Body,
@@ -34,7 +55,7 @@ _Last updated 2026-11-22._
      (`translateZ(0)`): on his phone it was still hidden after v1.0. Not reproducible in desktop WebKit.
    - Checked at 402×874 in WebKit with the dev Claude mock; screenshots `docs/ui-review/v1.0/05`–`10`. **Stefan needs
      to check the label and the new buttons on his phone.**
-2. **v1.0: rows line up, drag keeps the page as it is** (2026-11-22, from Stefan's phone screenshot).
+3. **v1.0: rows line up, drag keeps the page as it is** (2026-11-22, from Stefan's phone screenshot).
    - Every set row is one grid, `minmax(0,1fr) minmax(0,1fr) 56px`: weight | reps | tick. Bodyweight rows (Pull-up
      negative) now show +kg first, then reps, instead of the narrower `.pair` layout. Hold rows use seconds | play | tick.
    - Dragging a block's ⋮⋮ grip no longer folds every block to a row: the page stays put, the block's place shows
@@ -44,7 +65,7 @@ onMove)` lost its lifting state, `flushSync` and scroll anchoring; `LiftRow` and
      `backdrop-filter` element.
    - Checked at 402×874 in WebKit with mouse/pointer drag (synthetic touch didn't start Sortable there); screenshots in
      `docs/ui-review/v1.0/`. **Stefan needs to try the drag on his phone.**
-3. **v0.9: the UI review fixes** (2026-11-22, from `docs/ui-review.md`; Stefan said VoiceOver isn't needed, so
+4. **v0.9: the UI review fixes** (2026-11-22, from `docs/ui-review.md`; Stefan said VoiceOver isn't needed, so
    item 4 and every screen-reader-only point were skipped). Tuned for an iPhone 18 Pro (about 402×874 pt) and checked
    there in WebKit; screenshots in `docs/ui-review/v0.9/`.
    - Version label in a status strip under the notch (`.status-strip`, `--top` = the safe-area inset); the sticky
@@ -75,7 +96,7 @@ onMove)` lost its lifting state, `flushSync` and scroll anchoring; `LiftRow` and
    - Not done on purpose: the rest timer stays top right (Stefan chose not to start rest on tick); the review's
      "Save routine" wording, because the app calls routines "workouts" everywhere.
    - **Stefan needs to try it on his phone**, especially the keyboard behaviour (only simulated in WebKit) and Undo.
-4. **Drag in place, simpler ⋯ menu, superset with anything** (2026-11-21, from Stefan: the Reorder sheet's drag
+5. **Drag in place, simpler ⋯ menu, superset with anything** (2026-11-21, from Stefan: the Reorder sheet's drag
    "works perfectly", but there was no grip on the normal page and too many taps to get there; the menu was "crazy busy";
    then "just do what you did on the separate reorder page" on the main page).
    - Every card and folded row has the sheet's ⋮⋮ grip at its top left: touch it and drag straight away, every block
@@ -91,14 +112,14 @@ onMove)` lost its lifting state, `flushSync` and scroll anchoring; `LiftRow` and
      on the same side of the rehab dose, or "Another exercise…" from the library), Take out of superset, Remove last
      set, warm-ups, Log pain, Skip (supersets only; single cards have a Skip button), Remove. Complete all and Add a
      set went (the card has them). `supersetWithNext`, `canSupersetWithNext` and `splitBlock` were removed.
-5. **Tidy** (2026-11-21, after Stefan asked whether a full refactor was due: no, it was tidied recently; tidy as you
+6. **Tidy** (2026-11-21, after Stefan asked whether a full refactor was due: no, it was tidied recently; tidy as you
    go instead). The workout screen's scroll logic is one hook (`useFollowWorkout`); the store is split into types,
    reducer, sync queue and persistence; the routine editor's block edits moved to `lib/routineBlocks.ts` (with tests)
    and its item row to `RoutineItemEditor.tsx`; static inline styles in Progress, the workout screen and the routine
    editor moved to stylesheets. Fixed on the way: finishing the first block re-ran the "arrival" jump, and the
    Progress exercise card had lost its styling when Home's routine cards changed. History, Body and Home still have
    some static inline styles.
-6. **SortableJS reorder drag, workout-card usability pass** (2026-11-21).
+7. **SortableJS reorder drag, workout-card usability pass** (2026-11-21).
    - On his iPhone the hand-made drag grabbed a row but the sheet wouldn't scroll, so he couldn't steer the drop. He
      picked SortableJS: `ReorderSheet` creates it with `forceFallback` and auto-scroll on the `.sheet`, then undoes
      Sortable's DOM move in `onEnd` and applies `moveBlock` to React state. Tried with synthetic touch-type pointer
@@ -112,7 +133,7 @@ onMove)` lost its lifting state, `flushSync` and scroll anchoring; `LiftRow` and
    - He did **not** pick turning the rest timer on by default; leave it.
    - Known, not fixed: opening `/routines/<id>` straight from a not-found route shows an empty editor (the route has
      no key). Minor.
-7. **Reorder sheet, folding cards, two-sided holds** (from Stefan's app notes, 2026-11-21).
+8. **Reorder sheet, folding cards, two-sided holds** (from Stefan's app notes, 2026-11-21).
    - Drag-and-drop on the cards (`@dnd-kit`, `BlockDnd.tsx`) is gone: it swapped the list for compact rows mid-drag,
      so things jumped under the finger. Now a **Reorder** button (next to Add exercise, and in each exercise's menu)
      opens `ReorderSheet`: a fixed compact list, drag by the grip or tap ↑/↓, and a Superset menu per exercise
@@ -124,7 +145,7 @@ onMove)` lost its lifting state, `flushSync` and scroll anchoring; `LiftRow` and
    - Also from his workout notes: Russian twist cue (one rep = one side); the note reader now drops a message he
      takes back ("scrap that").
    - All tried in the browser on a mobile viewport with a made-up workout. Not yet tried on his phone (touch drag).
-8. **Stall detection** (`src/lib/stall.ts`, `src/lib/workout/stall.ts`, `src/components/workout/StallSheet.tsx`).
+9. **Stall detection** (`src/lib/stall.ts`, `src/lib/workout/stall.ts`, `src/components/workout/StallSheet.tsx`).
    A "Stuck" tag on the workout card when the last 4 sessions didn't beat the best before them, or reps were missed 2
    sessions running at one weight. The fixes are a ~10% reset, two other sets × reps (saved to the routine), a swap, or
    "Not now". Progress shows a note and greys the stuck points. Claude sees a STUCK list (`aiContext.ts`), and the
@@ -134,15 +155,18 @@ onMove)` lost its lifting state, `flushSync` and scroll anchoring; `LiftRow` and
      If one looks wrong, check `findStall` against his synced workouts (read-only).
    - Swap reuses the existing Replace picker and wasn't tried in the browser. Reset, the rep schemes and the Progress
      note were tested in the browser with made-up workouts.
-9. **Codebase tidy** (`a5c756f`). Workout logic is split by concern in `src/lib/workout/`, the workout card in
-   `src/components/workout/`, and the CSS in `src/styles/`. ESLint and Prettier were added, and CI lints before
-   deploying.
-10. **Fixes** (`943715b`). The rehab dose keeps its own blocks when moved. Sync merges fixes made in the repo
+10. **Codebase tidy** (`a5c756f`). Workout logic is split by concern in `src/lib/workout/`, the workout card in
+    `src/components/workout/`, and the CSS in `src/styles/`. ESLint and Prettier were added, and CI lints before
+    deploying.
+11. **Fixes** (`943715b`). The rehab dose keeps its own blocks when moved. Sync merges fixes made in the repo
     (`merge3`) instead of overwriting them. Walk–jog intervals chain from when the last one ended.
-11. **Go-up nudges, personal records, warm-up sets, hamstring rehab phase 4** (`870f540`).
+12. **Go-up nudges, personal records, warm-up sets, hamstring rehab phase 4** (`870f540`).
 
 ## Open items and ideas
 
+- **Daily workout, not chosen (2026-11-27):** showing the time estimate on the card, trimming a workout that runs over,
+  a nudge to Finish. Once a few weeks of `at` times exist, `blockMinutes` could learn his real set and rest times
+  instead of the fixed guesses (0.75 min a set, 1.25 rest, 1.75 for heavy lifts).
 - **Idea, not started:** Ask chats live only in memory (`chats` in `AskSheet.tsx`), so they're gone when the app
   closes. Saving them on the device would let Stefan pick a conversation back up.
 
@@ -161,7 +185,7 @@ None of these have been started. Ask Stefan before starting any of them.
   and general seed routines for new installs, with nothing changing for him. A friend would need their own private
   data repo and token to sync.
 
-- **Other ideas already pitched to him:** a 45-minute time check while working out (weekday cap), and a plate
+- **Other ideas already pitched to him:** a plate
   calculator. Possibly effort per set (RPE) and a calendar view. Not worth doing: a body-weight log, and lock-screen
   alerts.
 - **Haiku "stopped working"** (2026-11-17) fixed itself within minutes, with no code change. It was most likely an

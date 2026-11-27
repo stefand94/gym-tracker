@@ -42,7 +42,7 @@ export function finishHolds(w: Workout, hold: Hold, now: number, lookup: Lookup)
   let cur = hold;
   let out = w;
   for (;;) {
-    out = completeHold(out, cur.itemId, cur.set, Math.round((cur.endsAt - cur.goAt) / 1000), cur.side);
+    out = completeHold(out, cur.itemId, cur.set, Math.round((cur.endsAt - cur.goAt) / 1000), cur.side, new Date(cur.endsAt).toISOString());
     if (cur.side === 'L') {
       const s = out.blocks.flatMap((b) => b.items).find((i) => i.id === cur.itemId)?.sets[cur.set];
       const goAt = cur.endsAt + SWITCH_SIDES * 1000;

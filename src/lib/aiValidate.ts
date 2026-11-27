@@ -1,6 +1,6 @@
 import type { Exercise, Lookup, Routine, RoutineBlock, RoutineItem } from '../types';
 import { heldBack } from './aiContext';
-import type { RehabState } from './rehab';
+import { findDoseBlock, type RehabState } from './rehab';
 
 /** A workout plan as Claude writes it (structured output: every field present, null when unused). */
 export interface AiItem {
@@ -79,17 +79,10 @@ function cleanItem(raw: AiItem, ex: Exercise): RoutineItem {
   return item;
 }
 
-/** The rehab dose block to keep in a plan: the source routine's, else any routine's. */
+/** The rehab dose block to keep in a plan: the source routine's, else any routine's (archived ones too), else the default. */
 function doseBlock(rehab: RehabState | null, source: Routine | undefined, routines: Routine[]): RoutineBlock | undefined {
   if (!rehab || rehab.done) return undefined;
-  const own = source?.blocks.find((b) => b.rehabDose === rehab.area);
-  if (own) return own;
-  for (const r of routines) {
-    if (r.archived) continue;
-    const b = r.blocks.find((x) => x.rehabDose === rehab.area);
-    if (b) return b;
-  }
-  return undefined;
+  return source?.blocks.find((b) => b.rehabDose === rehab.area) ?? findDoseBlock(routines, rehab.area);
 }
 
 /**

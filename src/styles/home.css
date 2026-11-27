@@ -138,6 +138,88 @@
   pointer-events: none;
 }
 
+/* Today's workout: built for the day, with time, focus and avoid choices */
+.daily {
+  padding: 14px 16px 16px;
+}
+
+.daily-time {
+  margin-top: 14px;
+}
+
+.daily-time .seg-btn {
+  font-size: 15px;
+}
+
+.daily-more {
+  margin: 4px 0 0;
+  padding: 0;
+  color: var(--text-dim);
+}
+
+.daily-filters {
+  margin-top: 4px;
+}
+
+.daily-label {
+  margin: 10px 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.daily-plan {
+  margin: 12px 0;
+}
+
+.new-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.daily-empty {
+  margin: 12px 0;
+}
+
+.daily-tweaked {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0 6px;
+}
+
+.daily-tweaked svg,
+.daily-ask > svg {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+  flex: none;
+  vertical-align: -3px;
+}
+
+.daily-ask {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.daily-ask .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.daily-go {
+  margin-top: 12px;
+}
+
 .routine-name {
   font-weight: 750;
   font-size: 17px;

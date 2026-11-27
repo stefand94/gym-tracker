@@ -7,11 +7,17 @@ import { fromLast, warmupSets, withFreshWarmups } from './plan';
 
 export type SetPatch = Partial<Pick<SetEntry, 'weight' | 'reps' | 'seconds' | 'secondsR'>>;
 
-export function toggleSet(w: Workout, itemId: string, setIndex: number): Workout {
+/** A set ticked (with the time) or unticked (without one). */
+export function tick(s: SetEntry, done: boolean, at = new Date().toISOString()): SetEntry {
+  const { at: _at, ...rest } = s;
+  return done ? { ...rest, done, at: s.done && _at ? _at : at } : { ...rest, done };
+}
+
+export function toggleSet(w: Workout, itemId: string, setIndex: number, at?: string): Workout {
   return mapItem(w, itemId, (i) => ({
     ...i,
     status: i.status === 'skipped' ? 'pending' : i.status,
-    sets: i.sets.map((s, idx) => (idx === setIndex ? { ...s, done: !s.done } : s)),
+    sets: i.sets.map((s, idx) => (idx === setIndex ? tick(s, !s.done, at) : s)),
   }));
 }
 
@@ -19,7 +25,7 @@ export function toggleSet(w: Workout, itemId: string, setIndex: number): Workout
  * Log a timed set as held for `seconds` and tick it (only that set changes). On a two-sided hold the left side
  * only logs its seconds (the right is still to come); the right side logs its own and ticks the set.
  */
-export function completeHold(w: Workout, itemId: string, setIndex: number, seconds: number, side?: 'L' | 'R'): Workout {
+export function completeHold(w: Workout, itemId: string, setIndex: number, seconds: number, side?: 'L' | 'R', at?: string): Workout {
   return mapItem(w, itemId, (i) => ({
     ...i,
     status: i.status === 'skipped' ? 'pending' : i.status,
@@ -29,8 +35,8 @@ export function completeHold(w: Workout, itemId: string, setIndex: number, secon
         : side === 'L'
           ? { ...s, seconds }
           : side === 'R'
-            ? { ...s, secondsR: seconds, done: true }
-            : { ...s, seconds, done: true },
+            ? tick({ ...s, secondsR: seconds }, true, at)
+            : tick({ ...s, seconds }, true, at),
     ),
   }));
 }
@@ -39,7 +45,8 @@ export function completeHold(w: Workout, itemId: string, setIndex: number, secon
 export function toggleComplete(w: Workout, itemId: string): Workout {
   return mapItem(w, itemId, (i) => {
     const allDone = i.status === 'done';
-    return { ...i, status: 'pending', sets: i.sets.map((s) => ({ ...s, done: !allDone })) };
+    const at = new Date().toISOString();
+    return { ...i, status: 'pending', sets: i.sets.map((s) => tick(s, !allDone, at)) };
   });
 }
 
@@ -74,7 +81,7 @@ export function updateUnticked(w: Workout, itemId: string, patch: SetPatch): Wor
 export function addSet(w: Workout, itemId: string): Workout {
   return mapItem(w, itemId, (i) => {
     const last = i.sets[i.sets.length - 1];
-    const next: SetEntry = last ? { ...last, done: false } : { reps: 10, weight: 0, done: false };
+    const next: SetEntry = last ? tick(last, false) : { reps: 10, weight: 0, done: false };
     return { ...i, status: i.status === 'skipped' ? 'skipped' : 'pending', sets: [...i.sets, next] };
   });
 }

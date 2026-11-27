@@ -87,6 +87,29 @@ const MAINTENANCE: Record<RehabArea, RoutineItem[]> = {
   hamstring: [{ exerciseId: 'nordic-curl', sets: 2, reps: 4, trackPain: true }],
 };
 
+/** The dose block a routine starts with, for when no routine has one (the app's own daily workout, say). */
+export const DEFAULT_DOSE: Record<RehabArea, RoutineBlock> = {
+  hamstring: {
+    superset: true,
+    rehabDose: 'hamstring',
+    items: [
+      { exerciseId: 'hamstring-iso-bridge', sets: 3, seconds: 30 },
+      { exerciseId: 'glute-bridge', sets: 2, reps: 12 },
+    ],
+  },
+};
+
+/** The rehab dose block to use: a live routine's, else an archived one's, else the default. */
+export function findDoseBlock(routines: Routine[], area: RehabArea): RoutineBlock {
+  const live = routines.filter((r) => !r.archived);
+  for (const list of [live, routines])
+    for (const r of list) {
+      const b = r.blocks.find((x) => x.rehabDose === area);
+      if (b) return b;
+    }
+  return DEFAULT_DOSE[area];
+}
+
 /**
  * Items for a `rehabDose` block: as written while on phase 1; later the first two exercises of the
  * phase you're on (one back if dropping back) at 2 sets; the maintenance dose once done.

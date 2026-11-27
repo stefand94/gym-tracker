@@ -386,8 +386,19 @@ describe('hold timer', () => {
     const plankId = itemId(w, 1, 1);
     w = completeHold(w, plankId, 0, 32);
     const sets = w.blocks[1].items[1].sets;
-    expect(sets[0]).toEqual({ seconds: 32, done: true });
+    expect(sets[0]).toEqual({ seconds: 32, done: true, at: expect.any(String) });
     expect(sets[1]).toEqual({ seconds: 45, done: false });
+  });
+
+  it('saves when a set is ticked, drops it when unticked, and a new set starts without one', () => {
+    let w = fresh();
+    const id = itemId(w, 0);
+    w = toggleSet(w, id, 0, '2026-11-27T18:00:00.000Z');
+    expect(w.blocks[0].items[0].sets[0]).toMatchObject({ done: true, at: '2026-11-27T18:00:00.000Z' });
+    w = addSet(w, id);
+    expect(w.blocks[0].items[0].sets.at(-1)!.at).toBeUndefined();
+    w = toggleSet(w, id, 0);
+    expect(w.blocks[0].items[0].sets[0].at).toBeUndefined();
   });
 
   it('rests after a single exercise set, but only at the end of a superset round', () => {

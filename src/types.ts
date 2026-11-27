@@ -90,6 +90,8 @@ export interface SetEntry {
   /** The right side's seconds, on an exercise with `sides`. */
   secondsR?: number;
   done: boolean;
+  /** When it was ticked (ISO time), so time estimates can learn the real pace. Not on sets ticked before v1.2. */
+  at?: string;
 }
 
 export type ItemStatus = 'pending' | 'done' | 'skipped';

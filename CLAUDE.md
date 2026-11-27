@@ -78,10 +78,19 @@ entries win the lookup. Use his logged sets of it (workouts reference the id) to
     { "superset": true, "items": [{ "exerciseId": "lateral-raise" }, { "exerciseId": "triceps-pushdown", "sets": 3, "reps": 12, "weight": 20 }] }
   ] }
 ```
-No weekdays (`days` is no longer used): Home suggests the routine that best hits muscles that are behind over the
-last 7 days and rested over 48 h (`src/lib/suggest.ts`); routines with leg work outside the `rehabDose` block are held
-back while a rehab is unfinished. Stefan can also build and edit routines in the app (`src/screens/RoutineEditor.tsx`)
-and update one from the finish screen, so read the repo copy before changing a routine.
+No weekdays (`days` is no longer used). Home's main card is **today's workout** (`src/components/TodayCard.tsx`),
+built in code by `buildDaily` (`src/lib/daily.ts`) every time Home opens: it picks the exercises he does most for the
+muscles behind on the week (10 sets a muscle) and rested over 48 h, leans away from push or pull after a session heavy in
+one, adds at most one new exercise (tagged "New"), reuses the supersets he does, and stops when its time estimate
+(`blockMinutes`) reaches the minutes he picked (chips 30/45/60/75; 45 on weekdays, 60 at weekends). Focus and avoid chips
+(area or kit) rebuild it; the ✦ box sends it to Haiku (`src/lib/dailyTweak.ts`, checked by `checkPlan`). It leaves out
+functional kit (kettlebells, sled, boxes, med balls, treadmill), intervals and grip-only work, holds leg work back during a
+rehab and ends with the rehab dose (`findDoseBlock`: a live routine's, else an archived one's, else `DEFAULT_DOSE`). The
+choices are kept on the device for the day (`gym-tracker:today`). The workout it starts has no `routineId`.
+Saved routines are listed under it, ranked by `src/lib/suggest.ts`; routines with leg work outside the `rehabDose` block
+are held back while a rehab is unfinished. Upper A, Upper B, Functional, Chest+back+biceps quick and Thursday were
+archived on 2026-11-27 for the daily workout. Stefan can also build and edit routines in the app
+(`src/screens/RoutineEditor.tsx`) and update one from the finish screen, so read the repo copy before changing a routine.
 Go-up: when every set last time hit the target reps (routine reps, else the exercise default) at one weight, the
 sets pre-fill one step up (+2.5 kg barbell, +2 dumbbells, +4 kettlebell, +5 machine, 5 kg less assistance) and the
 item carries `goUp` (kg); not on pain-tracked items. Personal records aren't stored: `src/lib/records.ts` works them
@@ -134,7 +143,8 @@ Bump `APP_VERSION` in `src/version.ts` by 0.1 for each change set (0.9 → 1.0 �
 ## Reading Stefan's history
 
 `gh api repos/stefand94/gym-tracker-data/contents/workouts/<year>` lists workout files; each is a `Workout`
-(`src/types.ts`). Only sets with `done: true` count; items with `status: "skipped"` count for nothing.
+(`src/types.ts`). Sets ticked from v1.2 carry `at` (ISO time of the tick), for working out how long sets and rests
+really take. Only sets with `done: true` count; items with `status: "skipped"` count for nothing.
 Notes are chats: `WorkoutItem.noteThread` / `Workout.noteThread` (`{ from: 'me' | 'claude', text, at }`, Claude's empty
 text = read, nothing to say); `note` always holds just Stefan's messages, one per line — read that. `noteSuggestions`
 are the chips Claude read out of the note, waiting for a tap. Read them; they're often why a number looks odd.

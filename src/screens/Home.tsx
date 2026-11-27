@@ -6,10 +6,11 @@ import { CheckInCard } from '../components/CheckInCard';
 import { IconMore, IconPlus, IconSettings } from '../components/Icons';
 import { PainStrip } from '../components/PainStrip';
 import { SyncAlert } from '../components/SyncAlert';
+import { TodayCard } from '../components/TodayCard';
 import { ConfirmSheet, Sheet } from '../components/Sheet';
 import { getExercise, ROUTINES } from '../data/library';
 import { doneSetCount, fmtDate, relDay } from '../lib/format';
-import { loadSince, workoutLoad } from '../lib/muscleLoad';
+import { loadSince, routineMap, workoutLoad } from '../lib/muscleLoad';
 import { finishedNewestFirst } from '../lib/prefill';
 import { AREA_LABELS, doseItems, morningCheck, rehabState, rehabStatus, STREAK } from '../lib/rehab';
 import { newRoutineId } from '../lib/routineEdit';
@@ -25,30 +26,11 @@ function routineSummary(r: Routine): string {
     .join(' · ');
 }
 
-/** The first few exercises and how many more, so the suggested card stays scannable. */
-function routineShort(r: Routine, show = 4): string {
-  const names = r.blocks.flatMap((b) => b.items).map((i) => getExercise(i.exerciseId)?.name ?? i.exerciseId);
-  if (names.length <= show + 1) return names.join(' · ');
-  return `${names.slice(0, show).join(' · ')} + ${names.length - show} more`;
-}
-
 function routineMeta(r: Routine): string {
   return r.description ?? routineSummary(r);
 }
 
-function routineLoad(r: Routine) {
-  const fake: Workout = {
-    id: '',
-    name: '',
-    startedAt: '',
-    blocks: r.blocks.map((b) => ({
-      id: '',
-      superset: false,
-      items: b.items.map((i) => ({ id: '', exerciseId: i.exerciseId, status: 'pending', sets: [{ done: true }] })),
-    })),
-  };
-  return workoutLoad(fake, getExercise);
-}
+const routineLoad = (r: Routine) => routineMap(r.blocks, getExercise);
 
 export function Home() {
   const { state, dispatch } = useStore();
@@ -68,9 +50,8 @@ export function Home() {
   const routines = state.routines.filter((r) => !r.archived);
   const rehab = rehabState(state.history, state.routines);
   const ranked = suggest(routines, state.history, getExercise, rehab);
-  const top = !active && ranked[0] && !ranked[0].blocked ? ranked[0] : null;
   const rest: (Suggestion | { routine: Routine; reason?: undefined; blocked?: undefined })[] = [
-    ...ranked.filter((s) => s !== top),
+    ...ranked,
     ...routines.filter((r) => r.rehab).map((routine) => ({ routine })),
   ];
   const [menu, setMenu] = useState<Routine | null>(null);
@@ -153,27 +134,9 @@ export function Home() {
         </div>
       )}
 
-      {top && (
-        <div className="card today">
-          <button className="today-main" onClick={() => startRoutine(top.routine)}>
-            <div className="today-label">Suggested</div>
-            <div className="spread today-top">
-              <div className="grow">
-                <div className="today-name">{top.routine.name}</div>
-                <div className="routine-meta">{top.reason}</div>
-              </div>
-              <BodyMap load={routineLoad(top.routine)} size="mini" />
-            </div>
-            <div className="today-list">{routineShort(top.routine)}</div>
-            <span className="btn btn-primary btn-block btn-lg today-go">Start {top.routine.name}</span>
-          </button>
-          <button className="icon-btn card-menu" aria-label={`${top.routine.name} options`} onClick={() => setMenu(top.routine)}>
-            <IconMore />
-          </button>
-        </div>
-      )}
+      {!active && <TodayCard onStart={start} />}
 
-      <div className="section-title">{top ? 'Other workouts' : 'Start a workout'}</div>
+      <div className="section-title">{active ? 'Start a workout' : 'Saved workouts'}</div>
       <div className="stack">
         {rest.map(({ routine: r, blocked }) => (
           <div key={r.id} className={'card routine' + (blocked ? ' is-later' : '')}>

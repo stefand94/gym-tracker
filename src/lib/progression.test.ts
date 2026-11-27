@@ -190,7 +190,8 @@ describe('two-sided holds', () => {
     // phone locked through both sides: both logged and the set ticked
     const late = finishHolds(w, hold, 60_000, getExercise);
     expect(late.next).toBeNull();
-    expect(late.workout.blocks[0].items[0].sets[0]).toEqual({ seconds: 20, secondsR: 15, done: true });
-    expect(completeHold(w, item.id, 0, 12, 'R').blocks[0].items[0].sets[0]).toEqual({ seconds: 20, secondsR: 12, done: true });
+    // ticked when the right side ran out, not when the app noticed
+    expect(late.workout.blocks[0].items[0].sets[0]).toEqual({ seconds: 20, secondsR: 15, done: true, at: new Date(40_000).toISOString() });
+    expect(completeHold(w, item.id, 0, 12, 'R').blocks[0].items[0].sets[0]).toMatchObject({ seconds: 20, secondsR: 12, done: true });
   });
 });
